@@ -1,0 +1,42 @@
+{
+  "name": "pet-platform-backend",
+  "version": "1.0.0",
+  "description": "Pet Management and Service Platform - Backend API",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "db:check": "node scripts/checkEncoding.js",
+    "db:fix": "node scripts/fixEncoding.js",
+    "db:init": "npm run db:fix && npm run db:check"
+  },
+  "keywords": [
+    "pet",
+    "management",
+    "platform",
+    "koa",
+    "api"
+  ],
+  "author": "史子健",
+  "license": "MIT",
+  "dependencies": {
+    "bcrypt": "^5.1.1",
+    "dotenv": "^16.4.1",
+    "joi": "^17.12.0",
+    "jsonwebtoken": "^9.0.2",
+    "koa": "^2.15.0",
+    "koa-bodyparser": "^4.4.0",
+    "koa-cors": "^0.0.16",
+    "koa-router": "^12.0.1",
+    "koa-static": "^5.0.0",
+    "multer": "^1.4.5-lts.1",
+    "mysql2": "^3.9.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.3"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
