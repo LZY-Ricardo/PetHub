@@ -1,0 +1,97 @@
+.dashboard-page {
+  min-height: 100vh;
+  background: var(--color-warm-cream);
+  padding: 32px 24px;
+}
+
+.page-header {
+  margin-bottom: 32px;
+}
+
+.page-title {
+  font-family: var(--font-heading);
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  margin-bottom: 8px;
+}
+
+.page-subtitle {
+  font-size: 16px;
+  color: var(--color-text-secondary);
+}
+
+.stats-row {
+  max-width: 1400px;
+  margin: 0 auto 32px;
+}
+
+.stat-card {
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+  border: none;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+}
+
+.stat-users::before {
+  background: linear-gradient(90deg, #FF9F43 0%, #FFBE76 100%);
+}
+
+.stat-pets::before {
+  background: linear-gradient(90deg, #54A0FF 0%, #74B9FF 100%);
+}
+
+.stat-posts::before {
+  background: linear-gradient(90deg, #A29BFE 0%, #C8B6FF 100%);
+}
+
+.stat-pending::before {
+  background: linear-gradient(90deg, #26D07C 0%, #55E6A1 100%);
+}
+
+.stat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+}
+
+.pending-card {
+  max-width: 1400px;
+  margin: 0 auto;
+  border-radius: 20px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+  border: none;
+}
+
+.card-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+@media (max-width: 768px) {
+  .dashboard-page {
+    padding: 24px 16px;
+  }
+
+  .page-title {
+    font-size: 24px;
+  }
+
+  .stats-row {
+    margin-bottom: 24px;
+  }
+}

@@ -1,0 +1,206 @@
+.lost-pet-page {
+  min-height: 100vh;
+  background: var(--color-warm-cream);
+}
+
+.page-header {
+  background: linear-gradient(135deg, #FF6B6B 0%, #FF8E8E 100%);
+  padding: 60px 24px;
+  position: relative;
+  overflow: hidden;
+}
+
+.page-header::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -10%;
+  width: 400px;
+  height: 400px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  animation: float 8s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translate(0, 0);
+  }
+  50% {
+    transform: translate(20px, -20px);
+  }
+}
+
+.header-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  text-align: center;
+  position: relative;
+  z-index: 1;
+}
+
+.page-title {
+  font-family: var(--font-heading);
+  font-size: 42px;
+  font-weight: 700;
+  color: white;
+  margin-bottom: 12px;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.page-subtitle {
+  font-size: 18px;
+  color: rgba(255, 255, 255, 0.95);
+  margin-bottom: 32px;
+}
+
+.report-button {
+  position: absolute;
+  top: 50%;
+  right: 5%;
+  transform: translateY(-50%);
+  height: 48px;
+  border-radius: 24px;
+  font-weight: 600;
+  background: white;
+  color: #FF6B6B;
+  border: none;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.report-button:hover {
+  transform: translateY(-52%);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+.lost-pet-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px 24px;
+}
+
+.loading-state,
+.empty-state {
+  text-align: center;
+  padding: 60px;
+  font-size: 16px;
+  color: var(--color-text-secondary);
+}
+
+.lost-pet-card {
+  border-radius: 16px;
+  overflow: hidden;
+  border: none;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+  transition: all 0.3s ease;
+  height: 100%;
+}
+
+.lost-pet-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 12px 40px rgba(255, 107, 107, 0.2);
+}
+
+.pet-image-container {
+  position: relative;
+  height: 220px;
+  overflow: hidden;
+  background: linear-gradient(135deg, #FFE5E5 0%, #FFF0F0 100%);
+}
+
+.pet-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.image-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 64px;
+  color: #FF6B6B;
+  opacity: 0.3;
+}
+
+.status-tag {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  font-size: 14px;
+  padding: 6px 16px;
+  border-radius: 16px;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.pet-info {
+  padding: 20px;
+}
+
+.pet-name {
+  font-family: var(--font-heading);
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin-bottom: 16px;
+}
+
+.pet-detail {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+  font-size: 14px;
+}
+
+.pet-detail .label {
+  color: var(--color-text-secondary);
+  min-width: 60px;
+}
+
+.pet-detail .value {
+  color: var(--color-text-primary);
+  font-weight: 500;
+  flex: 1;
+}
+
+.pet-detail.location {
+  color: #FF6B6B;
+  font-weight: 500;
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.pet-detail.time,
+.pet-detail.contact {
+  color: var(--color-text-secondary);
+  font-size: 13px;
+}
+
+@media (max-width: 768px) {
+  .page-header {
+    padding: 40px 20px;
+  }
+
+  .page-title {
+    font-size: 32px;
+  }
+
+  .report-button {
+    position: static;
+    transform: none;
+    margin: 20px auto 0;
+    display: block;
+  }
+
+  .report-button:hover {
+    transform: translateY(-2px);
+  }
+
+  .lost-pet-content {
+    padding: 24px 16px;
+  }
+}

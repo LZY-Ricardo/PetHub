@@ -1,0 +1,102 @@
+.adoption-list-page {
+  min-height: 100vh;
+  background: var(--color-warm-cream);
+  padding: 32px 24px;
+}
+
+.adoption-card {
+  max-width: 1200px;
+  margin: 0 auto;
+  border-radius: 20px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+  padding: 40px;
+}
+
+.page-header-content {
+  margin-bottom: 32px;
+}
+
+.page-title {
+  font-family: var(--font-heading);
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  margin-bottom: 8px;
+}
+
+.page-subtitle {
+  font-size: 16px;
+  color: var(--color-text-secondary);
+}
+
+.adoption-table {
+  margin-top: 24px;
+}
+
+.adoption-table .ant-table-thead > tr > th {
+  background: linear-gradient(135deg, #FFF9F2 0%, #FFF5E6 100%);
+  font-weight: 600;
+  color: var(--color-text-primary);
+  border-bottom: 2px solid var(--color-warm-coral);
+}
+
+.adoption-table .ant-table-tbody > tr:hover {
+  background: rgba(255, 159, 67, 0.04);
+}
+
+.adoption-detail {
+  padding: 8px 0;
+}
+
+.detail-section {
+  margin-bottom: 24px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.detail-section:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.detail-section h3 {
+  font-family: var(--font-heading);
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--color-warm-coral);
+  margin-bottom: 12px;
+}
+
+.detail-section p {
+  margin: 8px 0;
+  line-height: 1.8;
+  color: var(--color-text-secondary);
+}
+
+.detail-section strong {
+  color: var(--color-text-primary);
+  font-weight: 600;
+}
+
+.reason-text {
+  padding: 16px;
+  background: #f9f9f9;
+  border-radius: 8px;
+  line-height: 1.8;
+  white-space: pre-wrap;
+}
+
+@media (max-width: 768px) {
+  .adoption-list-page {
+    padding: 16px;
+  }
+
+  .adoption-card {
+    padding: 24px;
+  }
+
+  .page-title {
+    font-size: 24px;
+  }
+}
