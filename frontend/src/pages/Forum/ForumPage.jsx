@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Card, List, Tag, Button, Input, Modal, Form, message, Avatar, Space } from 'antd';
+import { Card, List, Tag, Button, Input, Modal, Form, message, Avatar } from 'antd';
 import { MessageOutlined, PlusOutlined, EyeOutlined, LikeOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
@@ -116,41 +116,35 @@ function ForumPage() {
                 style={{ animation: `fadeInUp 0.6s ease-out ${index * 0.1}s both` }}
                 onClick={() => navigate(`/forum/${post.id}`)}
               >
-                <List.Item.Meta
-                  avatar={
+                <div className="forum-item-content">
+                  <div className="post-main">
                     <Avatar
                       size={48}
                       src={post.user_avatar}
-                      style={{ backgroundColor: '#FF9F43' }}
+                      style={{ backgroundColor: '#FF9F43', flexShrink: 0 }}
                     >
                       {post.nickname?.charAt(0) || 'U'}
                     </Avatar>
-                  }
-                  title={
-                    <div className="post-header">
-                      <h3 className="post-title">{post.title}</h3>
-                      <Tag color={getCategoryColor(post.category)}>{post.category}</Tag>
-                    </div>
-                  }
-                  description={
-                    <div className="post-meta">
-                      <Space size="large">
+                    <div className="post-info">
+                      <div className="post-header">
+                        <h3 className="post-title">{post.title}</h3>
+                        <Tag color={getCategoryColor(post.category)}>{post.category}</Tag>
+                      </div>
+                      <div className="post-meta">
                         <span className="author">{post.nickname || '匿名用户'}</span>
                         <span className="time">{new Date(post.created_at).toLocaleString('zh-CN')}</span>
-                      </Space>
-                      <div className="post-stats">
-                        <Space size="middle">
-                          <span><EyeOutlined /> {post.view_count || 0}</span>
-                          <span><LikeOutlined /> {post.like_count || 0}</span>
-                          <span><MessageOutlined /> {post.comment_count || 0}</span>
-                        </Space>
                       </div>
                     </div>
-                  }
-                />
-                <div className="post-preview">
-                  {post.content?.substring(0, 100)}
-                  {post.content?.length > 100 ? '...' : ''}
+                    <div className="post-stats">
+                      <span><EyeOutlined /> {post.view_count || 0}</span>
+                      <span><LikeOutlined /> {post.like_count || 0}</span>
+                      <span><MessageOutlined /> {post.comment_count || 0}</span>
+                    </div>
+                  </div>
+                  <div className="post-preview">
+                    {post.content?.substring(0, 100)}
+                    {post.content?.length > 100 ? '...' : ''}
+                  </div>
                 </div>
               </List.Item>
             )}

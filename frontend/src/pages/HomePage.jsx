@@ -58,21 +58,21 @@ const HomePage = () => {
 
   const petCards = [
     {
-      image: 'https://images.unsplash.com/photo-1552053831-7f94e00e0?w=400',
+      image: '/images/pets/dog_1_golden.jpg',
       name: '旺财',
       breed: '金毛',
       age: '2岁',
       description: '温顺友善，喜欢和人互动'
     },
     {
-      image: 'https://images.unsplash.com/photo-1587300003328-d9f4f3693242?w=400',
+      image: '/images/pets/dog_2_samoyed.jpg',
       name: '小白',
       breed: '萨摩耶',
       age: '1.5岁',
       description: '微笑天使，需要大量运动'
     },
     {
-      image: 'https://images.unsplash.com/photo-1579213830180-43f2b00e3df4?w=400',
+      image: '/images/pets/dog_7_labrador2.jpg',
       name: '欢欢',
       breed: '拉布拉多',
       age: '2.8岁',
