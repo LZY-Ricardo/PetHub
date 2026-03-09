@@ -62,13 +62,18 @@ const MainLayout = () => {
     {
       key: 'profile',
       icon: <UserOutlined />,
-      label: '个人中心'
+      label: '个人中心',
+      onClick: () => navigate('/profile')
     },
     {
       key: 'logout',
       icon: <LogoutOutlined />,
       label: '退出登录',
-      onClick: logout
+      onClick: () => {
+        logout();
+        // 退出登录后跳转到首页
+        navigate('/');
+      }
     }
   ];
 

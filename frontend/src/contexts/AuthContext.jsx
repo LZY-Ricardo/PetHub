@@ -88,6 +88,11 @@ export const AuthProvider = ({ children }) => {
     message.success('已退出登录');
   };
 
+  const updateUser = (updatedUser) => {
+    setUser(updatedUser);
+    localStorage.setItem('user', JSON.stringify(updatedUser));
+  };
+
   const isAdmin = () => {
     return user?.role === 'admin';
   };
@@ -98,6 +103,7 @@ export const AuthProvider = ({ children }) => {
     login,
     register,
     logout,
+    updateUser,
     isAdmin
   };
 

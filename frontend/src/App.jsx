@@ -12,6 +12,7 @@ import LostPetListPage from './pages/LostPet/LostPetListPage';
 import ForumPage from './pages/Forum/ForumPage';
 import ForumDetailPage from './pages/Forum/ForumDetailPage';
 import DashboardPage from './pages/Admin/DashboardPage';
+import ProfilePage from './pages/User/ProfilePage';
 import { AuthProvider } from './contexts/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import './App.css';
@@ -39,6 +40,11 @@ function App() {
               <Route path="lost-pets" element={<LostPetListPage />} />
               <Route path="forum" element={<ForumPage />} />
               <Route path="forum/:id" element={<ForumDetailPage />} />
+              <Route path="profile" element={
+                <ProtectedRoute>
+                  <ProfilePage />
+                </ProtectedRoute>
+              } />
               <Route path="admin/dashboard" element={
                 <ProtectedRoute requireAdmin>
                   <DashboardPage />
