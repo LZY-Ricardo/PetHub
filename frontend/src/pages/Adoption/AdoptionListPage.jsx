@@ -18,17 +18,45 @@ function AdoptionListPage() {
   const fetchAdoptions = async () => {
     setLoading(true);
     try {
-      const response = await fetch('/api/adoptions', {
+      const token = localStorage.getItem('token');
+
+      // 如果没有token，清空数据并提示登录
+      if (!token) {
+        message.warning('请先登录');
+        setAdoptions([]);
+        setLoading(false);
+        return;
+      }
+
+      const response = await fetch('/api/adoptions/my', {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
+          'Authorization': `Bearer ${token}`
         }
       });
-      const data = await response.json();
-      if (data.code === 200) {
-        setAdoptions(data.data || []);
+
+      // 处理401未授权（token过期或无效）
+      if (response.status === 401) {
+        message.error('登录已过期，请重新登录');
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        setAdoptions([]);
+        setLoading(false);
+        return;
       }
+
+      const data = await response.json();
+
+      // 处理API错误
+      if (data.code !== 200) {
+        message.error(data.message || '获取申请列表失败');
+        setAdoptions([]);
+        return;
+      }
+
+      setAdoptions(data.data || []);
     } catch (error) {
       console.error('Failed to fetch adoptions:', error);
+      message.error('网络错误，请稍后重试');
     } finally {
       setLoading(false);
     }
