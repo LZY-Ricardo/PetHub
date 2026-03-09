@@ -87,6 +87,16 @@
   white-space: pre-wrap;
 }
 
+.adoption-review-modal .ant-modal-footer {
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.adoption-review-modal .ant-input-textarea-show-count {
+  margin-bottom: 8px;
+}
+
 @media (max-width: 768px) {
   .adoption-list-page {
     padding: 16px;

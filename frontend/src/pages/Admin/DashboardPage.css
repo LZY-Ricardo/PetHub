@@ -21,10 +21,14 @@
   color: var(--color-text-secondary);
 }
 
+.stats-wrap {
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto 32px;
+}
+
 .stats-row {
   width: 100%;
-  max-width: 1200px;
-  margin: 0 auto 32px;
 }
 
 .stat-card {
@@ -93,6 +97,10 @@
   }
 
   .stats-row {
+    width: 100%;
+  }
+
+  .stats-wrap {
     margin-bottom: 24px;
   }
 }

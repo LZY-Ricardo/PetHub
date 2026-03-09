@@ -119,7 +119,7 @@ function DashboardPage() {
       render: (_, record) => (
         <Button
           type="link"
-          onClick={() => navigate('/adoptions')}
+          onClick={() => navigate(`/adoptions?focusId=${record.id}`)}
         >
           查看详情
         </Button>
@@ -134,48 +134,50 @@ function DashboardPage() {
         <p className="page-subtitle">系统数据统计与管理</p>
       </div>
 
-      <Row gutter={[24, 24]} className="stats-row">
-        <Col xs={24} sm={12} lg={6}>
-          <Card className="stat-card stat-users">
-            <Statistic
-              title="总用户数"
-              value={stats.totalUsers}
-              prefix={<UserOutlined />}
-              valueStyle={{ color: '#FF9F43' }}
-            />
-          </Card>
-        </Col>
-        <Col xs={24} sm={12} lg={6}>
-          <Card className="stat-card stat-pets">
-            <Statistic
-              title="总宠物数"
-              value={stats.totalPets}
-              prefix={<HeartOutlined />}
-              valueStyle={{ color: '#54A0FF' }}
-            />
-          </Card>
-        </Col>
-        <Col xs={24} sm={12} lg={6}>
-          <Card className="stat-card stat-posts">
-            <Statistic
-              title="总帖子数"
-              value={stats.totalPosts}
-              prefix={<MessageOutlined />}
-              valueStyle={{ color: '#A29BFE' }}
-            />
-          </Card>
-        </Col>
-        <Col xs={24} sm={12} lg={6}>
-          <Card className="stat-card stat-pending">
-            <Statistic
-              title="待审核"
-              value={stats.pendingAdoptions}
-              prefix={<ClockCircleOutlined />}
-              valueStyle={{ color: '#26D07C' }}
-            />
-          </Card>
-        </Col>
-      </Row>
+      <div className="stats-wrap">
+        <Row gutter={[24, 24]} className="stats-row">
+          <Col xs={24} sm={12} lg={6}>
+            <Card className="stat-card stat-users">
+              <Statistic
+                title="总用户数"
+                value={stats.totalUsers}
+                prefix={<UserOutlined />}
+                valueStyle={{ color: '#FF9F43' }}
+              />
+            </Card>
+          </Col>
+          <Col xs={24} sm={12} lg={6}>
+            <Card className="stat-card stat-pets">
+              <Statistic
+                title="总宠物数"
+                value={stats.totalPets}
+                prefix={<HeartOutlined />}
+                valueStyle={{ color: '#54A0FF' }}
+              />
+            </Card>
+          </Col>
+          <Col xs={24} sm={12} lg={6}>
+            <Card className="stat-card stat-posts">
+              <Statistic
+                title="总帖子数"
+                value={stats.totalPosts}
+                prefix={<MessageOutlined />}
+                valueStyle={{ color: '#A29BFE' }}
+              />
+            </Card>
+          </Col>
+          <Col xs={24} sm={12} lg={6}>
+            <Card className="stat-card stat-pending">
+              <Statistic
+                title="待审核"
+                value={stats.pendingAdoptions}
+                prefix={<ClockCircleOutlined />}
+                valueStyle={{ color: '#26D07C' }}
+              />
+            </Card>
+          </Col>
+        </Row>
+      </div>
 
       <Card
         className="pending-card"
