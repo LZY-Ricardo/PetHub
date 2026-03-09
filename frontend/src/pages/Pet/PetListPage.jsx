@@ -13,7 +13,7 @@ function PetListPage() {
   const [filters, setFilters] = useState({
     keyword: '',
     species: '',
-    status: ''
+    status: 'available'
   });
   const navigate = useNavigate();
 
@@ -88,7 +88,7 @@ function PetListPage() {
           </Select>
           <Select
             placeholder="领养状态"
-            allowClear
+            value={filters.status}
             style={{ width: 150 }}
             onChange={(value) => setFilters({ ...filters, status: value })}
           >

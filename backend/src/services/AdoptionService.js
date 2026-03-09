@@ -60,11 +60,25 @@ class AdoptionService {
       throw new Error('无效的审核状态');
     }
 
-    await AdoptionDAO.reviewApplication(id, status, reviewComment, reviewedBy);
+    const normalizedComment = (reviewComment || '').trim();
+    const finalReviewComment = status === 'rejected'
+      ? (normalizedComment || '申请未通过审核，请联系管理员咨询具体原因')
+      : normalizedComment;
+
+    await AdoptionDAO.reviewApplication(id, status, finalReviewComment, reviewedBy);
 
     // 如果审核通过，更新宠物状态
     if (status === 'approved') {
-      await PetDAO.updatePetStatus(application.pet_id, 'pending');
+      await PetDAO.updatePetStatus(application.pet_id, 'adopted');
+
+      // 自动驳回同宠物的其他待审核申请，并写入明确原因
+      const autoRejectReason = '该宠物已被其他申请人领养，当前申请已自动驳回';
+      await AdoptionDAO.rejectOtherPendingApplications(
+        application.pet_id,
+        id,
+        autoRejectReason,
+        reviewedBy
+      );
     }
 
     return { success: true };

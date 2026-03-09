@@ -530,6 +530,11 @@ status: string, 状态筛选
 }
 ```
 
+**业务规则说明**：
+- 当 `status=approved` 时：系统会将该宠物状态更新为 `adopted`，并自动驳回同一宠物的其他 `pending` 申请。
+- 自动驳回的申请会写入 `review_comment`：`该宠物已被其他申请人领养，当前申请已自动驳回`。
+- 当 `status=rejected` 且未传 `reviewComment` 时：系统会自动写入默认说明 `申请未通过审核，请联系管理员咨询具体原因`。
+
 **响应示例（通过）**：
 ```json
 {

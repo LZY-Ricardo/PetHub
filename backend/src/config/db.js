@@ -67,9 +67,35 @@ const ensureForumCategoryColumn = async () => {
   }
 };
 
+/**
+ * 修复历史数据：申请已通过但宠物状态未标记为 adopted
+ */
+const ensureAdoptionPetStatusConsistency = async () => {
+  try {
+    const [result] = await promisePool.query(`
+      UPDATE pet_info p
+      INNER JOIN (
+        SELECT DISTINCT pet_id
+        FROM adoption_application
+        WHERE status = 'approved'
+      ) a ON a.pet_id = p.id
+      SET p.status = 'adopted'
+      WHERE p.status <> 'adopted'
+    `);
+
+    if (result.affectedRows > 0) {
+      console.log(`🛠️  已修复 ${result.affectedRows} 条宠物状态（approved -> adopted）`);
+    }
+  } catch (error) {
+    console.error('❌ 宠物领养状态一致性修复失败:', error.message);
+    throw error;
+  }
+};
+
 module.exports = {
   pool,
   promisePool,
   testConnection,
-  ensureForumCategoryColumn
+  ensureForumCategoryColumn,
+  ensureAdoptionPetStatusConsistency
 };
