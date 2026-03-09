@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Card, List, Tag, Button, Input, Modal, Form, message, Avatar } from 'antd';
+import { Tag, Button, Input, Modal, Form, message, Avatar, Empty } from 'antd';
 import { MessageOutlined, PlusOutlined, EyeOutlined, LikeOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
@@ -79,77 +79,92 @@ function ForumPage() {
       '经验分享': '#FF9F43',
       '求助问答': '#54A0FF',
       '宠物展示': '#26D07C',
-      '闲聊灌水': '#A29BFE'
+      '闲聊灌水': '#8B7355'
     };
     return colors[category] || '#999';
   };
 
   return (
     <div className="forum-page">
-      <div className="page-header">
-        <div className="header-content">
-          <h1 className="page-title">
-            <MessageOutlined /> 宠友社区
-          </h1>
-          <p className="page-subtitle">分享养宠经验，交流养宠心得</p>
+      <section className="forum-hero">
+        <div className="hero-content">
+          <div className="hero-text">
+            <span className="hero-kicker">PET TALK</span>
+            <h1 className="forum-title">
+              <MessageOutlined /> 宠友社区
+            </h1>
+            <p className="forum-subtitle">分享养宠经验，交流养宠心得，记录每一段和毛孩子有关的故事。</p>
+            <div className="hero-meta">
+              <span className="hero-pill"><MessageOutlined /> {posts.length} 篇帖子</span>
+              <span className="hero-pill">实时互动</span>
+            </div>
+          </div>
+          <div className="hero-action">
+            <Button
+              type="primary"
+              size="large"
+              icon={<PlusOutlined />}
+              onClick={handleCreatePost}
+              className="create-button"
+            >
+              发布帖子
+            </Button>
+          </div>
         </div>
-        <Button
-          type="primary"
-          size="large"
-          icon={<PlusOutlined />}
-          onClick={handleCreatePost}
-          className="create-button"
-        >
-          发布帖子
-        </Button>
-      </div>
+      </section>
 
       <div className="forum-content">
-        <Card className="forum-card" bordered={false}>
-          <List
-            loading={loading}
-            dataSource={posts}
-            renderItem={(post, index) => (
-              <List.Item
-                key={post.id}
-                className="forum-item"
-                style={{ animation: `fadeInUp 0.6s ease-out ${index * 0.1}s both` }}
-                onClick={() => navigate(`/forum/${post.id}`)}
-              >
-                <div className="forum-item-content">
-                  <div className="post-main">
-                    <Avatar
-                      size={48}
-                      src={post.avatar || post.user_avatar}
-                      style={{ backgroundColor: '#FF9F43', flexShrink: 0 }}
-                    >
-                      {(post.user_name || post.nickname || 'U').charAt(0)}
-                    </Avatar>
-                    <div className="post-info">
-                      <div className="post-header">
-                        <h3 className="post-title">{post.title}</h3>
-                        <Tag color={getCategoryColor(post.category)}>{post.category}</Tag>
-                      </div>
-                      <div className="post-meta">
-                        <span className="author">{post.user_name || post.nickname || '匿名用户'}</span>
-                        <span className="time">{new Date(post.created_at).toLocaleString('zh-CN')}</span>
+        <div className="forum-list-shell">
+          {loading ? (
+            <div className="forum-loading">加载中...</div>
+          ) : posts.length === 0 ? (
+            <Empty description="还没有帖子，来发布第一条吧" />
+          ) : (
+            <div className="forum-grid">
+              {posts.map((post, index) => (
+                <article
+                  key={post.id}
+                  className="forum-item-card"
+                  style={{ animation: `fadeInUp 0.6s ease-out ${index * 0.08}s both` }}
+                  onClick={() => navigate(`/forum/${post.id}`)}
+                >
+                  <div className="forum-item-head">
+                    <div className="post-author">
+                      <Avatar
+                        size={48}
+                        src={post.avatar || post.user_avatar}
+                        style={{ backgroundColor: '#FF9F43', flexShrink: 0 }}
+                      >
+                        {(post.user_name || post.nickname || 'U').charAt(0)}
+                      </Avatar>
+                      <div className="post-author-info">
+                        <div className="author-row">
+                          <span className="post-author-name">{post.user_name || post.nickname || '匿名用户'}</span>
+                          <span className="post-time">{new Date(post.created_at).toLocaleString('zh-CN')}</span>
+                        </div>
+                        <Tag color={getCategoryColor(post.category)} className="category-tag">
+                          {post.category || '闲聊灌水'}
+                        </Tag>
                       </div>
                     </div>
                     <div className="post-stats">
-                      <span><EyeOutlined /> {post.view_count || 0}</span>
-                      <span><LikeOutlined /> {post.like_count || 0}</span>
-                      <span><MessageOutlined /> {post.comment_count || 0}</span>
+                      <span className="stat-chip"><EyeOutlined /> {post.view_count || 0}</span>
+                      <span className="stat-chip"><LikeOutlined /> {post.like_count || 0}</span>
+                      <span className="stat-chip"><MessageOutlined /> {post.comment_count || 0}</span>
                     </div>
                   </div>
+
+                  <h3 className="post-title">{post.title}</h3>
                   <div className="post-preview">
-                    {post.content?.substring(0, 100)}
-                    {post.content?.length > 100 ? '...' : ''}
+                    {post.content?.substring(0, 140)}
+                    {post.content?.length > 140 ? '...' : ''}
                   </div>
-                </div>
-              </List.Item>
-            )}
-          />
-        </Card>
+                  <div className="post-link-hint">点击查看完整讨论</div>
+                </article>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
 
       <Modal
