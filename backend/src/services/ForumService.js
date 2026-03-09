@@ -31,13 +31,23 @@ class ForumService {
   }
 
   async createPost(data, userId) {
-    const { title, content, images } = data;
+    const { title, content, images, category } = data;
+    const allowedCategories = ['经验分享', '求助问答', '宠物展示', '闲聊灌水'];
 
     if (!title || !content) {
       throw new Error('标题和内容不能为空');
     }
 
-    const postId = await ForumDAO.createPost(data, userId);
+    if (category && !allowedCategories.includes(category)) {
+      throw new Error('帖子分类无效');
+    }
+
+    const postId = await ForumDAO.createPost({
+      title,
+      content,
+      images,
+      category: category || '闲聊灌水'
+    }, userId);
     return await ForumDAO.getPostDetail(postId);
   }
 

@@ -35,7 +35,7 @@ class ForumController {
       const post = await ForumService.createPost(data, userId);
       success(ctx, post, '发布成功', 201);
     } catch (err) {
-      if (err.message.includes('不能为空')) {
+      if (err.message.includes('不能为空') || err.message.includes('分类无效')) {
         error(ctx, err.message, 400);
       } else {
         error(ctx, err.message, 500);

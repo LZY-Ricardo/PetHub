@@ -903,6 +903,7 @@ keyword: string, 搜索关键词
 {
   "title": "string (5-50字符), 必填",
   "content": "string (10-2000字符), 必填",
+  "category": "string (经验分享/求助问答/宠物展示/闲聊灌水), 可选，默认闲聊灌水",
   "images": "array [0-9张图片URL], 可选"
 }
 ```
@@ -915,6 +916,7 @@ keyword: string, 搜索关键词
   "data": {
     "id": 1,
     "title": "金毛的饲养经验分享",
+    "category": "经验分享",
     "created_at": "2026-03-07T10:00:00Z"
   }
 }

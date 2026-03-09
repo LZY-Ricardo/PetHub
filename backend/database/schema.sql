@@ -115,6 +115,7 @@ CREATE TABLE `forum_post` (
   `user_id` INT NOT NULL COMMENT '发帖人ID',
   `title` VARCHAR(100) NOT NULL COMMENT '标题',
   `content` TEXT NOT NULL COMMENT '内容',
+  `category` ENUM('经验分享', '求助问答', '宠物展示', '闲聊灌水') NOT NULL DEFAULT '闲聊灌水' COMMENT '帖子分类',
   `images` JSON DEFAULT NULL COMMENT '图片URL数组',
   `view_count` INT DEFAULT 0 COMMENT '浏览次数',
   `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '发帖时间',

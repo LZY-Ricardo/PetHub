@@ -1,6 +1,6 @@
 require('dotenv').config();
 const app = require('./app');
-const { testConnection } = require('./config/db');
+const { testConnection, ensureForumCategoryColumn } = require('./config/db');
 
 const PORT = process.env.PORT || 3000;
 
@@ -17,6 +17,9 @@ const startServer = async () => {
       console.error('❌ 数据库连接失败，服务器启动终止');
       process.exit(1);
     }
+
+    // 自动迁移：确保论坛分类字段存在
+    await ensureForumCategoryColumn();
 
     // 启动HTTP服务器
     app.listen(PORT, () => {

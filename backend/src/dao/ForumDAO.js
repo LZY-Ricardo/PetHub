@@ -5,6 +5,21 @@ class ForumDAO {
     this.postPool = require('../config/db').promisePool;
   }
 
+  normalizePost(row) {
+    if (!row) return row;
+
+    if (row.images) {
+      try {
+        row.images = JSON.parse(row.images);
+      } catch (e) {
+        row.images = [];
+      }
+    }
+
+    row.category = row.category || '闲聊灌水';
+    return row;
+  }
+
   // Posts
   async getPostList(page = 1, pageSize = 10) {
     const sql = `
@@ -23,15 +38,7 @@ class ForumDAO {
 
     const [countResult] = await this.postPool.query('SELECT COUNT(*) as total FROM forum_post');
 
-    rows.forEach(row => {
-      if (row.images) {
-        try {
-          row.images = JSON.parse(row.images);
-        } catch (e) {
-          row.images = [];
-        }
-      }
-    });
+    rows.forEach(row => this.normalizePost(row));
 
     return { list: rows, total: countResult[0].total, page, pageSize };
   }
@@ -48,25 +55,17 @@ class ForumDAO {
     const [rows] = await this.postPool.query(sql, [id]);
     const row = rows[0];
 
-    if (row && row.images) {
-      try {
-        row.images = JSON.parse(row.images);
-      } catch (e) {
-        row.images = [];
-      }
-    }
-
-    return row || null;
+    return this.normalizePost(row) || null;
   }
 
   async createPost(data, userId) {
-    const { title, content, images } = data;
+    const { title, content, images, category } = data;
     const sql = `
-      INSERT INTO forum_post (user_id, title, content, images)
-      VALUES (?, ?, ?, ?)
+      INSERT INTO forum_post (user_id, title, content, category, images)
+      VALUES (?, ?, ?, ?, ?)
     `;
     const imagesJson = images ? JSON.stringify(images) : null;
-    const [result] = await this.postPool.query(sql, [userId, title, content, imagesJson]);
+    const [result] = await this.postPool.query(sql, [userId, title, content, category, imagesJson]);
 
     // 增加浏览计数
     await this.incrementViewCount(result.insertId);
@@ -160,15 +159,7 @@ class ForumDAO {
     `;
     const [rows] = await this.postPool.query(sql, [userId]);
 
-    rows.forEach(row => {
-      if (row.images) {
-        try {
-          row.images = JSON.parse(row.images);
-        } catch (e) {
-          row.images = [];
-        }
-      }
-    });
+    rows.forEach(row => this.normalizePost(row));
 
     return rows;
   }
