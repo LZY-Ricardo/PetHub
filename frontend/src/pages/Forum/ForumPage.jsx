@@ -120,10 +120,10 @@ function ForumPage() {
                   <div className="post-main">
                     <Avatar
                       size={48}
-                      src={post.user_avatar}
+                      src={post.avatar || post.user_avatar}
                       style={{ backgroundColor: '#FF9F43', flexShrink: 0 }}
                     >
-                      {post.nickname?.charAt(0) || 'U'}
+                      {(post.user_name || post.nickname || 'U').charAt(0)}
                     </Avatar>
                     <div className="post-info">
                       <div className="post-header">
@@ -131,7 +131,7 @@ function ForumPage() {
                         <Tag color={getCategoryColor(post.category)}>{post.category}</Tag>
                       </div>
                       <div className="post-meta">
-                        <span className="author">{post.nickname || '匿名用户'}</span>
+                        <span className="author">{post.user_name || post.nickname || '匿名用户'}</span>
                         <span className="time">{new Date(post.created_at).toLocaleString('zh-CN')}</span>
                       </div>
                     </div>

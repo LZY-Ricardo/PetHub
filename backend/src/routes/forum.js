@@ -1,13 +1,13 @@
 const Router = require('koa-router');
 const ForumController = require('../controllers/ForumController');
-const { authMiddleware } = require('../middlewares/auth');
+const { authMiddleware, optionalAuthMiddleware } = require('../middlewares/auth');
 
 const router = new Router({ prefix: '/api/forum' });
 
 // Posts
 router.get('/posts', ForumController.getPostList);
 router.get('/posts/my', authMiddleware, ForumController.getMyContent);
-router.get('/posts/:id', ForumController.getPostDetail);
+router.get('/posts/:id', optionalAuthMiddleware, ForumController.getPostDetail);
 router.post('/posts', authMiddleware, ForumController.createPost);
 router.delete('/posts/:id', authMiddleware, ForumController.deletePost);
 

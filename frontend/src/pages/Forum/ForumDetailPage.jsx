@@ -27,11 +27,15 @@ function ForumDetailPage() {
   const fetchPostDetail = async () => {
     setLoading(true);
     try {
-      const response = await fetch(`/api/forum/posts/${id}`);
+      const token = localStorage.getItem('token');
+      const response = await fetch(`/api/forum/posts/${id}`, {
+        headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+      });
       const data = await response.json();
       if (data.code === 200) {
         setPost(data.data);
         setLikeCount(data.data.like_count || 0);
+        setLiked(Boolean(data.data.hasLiked));
       }
     } catch (error) {
       console.error('Failed to fetch post detail:', error);
@@ -62,16 +66,17 @@ function ForumDetailPage() {
       const response = await fetch(`/api/forum/posts/${id}/like`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
           'Authorization': `Bearer ${localStorage.getItem('token')}`
-        },
-        body: JSON.stringify({ userId: user.id })
+        }
       });
       const data = await response.json();
       if (data.code === 200) {
-        setLiked(!liked);
-        setLikeCount(liked ? likeCount - 1 : likeCount + 1);
-        message.success(liked ? '取消点赞' : '点赞成功');
+        const nextLiked = Boolean(data.data?.liked);
+        setLiked(nextLiked);
+        if (typeof data.data?.like_count === 'number') {
+          setLikeCount(data.data.like_count);
+        }
+        message.success(nextLiked ? '点赞成功' : '取消点赞');
       }
     } catch (error) {
       message.error('操作失败');
@@ -172,10 +177,10 @@ function ForumDetailPage() {
               size={56}
               style={{ backgroundColor: '#FF9F43' }}
             >
-              {post.nickname?.charAt(0) || 'U'}
+              {(post.user_name || post.nickname || 'U').charAt(0)}
             </Avatar>
             <div className="author-info">
-              <h3 className="author-name">{post.nickname || '匿名用户'}</h3>
+              <h3 className="author-name">{post.user_name || post.nickname || '匿名用户'}</h3>
               <p className="post-time">{new Date(post.created_at).toLocaleString('zh-CN')}</p>
             </div>
           </div>
@@ -259,12 +264,12 @@ function ForumDetailPage() {
                     <Avatar
                       style={{ backgroundColor: '#54A0FF' }}
                     >
-                      {comment.nickname?.charAt(0) || 'U'}
+                      {(comment.user_name || comment.nickname || 'U').charAt(0)}
                     </Avatar>
                   }
                   title={
                     <div className="comment-header">
-                      <span className="comment-author">{comment.nickname || '匿名用户'}</span>
+                      <span className="comment-author">{comment.user_name || comment.nickname || '匿名用户'}</span>
                       <span className="comment-time">
                         {new Date(comment.created_at).toLocaleString('zh-CN')}
                       </span>

@@ -38,7 +38,9 @@ class ForumDAO {
 
   async getPostDetail(id) {
     const sql = `
-      SELECT p.*, u.username, u.nickname as user_name, u.avatar
+      SELECT p.*, u.username, u.nickname as user_name, u.avatar,
+             (SELECT COUNT(*) FROM forum_like l WHERE l.post_id = p.id) as like_count,
+             (SELECT COUNT(*) FROM forum_comment c WHERE c.post_id = p.id) as comment_count
       FROM forum_post p
       LEFT JOIN sys_user u ON p.user_id = u.id
       WHERE p.id = ?
@@ -120,12 +122,20 @@ class ForumDAO {
       // 取消点赞
       const deleteSql = `DELETE FROM forum_like WHERE post_id = ? AND user_id = ?`;
       await this.postPool.query(deleteSql, [postId, userId]);
-      return { liked: false };
+      const [countRows] = await this.postPool.query(
+        'SELECT COUNT(*) as like_count FROM forum_like WHERE post_id = ?',
+        [postId]
+      );
+      return { liked: false, like_count: countRows[0].like_count };
     } else {
       // 点赞
       const insertSql = `INSERT INTO forum_like (post_id, user_id) VALUES (?, ?)`;
       await this.postPool.query(insertSql, [postId, userId]);
-      return { liked: true };
+      const [countRows] = await this.postPool.query(
+        'SELECT COUNT(*) as like_count FROM forum_like WHERE post_id = ?',
+        [postId]
+      );
+      return { liked: true, like_count: countRows[0].like_count };
     }
   }
 
