@@ -129,10 +129,12 @@ function DashboardPage() {
 
   return (
     <div className="dashboard-page">
-      <div className="page-header">
-        <h1 className="page-title">管理控制台</h1>
-        <p className="page-subtitle">系统数据统计与管理</p>
-      </div>
+      <section className="dashboard-hero">
+        <div className="dashboard-hero-inner">
+          <h1 className="dashboard-hero-title">管理控制台</h1>
+          <p className="dashboard-hero-subtitle">系统数据统计与管理</p>
+        </div>
+      </section>
 
       <div className="stats-wrap">
         <Row gutter={[24, 24]} className="stats-row">

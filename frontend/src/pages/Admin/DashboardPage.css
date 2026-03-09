@@ -1,24 +1,60 @@
 .dashboard-page {
   min-height: 100vh;
   background: var(--color-warm-cream);
-  padding: 32px 24px;
+  padding: 0 24px 32px;
 }
 
-.page-header {
-  margin-bottom: 32px;
+.dashboard-hero {
+  margin: 0 -24px 32px;
+  padding: 32px 24px 44px;
+  background: linear-gradient(135deg, #FF8D90 0%, #FF7B7D 60%, #F48D94 100%);
+  position: relative;
+  overflow: hidden;
 }
 
-.page-title {
+.dashboard-hero::before,
+.dashboard-hero::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.dashboard-hero::before {
+  width: 320px;
+  height: 320px;
+  left: -120px;
+  bottom: -140px;
+  background: rgba(255, 190, 118, 0.14);
+}
+
+.dashboard-hero::after {
+  width: 360px;
+  height: 360px;
+  right: -150px;
+  top: -120px;
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.dashboard-hero-inner {
+  max-width: 1400px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+}
+
+.dashboard-hero-title {
   font-family: var(--font-heading);
-  font-size: 32px;
-  font-weight: 700;
-  color: var(--color-text-primary);
+  font-size: 48px;
+  font-weight: 800;
+  color: #2C2C2C;
   margin-bottom: 8px;
 }
 
-.page-subtitle {
-  font-size: 16px;
-  color: var(--color-text-secondary);
+.dashboard-hero-subtitle {
+  font-size: 18px;
+  color: rgba(44, 44, 44, 0.88);
+  margin: 0;
 }
 
 .stats-wrap {
@@ -89,11 +125,20 @@
 
 @media (max-width: 768px) {
   .dashboard-page {
-    padding: 24px 16px;
+    padding: 0 16px 24px;
   }
 
-  .page-title {
+  .dashboard-hero {
+    margin: 0 -16px 24px;
+    padding: 24px 16px 32px;
+  }
+
+  .dashboard-hero-title {
     font-size: 24px;
+  }
+
+  .dashboard-hero-subtitle {
+    font-size: 14px;
   }
 
   .stats-row {

@@ -17,7 +17,7 @@
 }
 
 .header-content {
-  max-width: 1280px;
+  max-width: 1440px;
   margin: 0 auto;
   padding: 0 24px;
   height: 100%;
@@ -70,7 +70,8 @@
   flex: 1;
   display: flex;
   justify-content: center;
-  max-width: 600px;
+  min-width: 0;
+  max-width: 780px;
 }
 
 .main-menu {
@@ -81,7 +82,7 @@
 
 .main-menu .ant-menu-list {
   display: flex;
-  justify-content: space-around;
+  justify-content: center;
   width: 100%;
 }
 
@@ -94,7 +95,7 @@
   font-weight: 500;
   font-size: 14px;
   color: var(--color-warm-brown);
-  padding: 0 16px;
+  padding: 0 12px;
   height: 72px;
   line-height: 72px;
   position: relative;
@@ -120,7 +121,8 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  min-width: 120px;
+  min-width: 96px;
+  max-width: 220px;
   flex-shrink: 0;
 }
 
@@ -147,11 +149,18 @@
 .user-name {
   font-weight: 500;
   color: var(--color-warm-brown);
+  white-space: nowrap;
 }
 
 .auth-buttons {
   display: flex;
   gap: 12px;
+}
+
+@media (max-width: 1200px) {
+  .user-name {
+    display: none;
+  }
 }
 
 .auth-btn {

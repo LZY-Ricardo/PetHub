@@ -1,4 +1,4 @@
-.auth-container {
+.register-page {
   min-height: 100vh;
   display: flex;
   justify-content: center;
@@ -9,7 +9,14 @@
   background: linear-gradient(135deg, var(--color-warm-cream) 0%, #FFF5E6 100%);
 }
 
-.auth-background {
+.register-page .auth-container {
+  width: 100%;
+  max-width: 420px;
+  position: relative;
+  z-index: 1;
+}
+
+.register-page .auth-background {
   position: absolute;
   top: 0;
   left: 0;
@@ -19,32 +26,32 @@
   z-index: 0;
 }
 
-.paw-print {
+.register-page .paw-print {
   position: absolute;
   font-size: 80px;
   opacity: 0.05;
-  animation: float 6s ease-in-out infinite;
+  animation: register-float 6s ease-in-out infinite;
 }
 
-.paw-1 {
+.register-page .paw-1 {
   top: 10%;
   left: 10%;
   animation-delay: 0s;
 }
 
-.paw-2 {
+.register-page .paw-2 {
   top: 60%;
   right: 15%;
   animation-delay: 2s;
 }
 
-.paw-3 {
+.register-page .paw-3 {
   bottom: 20%;
   left: 20%;
   animation-delay: 4s;
 }
 
-@keyframes float {
+@keyframes register-float {
   0%, 100% {
     transform: translateY(0px) rotate(0deg);
   }
@@ -53,7 +60,7 @@
   }
 }
 
-.auth-card {
+.register-page .auth-card {
   width: 100%;
   max-width: 420px;
   position: relative;
@@ -64,14 +71,14 @@
   padding: 48px 40px;
 }
 
-.auth-logo {
+.register-page .auth-logo {
   font-size: 64px;
   text-align: center;
   margin-bottom: 16px;
-  animation: bounce 2s ease-in-out infinite;
+  animation: register-bounce 2s ease-in-out infinite;
 }
 
-@keyframes bounce {
+@keyframes register-bounce {
   0%, 100% {
     transform: scale(1);
   }
@@ -80,7 +87,7 @@
   }
 }
 
-.auth-title {
+.register-page .auth-title {
   font-family: var(--font-heading);
   font-size: 32px;
   font-weight: 600;
@@ -89,14 +96,14 @@
   margin-bottom: 8px;
 }
 
-.auth-subtitle {
+.register-page .auth-subtitle {
   font-size: 16px;
   color: var(--color-text-secondary);
   text-align: center;
   margin-bottom: 32px;
 }
 
-.auth-button {
+.register-page .auth-button {
   height: 48px;
   border-radius: 24px;
   font-weight: 600;
@@ -108,24 +115,24 @@
   transition: all 0.3s ease;
 }
 
-.auth-button:hover {
+.register-page .auth-button:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 16px rgba(255, 159, 67, 0.4);
 }
 
-.auth-footer {
+.register-page .auth-footer {
   text-align: center;
   margin-top: 24px;
   color: var(--color-text-secondary);
 }
 
-.auth-footer a {
+.register-page .auth-footer a {
   color: var(--color-warm-coral);
   font-weight: 600;
   text-decoration: none;
   transition: color 0.3s ease;
 }
 
-.auth-footer a:hover {
+.register-page .auth-footer a:hover {
   color: var(--color-warm-peach);
 }
