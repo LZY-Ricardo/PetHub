@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Card, Button, Input, message, Avatar, List, Tag, Popconfirm } from 'antd';
-import { LeftOutlined, LikeOutlined, MessageOutlined, DeleteOutlined } from '@ant-design/icons';
+import { Card, Button, Input, message, Avatar, List, Tag, Popconfirm, Modal, Select } from 'antd';
+import { LeftOutlined, LikeOutlined, MessageOutlined, DeleteOutlined, EditOutlined } from '@ant-design/icons';
 import { useAuth } from '../../contexts/AuthContext';
 import './ForumDetailPage.css';
 
 const { TextArea } = Input;
 
 function ForumDetailPage() {
+  const categoryOptions = ['经验分享', '求助问答', '宠物展示', '闲聊灌水'];
   const { id } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -18,6 +19,9 @@ function ForumDetailPage() {
   const [submitting, setSubmitting] = useState(false);
   const [liked, setLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(0);
+  const [categoryModalVisible, setCategoryModalVisible] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState('闲聊灌水');
+  const [updatingCategory, setUpdatingCategory] = useState(false);
 
   useEffect(() => {
     fetchPostDetail();
@@ -152,6 +156,45 @@ function ForumDetailPage() {
     return colors[category] || '#999';
   };
 
+  const isPostOwner = user && post && Number(user.id) === Number(post.user_id);
+
+  const openCategoryModal = () => {
+    setSelectedCategory(post?.category || '闲聊灌水');
+    setCategoryModalVisible(true);
+  };
+
+  const handleUpdateCategory = async () => {
+    if (!selectedCategory) {
+      message.warning('请选择分类');
+      return;
+    }
+
+    setUpdatingCategory(true);
+    try {
+      const response = await fetch(`/api/forum/posts/${id}/category`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify({ category: selectedCategory })
+      });
+
+      const data = await response.json();
+      if (data.code === 200) {
+        setPost((prev) => ({ ...prev, category: data.data?.category || selectedCategory }));
+        setCategoryModalVisible(false);
+        message.success('分类更新成功');
+      } else {
+        message.error(data.message || '分类更新失败');
+      }
+    } catch (error) {
+      message.error('分类更新失败');
+    } finally {
+      setUpdatingCategory(false);
+    }
+  };
+
   if (loading) {
     return <div className="loading-state">加载中...</div>;
   }
@@ -187,9 +230,21 @@ function ForumDetailPage() {
 
           <div className="post-content">
             <h1 className="post-title">{post.title}</h1>
-            <Tag color={getCategoryColor(post.category)} className="category-tag">
-              {post.category}
-            </Tag>
+            <div className="category-row">
+              <Tag color={getCategoryColor(post.category)} className="category-tag">
+                {post.category}
+              </Tag>
+              {isPostOwner && (
+                <Button
+                  size="small"
+                  icon={<EditOutlined />}
+                  onClick={openCategoryModal}
+                  className="edit-category-btn"
+                >
+                  编辑分类
+                </Button>
+              )}
+            </div>
             <div className="content-text">
               {post.content?.split('\n').map((line, index) => (
                 <p key={index}>{line}</p>
@@ -286,6 +341,23 @@ function ForumDetailPage() {
           />
         </Card>
       </div>
+
+      <Modal
+        title="编辑帖子分类"
+        open={categoryModalVisible}
+        onCancel={() => setCategoryModalVisible(false)}
+        onOk={handleUpdateCategory}
+        okText="保存"
+        cancelText="取消"
+        confirmLoading={updatingCategory}
+      >
+        <Select
+          value={selectedCategory}
+          onChange={setSelectedCategory}
+          style={{ width: '100%' }}
+          options={categoryOptions.map((category) => ({ label: category, value: category }))}
+        />
+      </Modal>
     </div>
   );
 }

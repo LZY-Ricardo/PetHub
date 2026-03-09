@@ -8,28 +8,38 @@ import './ForumPage.css';
 const { TextArea } = Input;
 
 function ForumPage() {
+  const categoryOptions = ['全部', '经验分享', '求助问答', '宠物展示', '闲聊灌水'];
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [postVisible, setPostVisible] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [activeCategory, setActiveCategory] = useState('全部');
   const [form] = Form.useForm();
   const { user } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
     fetchPosts();
-  }, []);
+  }, [activeCategory]);
 
   const fetchPosts = async () => {
     setLoading(true);
     try {
-      const response = await fetch('/api/forum/posts');
+      const params = new URLSearchParams();
+      if (activeCategory !== '全部') {
+        params.append('category', activeCategory);
+      }
+
+      const response = await fetch(`/api/forum/posts${params.toString() ? `?${params.toString()}` : ''}`);
       const data = await response.json();
       if (data.code === 200) {
         setPosts(data.data?.list || []);
+      } else {
+        message.error(data.message || '获取帖子失败');
       }
     } catch (error) {
       console.error('Failed to fetch posts:', error);
+      message.error('获取帖子失败');
     } finally {
       setLoading(false);
     }
@@ -96,7 +106,7 @@ function ForumPage() {
             <p className="forum-subtitle">分享养宠经验，交流养宠心得，记录每一段和毛孩子有关的故事。</p>
             <div className="hero-meta">
               <span className="hero-pill"><MessageOutlined /> {posts.length} 篇帖子</span>
-              <span className="hero-pill">实时互动</span>
+              <span className="hero-pill">分类：{activeCategory}</span>
             </div>
           </div>
           <div className="hero-action">
@@ -114,6 +124,19 @@ function ForumPage() {
       </section>
 
       <div className="forum-content">
+        <div className="forum-filter-bar">
+          {categoryOptions.map((category) => (
+            <button
+              key={category}
+              type="button"
+              className={`filter-chip ${activeCategory === category ? 'active' : ''}`}
+              onClick={() => setActiveCategory(category)}
+            >
+              {category}
+            </button>
+          ))}
+        </div>
+
         <div className="forum-list-shell">
           {loading ? (
             <div className="forum-loading">加载中...</div>
@@ -139,23 +162,23 @@ function ForumPage() {
                       </Avatar>
                       <div className="post-author-info">
                         <div className="author-row">
-                          <span className="post-author-name">{post.user_name || post.nickname || '匿名用户'}</span>
-                          <span className="post-time">{new Date(post.created_at).toLocaleString('zh-CN')}</span>
+                          <span className="forum-post-author-name">{post.user_name || post.nickname || '匿名用户'}</span>
+                          <span className="forum-post-time">{new Date(post.created_at).toLocaleString('zh-CN')}</span>
                         </div>
-                        <Tag color={getCategoryColor(post.category)} className="category-tag">
+                        <Tag color={getCategoryColor(post.category)} className="forum-category-tag">
                           {post.category || '闲聊灌水'}
                         </Tag>
                       </div>
                     </div>
-                    <div className="post-stats">
+                    <div className="forum-post-stats">
                       <span className="stat-chip"><EyeOutlined /> {post.view_count || 0}</span>
                       <span className="stat-chip"><LikeOutlined /> {post.like_count || 0}</span>
                       <span className="stat-chip"><MessageOutlined /> {post.comment_count || 0}</span>
                     </div>
                   </div>
 
-                  <h3 className="post-title">{post.title}</h3>
-                  <div className="post-preview">
+                  <h3 className="forum-post-title">{post.title}</h3>
+                  <div className="forum-post-preview">
                     {post.content?.substring(0, 140)}
                     {post.content?.length > 140 ? '...' : ''}
                   </div>

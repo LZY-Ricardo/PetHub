@@ -62,10 +62,23 @@
 }
 
 .category-tag {
-  margin-bottom: 24px;
+  margin-bottom: 0;
   font-size: 14px;
   padding: 6px 16px;
   border-radius: 16px;
+  font-weight: 600;
+}
+
+.category-row {
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.edit-category-btn {
+  border-radius: 14px;
+  font-size: 13px;
   font-weight: 600;
 }
 
@@ -188,5 +201,10 @@
 
   .comment-input {
     padding: 16px;
+  }
+
+  .category-row {
+    flex-wrap: wrap;
+    gap: 8px;
   }
 }

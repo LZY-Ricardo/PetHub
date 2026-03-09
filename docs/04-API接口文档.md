@@ -793,8 +793,7 @@ isFound: number (0/1), 是否已找到
 ```
 page: number (默认1), 页码
 pageSize: number (默认10), 每页数量
-sortBy: string (time/hot), 排序方式（默认time）
-keyword: string, 搜索关键词
+category: string (经验分享/求助问答/宠物展示/闲聊灌水), 可选
 ```
 
 **响应示例**：
@@ -924,7 +923,36 @@ keyword: string, 搜索关键词
 
 ---
 
-### 5.4 删除帖子
+### 5.4 更新帖子分类
+**接口地址**：`PUT /forum/posts/:id/category`
+**是否需要登录**：是（仅作者）
+
+**路径参数**：
+- `id`: number, 帖子ID
+
+**请求参数**：
+```json
+{
+  "category": "string (经验分享/求助问答/宠物展示/闲聊灌水), 必填"
+}
+```
+
+**响应示例**：
+```json
+{
+  "code": 200,
+  "message": "分类更新成功",
+  "data": {
+    "id": 1,
+    "category": "求助问答",
+    "updated_at": "2026-03-07T10:30:00Z"
+  }
+}
+```
+
+---
+
+### 5.5 删除帖子
 **接口地址**：`DELETE /forum/posts/:id`
 **是否需要登录**：是（作者或管理员）
 
@@ -942,7 +970,7 @@ keyword: string, 搜索关键词
 
 ---
 
-### 5.5 发表评论
+### 5.6 发表评论
 **接口地址**：`POST /forum/posts/:id/comments`
 **是否需要登录**：是
 
@@ -981,7 +1009,7 @@ keyword: string, 搜索关键词
 
 ---
 
-### 5.6 删除评论
+### 5.7 删除评论
 **接口地址**：`DELETE /forum/comments/:id`
 **是否需要登录**：是（作者或管理员）
 
@@ -999,7 +1027,7 @@ keyword: string, 搜索关键词
 
 ---
 
-### 5.7 点赞/取消点赞
+### 5.8 点赞/取消点赞
 **接口地址**：`POST /forum/posts/:id/like`
 **是否需要登录**：是
 
@@ -1020,7 +1048,7 @@ keyword: string, 搜索关键词
 
 ---
 
-### 5.8 获取我的内容
+### 5.9 获取我的内容
 **接口地址**：`GET /forum/posts/my`
 **是否需要登录**：是
 

@@ -136,6 +136,36 @@
   z-index: 2;
 }
 
+.forum-filter-bar {
+  margin-bottom: 14px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.filter-chip {
+  border: 1px solid rgba(139, 115, 85, 0.16);
+  background: rgba(255, 255, 255, 0.88);
+  color: #735E45;
+  border-radius: 999px;
+  padding: 8px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.filter-chip:hover {
+  border-color: rgba(255, 159, 67, 0.4);
+  color: #B06A21;
+}
+
+.filter-chip.active {
+  border-color: rgba(255, 159, 67, 0.45);
+  background: linear-gradient(135deg, rgba(255, 159, 67, 0.14), rgba(255, 190, 118, 0.2));
+  color: #A35D18;
+}
+
 .forum-list-shell {
   background: #FFFFFF;
   border: 1px solid rgba(139, 115, 85, 0.12);
@@ -191,18 +221,18 @@
   gap: 8px 12px;
 }
 
-.post-author-name {
+.forum-post-author-name {
   color: #D5771B;
   font-size: 15px;
   font-weight: 700;
 }
 
-.post-time {
+.forum-post-time {
   color: #8D7A61;
   font-size: 13px;
 }
 
-.category-tag.ant-tag {
+.forum-category-tag.ant-tag {
   margin: 8px 0 0;
   border-radius: 999px;
   padding: 3px 10px;
@@ -210,7 +240,7 @@
   border-width: 1px;
 }
 
-.post-stats {
+.forum-post-stats {
   flex-shrink: 0;
   display: flex;
   align-items: center;
@@ -231,7 +261,7 @@
   font-weight: 600;
 }
 
-.post-title {
+.forum-post-title {
   margin: 14px 0 10px;
   font-family: var(--font-heading);
   font-size: 28px;
@@ -241,7 +271,7 @@
   color: #2B241B;
 }
 
-.post-preview {
+.forum-post-preview {
   color: #574732;
   background: linear-gradient(90deg, rgba(255, 159, 67, 0.1), rgba(255, 190, 118, 0.08));
   border-left: 3px solid rgba(255, 159, 67, 0.55);
@@ -303,7 +333,7 @@
     width: 100%;
   }
 
-  .post-title {
+  .forum-post-title {
     font-size: 24px;
   }
 }
@@ -326,6 +356,16 @@
     padding: 0 16px 28px;
   }
 
+  .forum-filter-bar {
+    margin-bottom: 10px;
+    gap: 8px;
+  }
+
+  .filter-chip {
+    padding: 7px 12px;
+    font-size: 12px;
+  }
+
   .forum-list-shell {
     border-radius: 18px;
     padding: 12px;
@@ -340,17 +380,17 @@
     gap: 10px;
   }
 
-  .post-stats {
+  .forum-post-stats {
     width: 100%;
     flex-wrap: wrap;
   }
 
-  .post-title {
+  .forum-post-title {
     margin-top: 10px;
     font-size: 21px;
   }
 
-  .post-preview {
+  .forum-post-preview {
     -webkit-line-clamp: 3;
   }
 }

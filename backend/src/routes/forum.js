@@ -9,6 +9,7 @@ router.get('/posts', ForumController.getPostList);
 router.get('/posts/my', authMiddleware, ForumController.getMyContent);
 router.get('/posts/:id', optionalAuthMiddleware, ForumController.getPostDetail);
 router.post('/posts', authMiddleware, ForumController.createPost);
+router.put('/posts/:id/category', authMiddleware, ForumController.updatePostCategory);
 router.delete('/posts/:id', authMiddleware, ForumController.deletePost);
 
 // Comments

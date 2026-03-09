@@ -4,11 +4,19 @@ const { success, error, forbidden } = require('../utils/response');
 class ForumController {
   async getPostList(ctx) {
     try {
-      const { page = 1, pageSize = 10 } = ctx.query;
-      const result = await ForumService.getPostList(parseInt(page), parseInt(pageSize));
+      const { page = 1, pageSize = 10, category } = ctx.query;
+      const result = await ForumService.getPostList(
+        parseInt(page),
+        parseInt(pageSize),
+        category || null
+      );
       success(ctx, result);
     } catch (err) {
-      error(ctx, err.message, 500);
+      if (err.message.includes('分类无效')) {
+        error(ctx, err.message, 400);
+      } else {
+        error(ctx, err.message, 500);
+      }
     }
   }
 
@@ -54,6 +62,31 @@ class ForumController {
       if (err.message === '帖子不存在') {
         error(ctx, err.message, 404);
       } else if (err.message === '无权删除此帖子') {
+        forbidden(ctx, err.message);
+      } else {
+        error(ctx, err.message, 500);
+      }
+    }
+  }
+
+  async updatePostCategory(ctx) {
+    try {
+      const { id } = ctx.params;
+      const userId = ctx.state.user.userId;
+      const { category } = ctx.request.body;
+
+      if (!category) {
+        return error(ctx, '帖子分类不能为空', 400);
+      }
+
+      const post = await ForumService.updatePostCategory(parseInt(id), userId, category);
+      success(ctx, post, '分类更新成功');
+    } catch (err) {
+      if (err.message === '帖子不存在') {
+        error(ctx, err.message, 404);
+      } else if (err.message.includes('分类无效')) {
+        error(ctx, err.message, 400);
+      } else if (err.message === '无权修改此帖子分类') {
         forbidden(ctx, err.message);
       } else {
         error(ctx, err.message, 500);

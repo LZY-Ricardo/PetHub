@@ -21,7 +21,9 @@ class ForumDAO {
   }
 
   // Posts
-  async getPostList(page = 1, pageSize = 10) {
+  async getPostList(page = 1, pageSize = 10, category = null) {
+    const whereClause = category ? 'WHERE p.category = ?' : '';
+    const params = category ? [category] : [];
     const sql = `
       SELECT p.*, u.username, u.nickname as user_name, u.avatar,
              COUNT(DISTINCT c.id) as comment_count,
@@ -30,13 +32,17 @@ class ForumDAO {
       LEFT JOIN sys_user u ON p.user_id = u.id
       LEFT JOIN forum_comment c ON p.id = c.post_id
       LEFT JOIN forum_like l ON p.id = l.post_id
+      ${whereClause}
       GROUP BY p.id
       ORDER BY p.created_at DESC
       LIMIT ? OFFSET ?
     `;
-    const [rows] = await this.postPool.query(sql, [pageSize, (page - 1) * pageSize]);
+    const [rows] = await this.postPool.query(sql, [...params, pageSize, (page - 1) * pageSize]);
 
-    const [countResult] = await this.postPool.query('SELECT COUNT(*) as total FROM forum_post');
+    const [countResult] = await this.postPool.query(
+      `SELECT COUNT(*) as total FROM forum_post${category ? ' WHERE category = ?' : ''}`,
+      category ? [category] : []
+    );
 
     rows.forEach(row => this.normalizePost(row));
 
@@ -71,6 +77,12 @@ class ForumDAO {
     await this.incrementViewCount(result.insertId);
 
     return result.insertId;
+  }
+
+  async updatePostCategory(id, category) {
+    const sql = `UPDATE forum_post SET category = ? WHERE id = ?`;
+    const [result] = await this.postPool.query(sql, [category, id]);
+    return result.affectedRows > 0;
   }
 
   async deletePost(id) {

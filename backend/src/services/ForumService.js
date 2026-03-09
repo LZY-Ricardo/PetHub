@@ -1,8 +1,12 @@
 const ForumDAO = require('../dao/ForumDAO');
 
 class ForumService {
-  async getPostList(page, pageSize) {
-    return await ForumDAO.getPostList(page, pageSize);
+  async getPostList(page, pageSize, category = null) {
+    const allowedCategories = ['经验分享', '求助问答', '宠物展示', '闲聊灌水'];
+    if (category && !allowedCategories.includes(category)) {
+      throw new Error('帖子分类无效');
+    }
+    return await ForumDAO.getPostList(page, pageSize, category);
   }
 
   async getPostDetail(id, userId) {
@@ -63,6 +67,25 @@ class ForumService {
 
     await ForumDAO.deletePost(id);
     return { success: true };
+  }
+
+  async updatePostCategory(id, userId, category) {
+    const allowedCategories = ['经验分享', '求助问答', '宠物展示', '闲聊灌水'];
+    if (!allowedCategories.includes(category)) {
+      throw new Error('帖子分类无效');
+    }
+
+    const post = await ForumDAO.getPostDetail(id);
+    if (!post) {
+      throw new Error('帖子不存在');
+    }
+
+    if (post.user_id !== userId) {
+      throw new Error('无权修改此帖子分类');
+    }
+
+    await ForumDAO.updatePostCategory(id, category);
+    return await ForumDAO.getPostDetail(id);
   }
 
   async getComments(postId) {
