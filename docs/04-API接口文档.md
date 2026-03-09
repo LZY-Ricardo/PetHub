@@ -24,6 +24,7 @@
 
 **状态码说明**：
 - `200`：操作成功
+- `201`：创建成功
 - `400`：请求参数错误
 - `401`：未登录或token过期
 - `403`：无权限访问
@@ -43,7 +44,7 @@
 {
   "username": "string (3-20字符), 必填",
   "password": "string (6-20字符), 必填",
-  "contact_info": "string, 必填",
+  "contactInfo": "string, 可选",
   "nickname": "string (2-20字符), 必填"
 }
 ```
@@ -51,19 +52,16 @@
 **响应示例**：
 ```json
 {
-  "code": 200,
+  "code": 201,
   "message": "注册成功",
   "data": {
-    "user": {
-      "id": 1,
-      "username": "testuser",
-      "nickname": "测试用户",
-      "avatar": null,
-      "role": "user",
-      "contact_info": "13800138000",
-      "created_at": "2026-03-07T10:00:00Z"
-    },
-    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+    "id": 1,
+    "username": "testuser",
+    "nickname": "测试用户",
+    "avatar": null,
+    "role": "user",
+    "contact_info": "13800138000",
+    "created_at": "2026-03-07T10:00:00Z"
   }
 }
 ```
@@ -112,7 +110,7 @@
 **错误响应**：
 ```json
 {
-  "code": 400,
+  "code": 401,
   "message": "用户名或密码错误"
 }
 ```
@@ -120,7 +118,7 @@
 ---
 
 ### 1.3 获取当前用户信息
-**接口地址**：`GET /auth/me`
+**接口地址**：`GET /auth/user`
 **是否需要登录**：是
 
 **响应示例**：
@@ -143,7 +141,7 @@
 ---
 
 ### 1.4 更新用户信息
-**接口地址**：`PUT /auth/profile`
+**接口地址**：`PUT /auth/user`
 **是否需要登录**：是
 
 **请求参数**：
@@ -441,40 +439,28 @@ sortOrder: string (ASC/DESC), 排序方向
 **接口地址**：`GET /adoptions/my`
 **是否需要登录**：是
 
-**查询参数**：
-```
-page: number (默认1), 页码
-pageSize: number (默认10), 每页数量
-status: string (pending/approved/rejected), 状态筛选
-```
+**查询参数**：无（当前版本返回当前用户全部申请，按时间倒序）
 
 **响应示例**：
 ```json
 {
   "code": 200,
   "message": "获取成功",
-  "data": {
-    "list": [
-      {
-        "id": 1,
-        "pet": {
-          "id": 1,
-          "name": "旺财",
-          "breed": "金毛",
-          "photos": ["http://localhost:3000/uploads/pet/pet_1_1.jpg"]
-        },
-        "reason": "我很喜欢狗狗",
-        "contact": "13800138000",
-        "address": "北京市朝阳区",
-        "status": "pending",
-        "review_comment": null,
-        "created_at": "2026-03-07T10:00:00Z"
-      }
-    ],
-    "total": 5,
-    "page": 1,
-    "pageSize": 10
-  }
+  "data": [
+    {
+      "id": 1,
+      "pet_id": 1,
+      "pet_name": "旺财",
+      "pet_breed": "金毛",
+      "reason": "我很喜欢狗狗",
+      "contact": "13800138000",
+      "phone": "13800138000",
+      "address": "北京市朝阳区",
+      "status": "pending",
+      "review_comment": null,
+      "created_at": "2026-03-07T10:00:00Z"
+    }
+  ]
 }
 ```
 
@@ -489,8 +475,6 @@ status: string (pending/approved/rejected), 状态筛选
 page: number (默认1), 页码
 pageSize: number (默认10), 每页数量
 status: string, 状态筛选
-username: string, 用户名搜索
-petName: string, 宠物名称搜索
 ```
 
 **响应示例**：
@@ -541,8 +525,8 @@ petName: string, 宠物名称搜索
 **请求参数**：
 ```json
 {
-  "action": "string (approve/reject), 必填",
-  "review_comment": "string, 驳回时必填 (10-200字符)"
+  "status": "string (approved/rejected), 必填",
+  "reviewComment": "string, 可选"
 }
 ```
 
@@ -550,12 +534,8 @@ petName: string, 宠物名称搜索
 ```json
 {
   "code": 200,
-  "message": "审核通过",
-  "data": {
-    "id": 1,
-    "status": "approved",
-    "reviewed_at": "2026-03-07T11:00:00Z"
-  }
+  "message": "审核完成",
+  "data": null
 }
 ```
 
@@ -563,13 +543,8 @@ petName: string, 宠物名称搜索
 ```json
 {
   "code": 200,
-  "message": "已驳回申请",
-  "data": {
-    "id": 1,
-    "status": "rejected",
-    "review_comment": "居住条件不符合要求",
-    "reviewed_at": "2026-03-07T11:00:00Z"
-  }
+  "message": "审核完成",
+  "data": null
 }
 ```
 
@@ -577,7 +552,7 @@ petName: string, 宠物名称搜索
 ```json
 {
   "code": 400,
-  "message": "驳回时必须填写审核意见"
+  "message": "无效的审核状态"
 }
 ```
 
@@ -586,7 +561,7 @@ petName: string, 宠物名称搜索
 ## 4. 走失宠物模块
 
 ### 4.1 获取走失列表
-**接口地址**：`GET /lost`
+**接口地址**：`GET /lost-pets`
 **是否需要登录**：否
 
 **查询参数**：
@@ -631,7 +606,7 @@ isFound: number (0/1), 是否已找到
 ---
 
 ### 4.2 获取走失详情
-**接口地址**：`GET /lost/:id`
+**接口地址**：`GET /lost-pets/:id`
 **是否需要登录**：否
 
 **路径参数**：
@@ -669,7 +644,7 @@ isFound: number (0/1), 是否已找到
 ---
 
 ### 4.3 发布走失信息
-**接口地址**：`POST /lost`
+**接口地址**：`POST /lost-pets`
 **是否需要登录**：是
 
 **请求参数**：
@@ -702,7 +677,7 @@ isFound: number (0/1), 是否已找到
 ---
 
 ### 4.4 更新走失信息
-**接口地址**：`PUT /lost/:id`
+**接口地址**：`PUT /lost-pets/:id`
 **是否需要登录**：是
 
 **路径参数**：
@@ -744,7 +719,7 @@ isFound: number (0/1), 是否已找到
 ---
 
 ### 4.5 删除走失信息
-**接口地址**：`DELETE /lost/:id`
+**接口地址**：`DELETE /lost-pets/:id`
 **是否需要登录**：是（发布者或管理员）
 
 **路径参数**：
@@ -762,7 +737,7 @@ isFound: number (0/1), 是否已找到
 ---
 
 ### 4.6 标记已找到
-**接口地址**：`PUT /lost/:id/found`
+**接口地址**：`PATCH /lost-pets/:id/found`
 **是否需要登录**：是（发布者）
 
 **路径参数**：
@@ -783,35 +758,26 @@ isFound: number (0/1), 是否已找到
 ---
 
 ### 4.7 获取我的走失信息
-**接口地址**：`GET /lost/my`
+**接口地址**：`GET /lost-pets/my`
 **是否需要登录**：是
 
-**查询参数**：
-```
-page: number (默认1), 页码
-pageSize: number (默认10), 每页数量
-```
+**查询参数**：无（当前版本返回当前用户全部记录，按时间倒序）
 
 **响应示例**：
 ```json
 {
   "code": 200,
   "message": "获取成功",
-  "data": {
-    "list": [
-      {
-        "id": 1,
-        "name": "小白",
-        "location": "北京市朝阳区望京SOHO",
-        "is_urgent": 1,
-        "is_found": 0,
-        "created_at": "2026-03-07T09:00:00Z"
-      }
-    ],
-    "total": 5,
-    "page": 1,
-    "pageSize": 10
-  }
+  "data": [
+    {
+      "id": 1,
+      "name": "小白",
+      "location": "北京市朝阳区望京SOHO",
+      "is_urgent": 1,
+      "is_found": 0,
+      "created_at": "2026-03-07T09:00:00Z"
+    }
+  ]
 }
 ```
 
@@ -1053,35 +1019,35 @@ keyword: string, 搜索关键词
 ---
 
 ### 5.8 获取我的内容
-**接口地址**：`GET /forum/my`
+**接口地址**：`GET /forum/posts/my`
 **是否需要登录**：是
 
 **查询参数**：
 ```
-type: string (posts/comments/likes), 类型
-page: number (默认1), 页码
-pageSize: number (默认10), 每页数量
+无（当前版本直接返回 posts/comments 两组数据）
 ```
 
-**响应示例（posts）**：
+**响应示例**：
 ```json
 {
   "code": 200,
   "message": "获取成功",
   "data": {
-    "list": [
+    "posts": [
       {
         "id": 1,
         "title": "金毛的饲养经验分享",
-        "view_count": 100,
-        "comment_count": 10,
-        "like_count": 25,
         "created_at": "2026-03-07T10:00:00Z"
       }
     ],
-    "total": 10,
-    "page": 1,
-    "pageSize": 10
+    "comments": [
+      {
+        "id": 1,
+        "content": "很有帮助",
+        "post_id": 1,
+        "created_at": "2026-03-07T10:10:00Z"
+      }
+    ]
   }
 }
 ```
@@ -1142,8 +1108,8 @@ pageSize: number (默认10), 每页数量
 **Content-Type**：`multipart/form-data`
 
 **请求参数**：
-- `file`: File (图片文件, ≤5MB, jpg/jpeg/png)
-- `type`: string (avatar/pet/lost/forum), 图片类型
+- `file`: File (图片文件, ≤5MB, jpg/jpeg/png/webp)
+- `type`: string (avatar/pet/lost/forum/common), 可选，默认 `common`
 
 **响应示例**：
 ```json

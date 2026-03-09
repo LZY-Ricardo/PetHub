@@ -98,6 +98,22 @@ class UserService {
   }
 
   /**
+   * 更新用户头像
+   * @param {number} userId - 用户ID
+   * @param {string} avatar - 头像URL
+   */
+  async updateAvatar(userId, avatar) {
+    const user = await UserDAO.findById(userId);
+    if (!user) {
+      throw new Error('用户不存在');
+    }
+
+    await UserDAO.updateAvatar(userId, avatar);
+    const updatedUser = await UserDAO.findById(userId);
+    return this.formatUserInfo(updatedUser);
+  }
+
+  /**
    * 修改密码
    * @param {number} userId - 用户ID
    * @param {string} oldPassword - 旧密码

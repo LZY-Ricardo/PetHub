@@ -14,6 +14,9 @@ const petRoutes = require('./routes/pets');
 const adoptionRoutes = require('./routes/adoptions');
 const lostPetRoutes = require('./routes/lostPets');
 const forumRoutes = require('./routes/forum');
+const userRoutes = require('./routes/users');
+const adminRoutes = require('./routes/admin');
+const uploadRoutes = require('./routes/upload');
 
 const app = new Koa();
 
@@ -38,7 +41,17 @@ app.use(bodyParser({
 app.use(logger);
 
 // 静态文件服务（用于上传的文件）
-app.use(serve(path.join(__dirname, '../uploads')));
+const uploadStatic = serve(path.join(__dirname, '../uploads'));
+app.use(async (ctx, next) => {
+  if (ctx.path.startsWith('/uploads/')) {
+    const originalPath = ctx.path;
+    ctx.path = ctx.path.replace('/uploads', '') || '/';
+    await uploadStatic(ctx, next);
+    ctx.path = originalPath;
+    return;
+  }
+  await next();
+});
 
 // 注册路由
 app.use(authRoutes.routes());
@@ -55,6 +68,15 @@ app.use(lostPetRoutes.allowedMethods());
 
 app.use(forumRoutes.routes());
 app.use(forumRoutes.allowedMethods());
+
+app.use(userRoutes.routes());
+app.use(userRoutes.allowedMethods());
+
+app.use(adminRoutes.routes());
+app.use(adminRoutes.allowedMethods());
+
+app.use(uploadRoutes.routes());
+app.use(uploadRoutes.allowedMethods());
 
 // 健康检查接口
 app.use(async (ctx) => {

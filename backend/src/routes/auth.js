@@ -1,6 +1,8 @@
 const Router = require('koa-router');
 const AuthController = require('../controllers/AuthController');
+const UploadController = require('../controllers/UploadController');
 const { authMiddleware } = require('../middlewares/auth');
+const { singleImageUpload } = require('../middlewares/upload');
 
 const router = new Router({
   prefix: '/api/auth'
@@ -40,5 +42,12 @@ router.put('/user', authMiddleware, AuthController.updateUserInfo);
  * @access private
  */
 router.post('/change-password', authMiddleware, AuthController.changePassword);
+
+/**
+ * @route POST /api/auth/avatar
+ * @desc 上传头像
+ * @access private
+ */
+router.post('/avatar', authMiddleware, singleImageUpload('avatar', 'avatar'), UploadController.uploadAvatar);
 
 module.exports = router;

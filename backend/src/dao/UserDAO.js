@@ -61,6 +61,17 @@ class UserDAO extends BaseDAO {
   }
 
   /**
+   * 更新用户头像
+   * @param {number} id - 用户ID
+   * @param {string} avatar - 头像URL
+   */
+  async updateAvatar(id, avatar) {
+    const sql = `UPDATE ${this.tableName} SET avatar = ? WHERE id = ?`;
+    const [result] = await this.pool.query(sql, [avatar, id]);
+    return result.affectedRows > 0;
+  }
+
+  /**
    * 更新用户密码
    * @param {number} id - 用户ID
    * @param {string} newPassword - 新密码（已加密）

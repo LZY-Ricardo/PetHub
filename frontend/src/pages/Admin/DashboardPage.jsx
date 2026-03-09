@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Row, Col, Statistic, Table, Tag, Button } from 'antd';
+import { Card, Row, Col, Statistic, Table, Button, message } from 'antd';
 import {
   UserOutlined,
   HeartOutlined,
@@ -28,25 +28,27 @@ function DashboardPage() {
 
   const fetchStats = async () => {
     try {
-      // In a real app, this would be a single API call
-      const [usersRes, petsRes, postsRes] = await Promise.all([
-        fetch('/api/users', {
-          headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
-        }),
-        fetch('/api/pets'),
-        fetch('/api/forum/posts')
-      ]);
+      const token = localStorage.getItem('token');
+      if (!token) return;
 
-      const usersData = await usersRes.json();
-      const petsData = await petsRes.json();
-      const postsData = await postsRes.json();
-
-      setStats({
-        totalUsers: usersData.data?.length || 0,
-        totalPets: petsData.data?.length || 0,
-        totalPosts: postsData.data?.length || 0,
-        pendingAdoptions: 0 // Will be updated by fetchPendingAdoptions
+      const response = await fetch('/api/admin/dashboard', {
+        headers: { 'Authorization': `Bearer ${token}` }
       });
+
+      if (response.status === 401 || response.status === 403) {
+        message.error('无权限访问管理数据');
+        return;
+      }
+
+      const data = await response.json();
+      if (data.code === 200) {
+        setStats({
+          totalUsers: data.data?.user_count || 0,
+          totalPets: data.data?.pet_count || 0,
+          totalPosts: data.data?.post_count || 0,
+          pendingAdoptions: data.data?.pending_adoption_count || 0
+        });
+      }
     } catch (error) {
       console.error('Failed to fetch stats:', error);
     }
@@ -55,14 +57,20 @@ function DashboardPage() {
   const fetchPendingAdoptions = async () => {
     setLoading(true);
     try {
-      const response = await fetch('/api/adoptions/admin', {
-        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+      const token = localStorage.getItem('token');
+      if (!token) {
+        setAdoptions([]);
+        return;
+      }
+
+      const response = await fetch('/api/adoptions?page=1&pageSize=20&status=pending', {
+        headers: { 'Authorization': `Bearer ${token}` }
       });
       const data = await response.json();
       if (data.code === 200) {
-        const pending = data.data?.filter(a => a.status === 'pending') || [];
+        const pending = data.data?.list || [];
         setAdoptions(pending);
-        setStats(prev => ({ ...prev, pendingAdoptions: pending.length }));
+        setStats(prev => ({ ...prev, pendingAdoptions: data.data?.total || prev.pendingAdoptions }));
       }
     } catch (error) {
       console.error('Failed to fetch pending adoptions:', error);
@@ -89,13 +97,14 @@ function DashboardPage() {
     },
     {
       title: '申请人',
-      dataIndex: 'applicant_name',
-      key: 'applicant_name',
+      dataIndex: 'user_name',
+      key: 'user_name',
     },
     {
       title: '联系电话',
-      dataIndex: 'phone',
-      key: 'phone',
+      dataIndex: 'contact',
+      key: 'contact',
+      render: (text) => text || '-',
     },
     {
       title: '申请时间',
