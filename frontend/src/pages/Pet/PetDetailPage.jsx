@@ -45,7 +45,6 @@ function PetDetailPage() {
   const handleAdoSubmit = async (values) => {
     setAdoLoading(true);
     try {
-      const user = JSON.parse(localStorage.getItem('user') || '{}');
       const response = await fetch('/api/adoptions', {
         method: 'POST',
         headers: {
@@ -54,15 +53,13 @@ function PetDetailPage() {
         },
         body: JSON.stringify({
           petId: parseInt(id),
-          userId: user.id,
-          applicantName: values.applicantName,
-          phone: values.phone,
-          address: values.address,
-          reason: values.reason
+          reason: values.reason,
+          contact: values.phone,  // 映射字段名
+          address: values.address
         })
       });
       const data = await response.json();
-      if (data.code === 200) {
+      if (data.code === 200 || data.code === 201) {
         message.success('领养申请已提交');
         setAdoVisible(false);
         form.resetFields();

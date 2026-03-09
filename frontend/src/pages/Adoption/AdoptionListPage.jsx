@@ -172,26 +172,26 @@ function AdoptionListPage() {
             <div className="detail-section">
               <h3>宠物信息</h3>
               <p><strong>宠物名称:</strong> {currentAdo.pet_name}</p>
-              <p><strong>品种:</strong> {currentAdo.pet_breed}</p>
+              <p><strong>品种:</strong> {currentAdo.pet_breed || currentAdo.breed}</p>
             </div>
 
             <div className="detail-section">
               <h3>申请人信息</h3>
-              <p><strong>姓名:</strong> {currentAdo.applicant_name}</p>
-              <p><strong>联系电话:</strong> {currentAdo.phone}</p>
-              <p><strong>地址:</strong> {currentAdo.address}</p>
+              <p><strong>姓名:</strong> {currentAdo.applicant_name || '未填写'}</p>
+              <p><strong>联系电话:</strong> {currentAdo.phone || currentAdo.contact || '未填写'}</p>
+              <p><strong>地址:</strong> {currentAdo.address || '未填写'}</p>
             </div>
 
             <div className="detail-section">
               <h3>申请理由</h3>
-              <p className="reason-text">{currentAdo.reason}</p>
+              <p className="reason-text">{currentAdo.reason || '未填写'}</p>
             </div>
 
             <div className="detail-section">
               <h3>审核信息</h3>
               <p><strong>状态:</strong> <Tag color={getStatusColor(currentAdo.status)}>{getStatusText(currentAdo.status)}</Tag></p>
-              {currentAdo.review_note && (
-                <p><strong>审核备注:</strong> {currentAdo.review_note}</p>
+              {currentAdo.review_comment && (
+                <p><strong>审核备注:</strong> {currentAdo.review_comment}</p>
               )}
               <p><strong>申请时间:</strong> {new Date(currentAdo.created_at).toLocaleString('zh-CN')}</p>
             </div>

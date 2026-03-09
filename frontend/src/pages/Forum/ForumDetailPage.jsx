@@ -103,7 +103,7 @@ function ForumDetailPage() {
         })
       });
       const data = await response.json();
-      if (data.code === 200) {
+      if (data.code === 200 || data.code === 201) {
         message.success('评论成功');
         setCommentText('');
         fetchComments();

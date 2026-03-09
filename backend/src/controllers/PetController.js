@@ -11,7 +11,7 @@ class PetController {
    */
   async getPetList(ctx) {
     try {
-      const { page = 1, pageSize = 10, status, breed, gender, minAge, maxAge } = ctx.query;
+      const { page = 1, pageSize = 10, status, breed, gender, minAge, maxAge, keyword, species } = ctx.query;
 
       const filters = {};
       if (status) filters.status = status;
@@ -19,6 +19,8 @@ class PetController {
       if (gender) filters.gender = gender;
       if (minAge) filters.minAge = parseFloat(minAge);
       if (maxAge) filters.maxAge = parseFloat(maxAge);
+      if (keyword) filters.keyword = keyword;
+      if (species) filters.species = species;
 
       const result = await PetService.getPetList(
         filters,

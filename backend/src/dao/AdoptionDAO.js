@@ -61,10 +61,16 @@ class AdoptionDAO extends BaseDAO {
    */
   async getUserApplications(userId) {
     const sql = `
-      SELECT a.*, p.name as pet_name, p.breed, p.photos as pet_photos,
-             p.status as pet_status
+      SELECT a.*,
+             p.name as pet_name,
+             p.breed as pet_breed,
+             p.photos as pet_photos,
+             p.status as pet_status,
+             u.nickname as applicant_name,
+             u.contact_info as user_contact
       FROM ${this.tableName} a
       LEFT JOIN pet_info p ON a.pet_id = p.id
+      LEFT JOIN sys_user u ON a.user_id = u.id
       WHERE a.user_id = ?
       ORDER BY a.created_at DESC
     `;
@@ -77,6 +83,10 @@ class AdoptionDAO extends BaseDAO {
         } catch (e) {
           row.pet_photos = [];
         }
+      }
+      // 将contact字段映射为phone，方便前端使用
+      if (row.contact) {
+        row.phone = row.contact;
       }
     });
 

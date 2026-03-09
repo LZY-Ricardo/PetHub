@@ -59,7 +59,7 @@ function ForumPage() {
         })
       });
       const data = await response.json();
-      if (data.code === 200) {
+      if (data.code === 200 || data.code === 201) {
         message.success('发布成功');
         setPostVisible(false);
         form.resetFields();

@@ -47,19 +47,37 @@ function LostPetListPage() {
   const handleSubmit = async (values) => {
     setSubmitting(true);
     try {
+      // 将单个照片URL转换为数组格式
+      const photos = values.photos ? [values.photos] : [];
+
+      // 只发送后端期望的字段
+      const submitData = {
+        name: values.name,
+        location: values.location,
+        lostTime: values.lostTime,
+        description: values.description,
+        photos: photos,
+        contact: values.contact,
+        isUrgent: false
+      };
+
+      // 过滤掉空值
+      Object.keys(submitData).forEach(key => {
+        if (submitData[key] === undefined || submitData[key] === null || submitData[key] === '') {
+          delete submitData[key];
+        }
+      });
+
       const response = await fetch('/api/lost-pets', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         },
-        body: JSON.stringify({
-          ...values,
-          userId: user.id
-        })
+        body: JSON.stringify(submitData)
       });
       const data = await response.json();
-      if (data.code === 200) {
+      if (data.code === 200 || data.code === 201) {
         message.success('发布成功');
         setReportVisible(false);
         form.resetFields();
@@ -115,37 +133,33 @@ function LostPetListPage() {
                   style={{ animation: `fadeInUp 0.6s ease-out ${index * 0.1}s both` }}
                 >
                   <div className="pet-image-container">
-                    {pet.photo ? (
-                      <img src={pet.photo} alt={pet.name} className="pet-image" />
+                    {pet.photos && pet.photos.length > 0 ? (
+                      <img src={pet.photos[0]} alt={pet.name} className="pet-image" />
                     ) : (
                       <div className="image-placeholder">
                         <SearchOutlined />
                       </div>
                     )}
                     <Tag
-                      color={getStatusColor(pet.status)}
+                      color={getStatusColor(pet.is_found ? 'found' : 'lost')}
                       className="status-tag"
                     >
-                      {getStatusText(pet.status)}
+                      {getStatusText(pet.is_found ? 'found' : 'lost')}
                     </Tag>
                   </div>
 
                   <div className="pet-info">
                     <h3 className="pet-name">{pet.name}</h3>
                     <div className="pet-detail">
-                      <span className="label">品种:</span>
-                      <span className="value">{pet.breed}</span>
-                    </div>
-                    <div className="pet-detail">
                       <span className="label">特征:</span>
-                      <span className="value">{pet.features}</span>
+                      <span className="value">{pet.description}</span>
                     </div>
                     <div className="pet-detail location">
                       <EnvironmentOutlined />
-                      <span>{pet.lost_location}</span>
+                      <span>{pet.location}</span>
                     </div>
                     <div className="pet-detail time">
-                      <span>走失于 {new Date(pet.lost_date).toLocaleDateString('zh-CN')}</span>
+                      <span>走失于 {new Date(pet.lost_time).toLocaleDateString('zh-CN')}</span>
                     </div>
                     <div className="pet-detail contact">
                       <span>联系电话: {pet.contact}</span>
@@ -179,24 +193,16 @@ function LostPetListPage() {
           </Form.Item>
 
           <Form.Item
-            label="品种"
-            name="breed"
-            rules={[{ required: true, message: '请输入品种' }]}
-          >
-            <Input placeholder="请输入品种" />
-          </Form.Item>
-
-          <Form.Item
             label="特征描述"
-            name="features"
+            name="description"
             rules={[{ required: true, message: '请输入特征描述' }]}
           >
-            <Input.TextArea rows={3} placeholder="请描述宠物的特征，如颜色、体型等" />
+            <Input.TextArea rows={3} placeholder="请描述宠物的特征，如颜色、体型、品种等" />
           </Form.Item>
 
           <Form.Item
             label="走失地点"
-            name="lost_location"
+            name="location"
             rules={[{ required: true, message: '请输入走失地点' }]}
           >
             <Input placeholder="请输入走失地点" />
@@ -204,7 +210,7 @@ function LostPetListPage() {
 
           <Form.Item
             label="走失时间"
-            name="lost_date"
+            name="lostTime"
             rules={[{ required: true, message: '请选择走失时间' }]}
           >
             <Input type="date" />
@@ -223,7 +229,7 @@ function LostPetListPage() {
 
           <Form.Item
             label="照片链接（选填）"
-            name="photo"
+            name="photos"
           >
             <Input placeholder="请输入宠物照片的URL" />
           </Form.Item>

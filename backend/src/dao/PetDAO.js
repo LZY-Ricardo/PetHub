@@ -30,9 +30,34 @@ class PetDAO extends BaseDAO {
       params.push(filters.status);
     }
 
+    // 名称搜索（支持模糊匹配）
+    if (filters.keyword) {
+      sql += ' AND p.name LIKE ?';
+      params.push(`%${filters.keyword}%`);
+    }
+
+    // 品种筛选
     if (filters.breed) {
       sql += ' AND p.breed LIKE ?';
       params.push(`%${filters.breed}%`);
+    }
+
+    // 类型筛选（猫/狗/其他）
+    if (filters.species) {
+      const speciesMap = {
+        '猫': ['猫', '猫科', '布偶', '英国短毛', '波斯', '暹罗', '折耳', '狸花', '橘猫', '黑白'],
+        '狗': ['狗', '金毛', '拉布拉多', '泰迪', '萨摩耶', '柯基', '哈士奇', '比熊', '贵宾', '边境牧羊犬', '中华田园犬'],
+        '其他': ['仓鼠', '兔子', '鸟', '龟', '蜥蜴']
+      };
+
+      const keywords = speciesMap[filters.species] || [];
+      if (keywords.length > 0) {
+        const breedConditions = keywords.map(() => 'p.breed LIKE ?').join(' OR ');
+        sql += ` AND (${breedConditions})`;
+        keywords.forEach(keyword => {
+          params.push(`%${keyword}%`);
+        });
+      }
     }
 
     if (filters.gender) {
@@ -59,9 +84,34 @@ class PetDAO extends BaseDAO {
       countParams.push(filters.status);
     }
 
+    // 名称搜索
+    if (filters.keyword) {
+      countSql += ' AND name LIKE ?';
+      countParams.push(`%${filters.keyword}%`);
+    }
+
+    // 品种筛选
     if (filters.breed) {
       countSql += ' AND breed LIKE ?';
       countParams.push(`%${filters.breed}%`);
+    }
+
+    // 类型筛选
+    if (filters.species) {
+      const speciesMap = {
+        '猫': ['猫', '猫科', '布偶', '英国短毛', '波斯', '暹罗', '折耳', '狸花', '橘猫', '黑白'],
+        '狗': ['狗', '金毛', '拉布拉多', '泰迪', '萨摩耶', '柯基', '哈士奇', '比熊', '贵宾', '边境牧羊犬', '中华田园犬'],
+        '其他': ['仓鼠', '兔子', '鸟', '龟', '蜥蜴']
+      };
+
+      const keywords = speciesMap[filters.species] || [];
+      if (keywords.length > 0) {
+        const breedConditions = keywords.map(() => 'breed LIKE ?').join(' OR ');
+        countSql += ` AND (${breedConditions})`;
+        keywords.forEach(keyword => {
+          countParams.push(`%${keyword}%`);
+        });
+      }
     }
 
     if (filters.gender) {

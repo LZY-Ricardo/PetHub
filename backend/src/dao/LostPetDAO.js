@@ -37,11 +37,24 @@ class LostPetDAO extends BaseDAO {
 
     rows.forEach(row => {
       if (row.photos) {
-        try {
-          row.photos = JSON.parse(row.photos);
-        } catch (e) {
-          row.photos = [];
+        // 如果已经是数组，直接使用
+        if (Array.isArray(row.photos)) {
+          // 已经是数组，无需处理
+        } else if (typeof row.photos === 'string') {
+          try {
+            const parsed = JSON.parse(row.photos);
+            // 解析成功，检查是否为数组
+            row.photos = Array.isArray(parsed) ? parsed : [parsed];
+          } catch (e) {
+            // 解析失败，将字符串URL转换为数组
+            row.photos = [row.photos];
+          }
+        } else {
+          // 其他类型，转换为数组
+          row.photos = [row.photos];
         }
+      } else {
+        row.photos = [];
       }
     });
 
@@ -59,11 +72,24 @@ class LostPetDAO extends BaseDAO {
     const row = rows[0];
 
     if (row && row.photos) {
-      try {
-        row.photos = JSON.parse(row.photos);
-      } catch (e) {
-        row.photos = [];
+      // 如果已经是数组，直接使用
+      if (Array.isArray(row.photos)) {
+        // 已经是数组，无需处理
+      } else if (typeof row.photos === 'string') {
+        try {
+          const parsed = JSON.parse(row.photos);
+          // 解析成功，检查是否为数组
+          row.photos = Array.isArray(parsed) ? parsed : [parsed];
+        } catch (e) {
+          // 解析失败，将字符串URL转换为数组
+          row.photos = [row.photos];
+        }
+      } else {
+        // 其他类型，转换为数组
+        row.photos = [row.photos];
       }
+    } else if (row) {
+      row.photos = [];
     }
 
     return row || null;
@@ -115,11 +141,24 @@ class LostPetDAO extends BaseDAO {
 
     rows.forEach(row => {
       if (row.photos) {
-        try {
-          row.photos = JSON.parse(row.photos);
-        } catch (e) {
-          row.photos = [];
+        // 如果已经是数组，直接使用
+        if (Array.isArray(row.photos)) {
+          // 已经是数组，无需处理
+        } else if (typeof row.photos === 'string') {
+          try {
+            const parsed = JSON.parse(row.photos);
+            // 解析成功，检查是否为数组
+            row.photos = Array.isArray(parsed) ? parsed : [parsed];
+          } catch (e) {
+            // 解析失败，将字符串URL转换为数组
+            row.photos = [row.photos];
+          }
+        } else {
+          // 其他类型，转换为数组
+          row.photos = [row.photos];
         }
+      } else {
+        row.photos = [];
       }
     });
 
