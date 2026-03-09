@@ -55,6 +55,10 @@ class ForumService {
     return { success: true };
   }
 
+  async getComments(postId) {
+    return await ForumDAO.getComments(postId);
+  }
+
   async createComment(postId, userId, content, parentId = null) {
     if (!content) {
       throw new Error('评论内容不能为空');
@@ -69,16 +73,16 @@ class ForumService {
       LEFT JOIN sys_user u ON c.user_id = u.id
       WHERE c.id = ?
     `;
-    const { postPool } = require('../dao/ForumDAO').prototype.postPool || require('../config/db').promisePool;
-    const [rows] = await postPool.query(sql, [commentId]);
+    const db = require('../config/db');
+    const [rows] = await db.promisePool.query(sql, [commentId]);
 
     return rows[0];
   }
 
   async deleteComment(id, userId) {
     const sql = `SELECT * FROM forum_comment WHERE id = ?`;
-    const { postPool } = require('../config/db');
-    const [rows] = await postPool.query(sql, [id]);
+    const db = require('../config/db');
+    const [rows] = await db.promisePool.query(sql, [id]);
     const comment = rows[0];
 
     if (!comment) {

@@ -61,6 +61,16 @@ class ForumController {
     }
   }
 
+  async getComments(ctx) {
+    try {
+      const { id } = ctx.params;
+      const comments = await ForumService.getComments(parseInt(id));
+      success(ctx, comments);
+    } catch (err) {
+      error(ctx, err.message, 500);
+    }
+  }
+
   async createComment(ctx) {
     try {
       const { id } = ctx.params;

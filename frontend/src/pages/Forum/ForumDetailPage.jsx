@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Card, Button, Input, message, Avatar, List, Tag } from 'antd';
-import { LeftOutlined, LikeOutlined, MessageOutlined } from '@ant-design/icons';
+import { Card, Button, Input, message, Avatar, List, Tag, Popconfirm } from 'antd';
+import { LeftOutlined, LikeOutlined, MessageOutlined, DeleteOutlined } from '@ant-design/icons';
 import { useAuth } from '../../contexts/AuthContext';
 import './ForumDetailPage.css';
 
@@ -117,6 +117,26 @@ function ForumDetailPage() {
     }
   };
 
+  const handleDeleteComment = async (commentId) => {
+    try {
+      const response = await fetch(`/api/forum/comments/${commentId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+      const data = await response.json();
+      if (data.code === 200) {
+        message.success('删除成功');
+        fetchComments();
+      } else {
+        message.error(data.message || '删除失败');
+      }
+    } catch (error) {
+      message.error('删除失败');
+    }
+  };
+
   const getCategoryColor = (category) => {
     const colors = {
       '经验分享': '#FF9F43',
@@ -211,7 +231,29 @@ function ForumDetailPage() {
             className="comments-list"
             dataSource={comments}
             renderItem={(comment) => (
-              <List.Item className="comment-item">
+              <List.Item
+                className="comment-item"
+                actions={
+                  user && comment.user_id === user.id ? [
+                    <Popconfirm
+                      key="delete"
+                      title="确定要删除这条评论吗？"
+                      onConfirm={() => handleDeleteComment(comment.id)}
+                      okText="确定"
+                      cancelText="取消"
+                    >
+                      <Button
+                        type="text"
+                        danger
+                        icon={<DeleteOutlined />}
+                        size="small"
+                      >
+                        删除
+                      </Button>
+                    </Popconfirm>
+                  ] : null
+                }
+              >
                 <List.Item.Meta
                   avatar={
                     <Avatar

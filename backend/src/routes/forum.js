@@ -12,6 +12,7 @@ router.post('/posts', authMiddleware, ForumController.createPost);
 router.delete('/posts/:id', authMiddleware, ForumController.deletePost);
 
 // Comments
+router.get('/posts/:id/comments', ForumController.getComments);
 router.post('/posts/:id/comments', authMiddleware, ForumController.createComment);
 router.delete('/comments/:id', authMiddleware, ForumController.deleteComment);
 
