@@ -1,6 +1,6 @@
 import React from 'react';
-import { Card, Descriptions, Button, Tag, Space, Divider, Avatar, message, Modal, Form, Input, Select } from 'antd';
-import { UserOutlined, MailOutlined, PhoneOutlined, EditOutlined, LockOutlined } from '@ant-design/icons';
+import { Card, Descriptions, Button, Tag, Space, Divider, Avatar, message, Modal, Form, Input, Select, Upload, Spin } from 'antd';
+import { UserOutlined, MailOutlined, PhoneOutlined, EditOutlined, LockOutlined, CameraOutlined } from '@ant-design/icons';
 import { useAuth } from '../../contexts/AuthContext';
 import './ProfilePage.css';
 
@@ -11,6 +11,46 @@ function ProfilePage() {
   const [loading, setLoading] = React.useState(false);
   const [form] = Form.useForm();
   const [passwordForm] = Form.useForm();
+  const [avatarUploading, setAvatarUploading] = React.useState(false);
+
+  const handleAvatarUpload = async (file) => {
+    const isValid = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'].includes(file.type);
+    if (!isValid) {
+      message.error('仅支持 JPG/PNG/WebP 格式的图片');
+      return false;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      message.error('图片大小不能超过 5MB');
+      return false;
+    }
+
+    const formData = new FormData();
+    formData.append('avatar', file);
+
+    setAvatarUploading(true);
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch('/api/auth/avatar', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        },
+        body: formData
+      });
+      const data = await response.json();
+      if (data.code === 200) {
+        message.success('头像上传成功');
+        updateUser({ ...user, avatar: data.data.avatar });
+      } else {
+        message.error(data.message || '头像上传失败');
+      }
+    } catch (error) {
+      message.error('网络错误，请稍后重试');
+    } finally {
+      setAvatarUploading(false);
+    }
+    return false;
+  };
 
   const handleEditProfile = () => {
     form.setFieldsValue({
@@ -103,11 +143,24 @@ function ProfilePage() {
     <div className="profile-page">
       <Card className="profile-card" bordered={false}>
         <div className="profile-header">
-          <Avatar
-            size={80}
-            icon={<UserOutlined />}
-            className="profile-avatar"
-          />
+          <Upload
+            showUploadList={false}
+            beforeUpload={handleAvatarUpload}
+            accept="image/jpeg,image/jpg,image/png,image/webp"
+            disabled={avatarUploading}
+          >
+            <div className="avatar-upload-wrapper">
+              <Avatar
+                size={80}
+                src={user.avatar}
+                icon={!user.avatar && <UserOutlined />}
+                className="profile-avatar"
+              />
+              <div className="avatar-upload-overlay">
+                {avatarUploading ? <Spin size="small" /> : <CameraOutlined />}
+              </div>
+            </div>
+          </Upload>
           <div className="profile-title">
             <h2>{user.nickname}</h2>
             <div className="profile-meta">

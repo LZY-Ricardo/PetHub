@@ -107,7 +107,8 @@ const MainLayout = () => {
                 <div className="user-info">
                   <Avatar
                     size="large"
-                    icon={<UserOutlined />}
+                    src={user.avatar}
+                    icon={!user.avatar && <UserOutlined />}
                     className="user-avatar"
                   />
                   <span className="user-name">{user.nickname}</span>
