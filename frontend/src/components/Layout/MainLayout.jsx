@@ -34,11 +34,6 @@ const MainLayout = () => {
       label: '领养宠物'
     },
     {
-      key: '/adoptions',
-      icon: <SearchOutlined />,
-      label: '我的申请'
-    },
-    {
       key: '/lost-pets',
       icon: <SearchOutlined />,
       label: '宠物寻回'
@@ -47,6 +42,21 @@ const MainLayout = () => {
       key: '/forum',
       icon: <MessageOutlined />,
       label: '宠友社区'
+    },
+    {
+      key: '/adoptions',
+      icon: <SearchOutlined />,
+      label: '我的申请'
+    },
+    {
+      key: '/my-lost-pets',
+      icon: <SearchOutlined />,
+      label: '我的寻宠'
+    },
+    {
+      key: '/my-forum-posts',
+      icon: <MessageOutlined />,
+      label: '我的帖子'
     }
   ];
 
@@ -64,6 +74,18 @@ const MainLayout = () => {
       icon: <UserOutlined />,
       label: '个人中心',
       onClick: () => navigate('/profile')
+    },
+    {
+      key: 'myLostPets',
+      icon: <SearchOutlined />,
+      label: '我的寻宠发布',
+      onClick: () => navigate('/my-lost-pets')
+    },
+    {
+      key: 'myForumPosts',
+      icon: <MessageOutlined />,
+      label: '我的社区帖子',
+      onClick: () => navigate('/my-forum-posts')
     },
     {
       key: 'logout',

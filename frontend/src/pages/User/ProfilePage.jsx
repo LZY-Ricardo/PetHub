@@ -291,15 +291,15 @@ function ProfilePage() {
         <div className="profile-section">
           <h3>账号统计</h3>
           <div className="stats-grid">
-            <div className="stat-item">
+            <div className="stat-item" onClick={() => navigate('/adoptions')}>
               <div className="stat-value">{statsLoading ? '-' : stats.adoptionCount}</div>
               <div className="stat-label">领养申请</div>
             </div>
-            <div className="stat-item">
+            <div className="stat-item" onClick={() => navigate('/my-lost-pets')}>
               <div className="stat-value">{statsLoading ? '-' : stats.lostPetCount}</div>
               <div className="stat-label">寻宠发布</div>
             </div>
-            <div className="stat-item">
+            <div className="stat-item" onClick={() => navigate('/my-forum-posts')}>
               <div className="stat-value">{statsLoading ? '-' : stats.forumPostCount}</div>
               <div className="stat-label">社区帖子</div>
             </div>

@@ -9,8 +9,10 @@ import PetListPage from './pages/Pet/PetListPage';
 import PetDetailPage from './pages/Pet/PetDetailPage';
 import AdoptionListPage from './pages/Adoption/AdoptionListPage';
 import LostPetListPage from './pages/LostPet/LostPetListPage';
+import MyLostPetPage from './pages/LostPet/MyLostPetPage';
 import ForumPage from './pages/Forum/ForumPage';
 import ForumDetailPage from './pages/Forum/ForumDetailPage';
+import MyForumPostsPage from './pages/Forum/MyForumPostsPage';
 import DashboardPage from './pages/Admin/DashboardPage';
 import ProfilePage from './pages/User/ProfilePage';
 import { AuthProvider } from './contexts/AuthContext';
@@ -38,8 +40,18 @@ function App() {
                 </ProtectedRoute>
               } />
               <Route path="lost-pets" element={<LostPetListPage />} />
+              <Route path="my-lost-pets" element={
+                <ProtectedRoute>
+                  <MyLostPetPage />
+                </ProtectedRoute>
+              } />
               <Route path="forum" element={<ForumPage />} />
               <Route path="forum/:id" element={<ForumDetailPage />} />
+              <Route path="my-forum-posts" element={
+                <ProtectedRoute>
+                  <MyForumPostsPage />
+                </ProtectedRoute>
+              } />
               <Route path="profile" element={
                 <ProtectedRoute>
                   <ProfilePage />
