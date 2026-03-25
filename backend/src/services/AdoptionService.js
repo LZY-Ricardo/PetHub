@@ -1,5 +1,6 @@
 const AdoptionDAO = require('../dao/AdoptionDAO');
 const PetDAO = require('../dao/PetDAO');
+const NotificationService = require('./NotificationService');
 
 class AdoptionService {
   async getApplicationList(page, pageSize, status) {
@@ -43,6 +44,15 @@ class AdoptionService {
       address
     });
 
+    await NotificationService.notifyAdmins({
+      type: 'adoption',
+      title: '新的领养申请待处理',
+      content: `用户提交了宠物「${pet.name}」的领养申请，请及时审核。`,
+      relatedType: 'adoption_application',
+      relatedId: applicationId,
+      actionUrl: `/adoptions?focusId=${applicationId}`
+    });
+
     return await AdoptionDAO.findById(applicationId);
   }
 
@@ -65,7 +75,23 @@ class AdoptionService {
       ? (normalizedComment || '申请未通过审核，请联系管理员咨询具体原因')
       : normalizedComment;
 
+    const otherPending = status === 'approved'
+      ? await AdoptionDAO.getOtherPendingApplications(application.pet_id, id)
+      : [];
+
     await AdoptionDAO.reviewApplication(id, status, finalReviewComment, reviewedBy);
+
+    await NotificationService.createNotification({
+      userId: application.user_id,
+      type: 'adoption',
+      title: status === 'approved' ? '领养申请已通过' : '领养申请未通过',
+      content: status === 'approved'
+        ? `您对宠物 #${application.pet_id} 的领养申请已通过审核。`
+        : `您对宠物 #${application.pet_id} 的领养申请未通过。${finalReviewComment ? `备注：${finalReviewComment}` : ''}`,
+      relatedType: 'adoption_application',
+      relatedId: id,
+      actionUrl: `/adoptions?focusId=${id}`
+    });
 
     // 如果审核通过，更新宠物状态
     if (status === 'approved') {
@@ -79,6 +105,18 @@ class AdoptionService {
         autoRejectReason,
         reviewedBy
       );
+
+      for (const item of otherPending) {
+        await NotificationService.createNotification({
+          userId: item.user_id,
+          type: 'adoption',
+          title: '领养申请已自动驳回',
+          content: autoRejectReason,
+          relatedType: 'adoption_application',
+          relatedId: item.id,
+          actionUrl: `/adoptions?focusId=${item.id}`
+        });
+      }
     }
 
     return { success: true };

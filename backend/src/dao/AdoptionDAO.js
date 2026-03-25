@@ -139,6 +139,21 @@ class AdoptionDAO extends BaseDAO {
   }
 
   /**
+   * 获取同一宠物其他待审核申请
+   */
+  async getOtherPendingApplications(petId, approvedApplicationId) {
+    const sql = `
+      SELECT id, user_id
+      FROM ${this.tableName}
+      WHERE pet_id = ?
+        AND status = 'pending'
+        AND id <> ?
+    `;
+    const [rows] = await this.pool.query(sql, [petId, approvedApplicationId]);
+    return rows;
+  }
+
+  /**
    * 检查是否已有待审核的申请
    */
   async checkPendingApplication(userId, petId) {

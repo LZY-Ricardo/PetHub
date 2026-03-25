@@ -1,11 +1,12 @@
 import React from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
-import { Layout, Menu, Button, Avatar, Dropdown } from 'antd';
+import { Layout, Menu, Button, Avatar, Dropdown, Badge } from 'antd';
 import {
   HomeOutlined,
   HeartOutlined,
   SearchOutlined,
   MessageOutlined,
+  BellOutlined,
   UserOutlined,
   LogoutOutlined,
   DashboardOutlined,
@@ -21,6 +22,56 @@ const MainLayout = () => {
   const location = useLocation();
   const { user, logout, isAdmin } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
+  const [unreadCount, setUnreadCount] = React.useState(0);
+
+  const fetchUnreadCount = React.useCallback(async () => {
+    if (!user) {
+      setUnreadCount(0);
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        setUnreadCount(0);
+        return;
+      }
+
+      const response = await fetch('/api/notifications/unread-count', {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+
+      if (response.status === 401) {
+        setUnreadCount(0);
+        return;
+      }
+
+      const data = await response.json();
+      if (data.code === 200) {
+        setUnreadCount(data.data?.unreadCount || 0);
+      }
+    } catch (err) {
+      setUnreadCount(0);
+    }
+  }, [user]);
+
+  React.useEffect(() => {
+    fetchUnreadCount();
+  }, [fetchUnreadCount, location.pathname]);
+
+  React.useEffect(() => {
+    const handleUnreadChanged = () => {
+      fetchUnreadCount();
+    };
+
+    window.addEventListener('notification-unread-changed', handleUnreadChanged);
+
+    return () => {
+      window.removeEventListener('notification-unread-changed', handleUnreadChanged);
+    };
+  }, [fetchUnreadCount]);
 
   const menuItems = [
     {
@@ -44,19 +95,13 @@ const MainLayout = () => {
       label: '宠友社区'
     },
     {
-      key: '/adoptions',
-      icon: <SearchOutlined />,
-      label: '我的申请'
-    },
-    {
-      key: '/my-lost-pets',
-      icon: <SearchOutlined />,
-      label: '我的寻宠'
-    },
-    {
-      key: '/my-forum-posts',
-      icon: <MessageOutlined />,
-      label: '我的帖子'
+      key: '/notifications',
+      icon: (
+        <Badge count={unreadCount} size="small" overflowCount={99}>
+          <BellOutlined />
+        </Badge>
+      ),
+      label: '消息通知'
     }
   ];
 
@@ -74,6 +119,18 @@ const MainLayout = () => {
       icon: <UserOutlined />,
       label: '个人中心',
       onClick: () => navigate('/profile')
+    },
+    {
+      key: 'notifications',
+      icon: <BellOutlined />,
+      label: unreadCount > 0 ? `消息通知（${unreadCount}）` : '消息通知',
+      onClick: () => navigate('/notifications')
+    },
+    {
+      key: 'myAdoptions',
+      icon: <HeartOutlined />,
+      label: '我的申请',
+      onClick: () => navigate('/adoptions')
     },
     {
       key: 'myLostPets',

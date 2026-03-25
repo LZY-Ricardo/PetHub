@@ -17,6 +17,7 @@ const forumRoutes = require('./routes/forum');
 const userRoutes = require('./routes/users');
 const adminRoutes = require('./routes/admin');
 const uploadRoutes = require('./routes/upload');
+const notificationRoutes = require('./routes/notifications');
 
 const app = new Koa();
 
@@ -77,6 +78,9 @@ app.use(adminRoutes.allowedMethods());
 
 app.use(uploadRoutes.routes());
 app.use(uploadRoutes.allowedMethods());
+
+app.use(notificationRoutes.routes());
+app.use(notificationRoutes.allowedMethods());
 
 // 健康检查接口
 app.use(async (ctx) => {

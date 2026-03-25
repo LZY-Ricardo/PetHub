@@ -1,4 +1,5 @@
 const ForumDAO = require('../dao/ForumDAO');
+const NotificationService = require('./NotificationService');
 
 class ForumService {
   async getPostList(page, pageSize, category = null) {
@@ -98,6 +99,34 @@ class ForumService {
     }
 
     const commentId = await ForumDAO.createComment(postId, userId, content, parentId);
+
+    const post = await ForumDAO.getPostOwner(postId);
+    if (post && Number(post.user_id) !== Number(userId)) {
+      await NotificationService.createNotification({
+        userId: post.user_id,
+        type: 'forum',
+        title: '帖子收到新评论',
+        content: `您的帖子《${post.title}》收到了新的评论。`,
+        relatedType: 'forum_post',
+        relatedId: postId,
+        actionUrl: `/forum/${postId}`
+      });
+    }
+
+    if (parentId) {
+      const parentComment = await ForumDAO.getCommentById(parentId);
+      if (parentComment && Number(parentComment.user_id) !== Number(userId) && Number(parentComment.user_id) !== Number(post?.user_id)) {
+        await NotificationService.createNotification({
+          userId: parentComment.user_id,
+          type: 'forum',
+          title: '评论收到新回复',
+          content: '您在社区中的评论收到了新的回复。',
+          relatedType: 'forum_post',
+          relatedId: postId,
+          actionUrl: `/forum/${postId}`
+        });
+      }
+    }
 
     // 返回评论详情
     const sql = `

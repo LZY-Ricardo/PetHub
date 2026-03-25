@@ -13,4 +13,11 @@ const router = new Router({
  */
 router.get('/dashboard', authMiddleware, adminMiddleware, AdminController.getDashboardStats);
 
+/**
+ * @route POST /api/admin/notifications/broadcast
+ * @desc 管理员发布系统公告
+ * @access private (admin)
+ */
+router.post('/notifications/broadcast', authMiddleware, adminMiddleware, AdminController.publishAnnouncement);
+
 module.exports = router;

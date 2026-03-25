@@ -118,6 +118,18 @@ class ForumDAO {
     return result.insertId;
   }
 
+  async getPostOwner(postId) {
+    const sql = `SELECT id, user_id, title FROM forum_post WHERE id = ?`;
+    const [rows] = await this.postPool.query(sql, [postId]);
+    return rows[0] || null;
+  }
+
+  async getCommentById(commentId) {
+    const sql = `SELECT id, post_id, user_id, content FROM forum_comment WHERE id = ?`;
+    const [rows] = await this.postPool.query(sql, [commentId]);
+    return rows[0] || null;
+  }
+
   async deleteComment(id) {
     const sql = `DELETE FROM forum_comment WHERE id = ?`;
     const [result] = await this.postPool.query(sql, [id]);

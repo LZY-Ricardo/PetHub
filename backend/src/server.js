@@ -3,7 +3,8 @@ const app = require('./app');
 const {
   testConnection,
   ensureForumCategoryColumn,
-  ensureAdoptionPetStatusConsistency
+  ensureAdoptionPetStatusConsistency,
+  ensureNotificationTable
 } = require('./config/db');
 
 const PORT = process.env.PORT || 3000;
@@ -26,6 +27,8 @@ const startServer = async () => {
     await ensureForumCategoryColumn();
     // 自动修复：确保领养通过后的宠物状态为 adopted
     await ensureAdoptionPetStatusConsistency();
+    // 自动迁移：确保通知表存在
+    await ensureNotificationTable();
 
     // 启动HTTP服务器
     app.listen(PORT, () => {

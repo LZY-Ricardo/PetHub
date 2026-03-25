@@ -15,6 +15,7 @@ import ForumDetailPage from './pages/Forum/ForumDetailPage';
 import MyForumPostsPage from './pages/Forum/MyForumPostsPage';
 import DashboardPage from './pages/Admin/DashboardPage';
 import ProfilePage from './pages/User/ProfilePage';
+import NotificationPage from './pages/Notification/NotificationPage';
 import { AuthProvider } from './contexts/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import './App.css';
@@ -55,6 +56,11 @@ function App() {
               <Route path="profile" element={
                 <ProtectedRoute>
                   <ProfilePage />
+                </ProtectedRoute>
+              } />
+              <Route path="notifications" element={
+                <ProtectedRoute>
+                  <NotificationPage />
                 </ProtectedRoute>
               } />
               <Route path="admin/dashboard" element={

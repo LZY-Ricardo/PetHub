@@ -3,17 +3,20 @@
 ## 接口概览
 
 ### 基础信息
+
 - **Base URL**：`http://localhost:3000/api`（开发环境）
 - **接口协议**：HTTP/HTTPS
 - **数据格式**：JSON
 - **字符编码**：UTF-8
 
 ### 认证方式
+
 - **方式**：JWT Token
 - **Header**：`Authorization: Bearer {token}`
 - **Token有效期**：24小时
 
 ### 统一响应格式
+
 ```json
 {
   "code": 200,
@@ -23,6 +26,7 @@
 ```
 
 **状态码说明**：
+
 - `200`：操作成功
 - `201`：创建成功
 - `400`：请求参数错误
@@ -36,10 +40,12 @@
 ## 1. 认证模块
 
 ### 1.1 用户注册
+
 **接口地址**：`POST /auth/register`
 **是否需要登录**：否
 
 **请求参数**：
+
 ```json
 {
   "username": "string (3-20字符), 必填",
@@ -50,6 +56,7 @@
 ```
 
 **响应示例**：
+
 ```json
 {
   "code": 201,
@@ -67,6 +74,7 @@
 ```
 
 **错误响应**：
+
 ```json
 {
   "code": 400,
@@ -77,10 +85,12 @@
 ---
 
 ### 1.2 用户登录
+
 **接口地址**：`POST /auth/login`
 **是否需要登录**：否
 
 **请求参数**：
+
 ```json
 {
   "username": "string, 必填",
@@ -89,6 +99,7 @@
 ```
 
 **响应示例**：
+
 ```json
 {
   "code": 200,
@@ -108,6 +119,7 @@
 ```
 
 **错误响应**：
+
 ```json
 {
   "code": 401,
@@ -118,10 +130,12 @@
 ---
 
 ### 1.3 获取当前用户信息
+
 **接口地址**：`GET /auth/user`
 **是否需要登录**：是
 
 **响应示例**：
+
 ```json
 {
   "code": 200,
@@ -141,10 +155,12 @@
 ---
 
 ### 1.4 更新用户信息
+
 **接口地址**：`PUT /auth/user`
 **是否需要登录**：是
 
 **请求参数**：
+
 ```json
 {
   "nickname": "string (2-20字符), 可选",
@@ -153,6 +169,7 @@
 ```
 
 **响应示例**：
+
 ```json
 {
   "code": 200,
@@ -171,14 +188,17 @@
 ---
 
 ### 1.5 上传头像
+
 **接口地址**：`POST /auth/avatar`
 **是否需要登录**：是
 **Content-Type**：`multipart/form-data`
 
 **请求参数**：
+
 - `avatar`: File (图片文件, ≤5MB, jpg/jpeg/png)
 
 **响应示例**：
+
 ```json
 {
   "code": 200,
@@ -190,6 +210,7 @@
 ```
 
 **错误响应**：
+
 ```json
 {
   "code": 400,
@@ -202,10 +223,12 @@
 ## 2. 宠物档案模块
 
 ### 2.1 获取宠物列表
+
 **接口地址**：`GET /pets`
 **是否需要登录**：否
 
 **查询参数**：
+
 ```
 page: number (默认1), 页码
 pageSize: number (默认10), 每页数量
@@ -219,6 +242,7 @@ sortOrder: string (ASC/DESC), 排序方向
 ```
 
 **响应示例**：
+
 ```json
 {
   "code": 200,
@@ -247,13 +271,16 @@ sortOrder: string (ASC/DESC), 排序方向
 ---
 
 ### 2.2 获取宠物详情
+
 **接口地址**：`GET /pets/:id`
 **是否需要登录**：否
 
 **路径参数**：
+
 - `id`: number, 宠物ID
 
 **响应示例**：
+
 ```json
 {
   "code": 200,
@@ -287,10 +314,12 @@ sortOrder: string (ASC/DESC), 排序方向
 ---
 
 ### 2.3 添加宠物（管理员）
+
 **接口地址**：`POST /pets`
 **是否需要登录**：是（管理员）
 
 **请求参数**：
+
 ```json
 {
   "name": "string (2-50字符), 必填",
@@ -307,6 +336,7 @@ sortOrder: string (ASC/DESC), 排序方向
 ```
 
 **响应示例**：
+
 ```json
 {
   "code": 200,
@@ -323,13 +353,16 @@ sortOrder: string (ASC/DESC), 排序方向
 ---
 
 ### 2.4 更新宠物信息（管理员）
+
 **接口地址**：`PUT /pets/:id`
 **是否需要登录**：是（管理员）
 
 **路径参数**：
+
 - `id`: number, 宠物ID
 
 **请求参数**：
+
 ```json
 {
   "name": "string, 可选",
@@ -347,6 +380,7 @@ sortOrder: string (ASC/DESC), 排序方向
 ```
 
 **响应示例**：
+
 ```json
 {
   "code": 200,
@@ -362,13 +396,16 @@ sortOrder: string (ASC/DESC), 排序方向
 ---
 
 ### 2.5 删除宠物（管理员）
+
 **接口地址**：`DELETE /pets/:id`
 **是否需要登录**：是（管理员）
 
 **路径参数**：
+
 - `id`: number, 宠物ID
 
 **响应示例**：
+
 ```json
 {
   "code": 200,
@@ -378,6 +415,7 @@ sortOrder: string (ASC/DESC), 排序方向
 ```
 
 **错误响应**：
+
 ```json
 {
   "code": 400,
@@ -390,10 +428,12 @@ sortOrder: string (ASC/DESC), 排序方向
 ## 3. 领养申请模块
 
 ### 3.1 提交领养申请
+
 **接口地址**：`POST /adoptions`
 **是否需要登录**：是
 
 **请求参数**：
+
 ```json
 {
   "pet_id": "number, 必填",
@@ -405,6 +445,7 @@ sortOrder: string (ASC/DESC), 排序方向
 ```
 
 **响应示例**：
+
 ```json
 {
   "code": 200,
@@ -419,6 +460,7 @@ sortOrder: string (ASC/DESC), 排序方向
 ```
 
 **错误响应**：
+
 ```json
 {
   "code": 400,
@@ -436,12 +478,14 @@ sortOrder: string (ASC/DESC), 排序方向
 ---
 
 ### 3.2 获取我的申请列表
+
 **接口地址**：`GET /adoptions/my`
 **是否需要登录**：是
 
 **查询参数**：无（当前版本返回当前用户全部申请，按时间倒序）
 
 **响应示例**：
+
 ```json
 {
   "code": 200,
@@ -467,10 +511,12 @@ sortOrder: string (ASC/DESC), 排序方向
 ---
 
 ### 3.3 获取所有申请（管理员）
+
 **接口地址**：`GET /adoptions`
 **是否需要登录**：是（管理员）
 
 **查询参数**：
+
 ```
 page: number (默认1), 页码
 pageSize: number (默认10), 每页数量
@@ -478,6 +524,7 @@ status: string, 状态筛选
 ```
 
 **响应示例**：
+
 ```json
 {
   "code": 200,
@@ -516,13 +563,16 @@ status: string, 状态筛选
 ---
 
 ### 3.4 审核申请（管理员）
+
 **接口地址**：`PUT /adoptions/:id/review`
 **是否需要登录**：是（管理员）
 
 **路径参数**：
+
 - `id`: number, 申请ID
 
 **请求参数**：
+
 ```json
 {
   "status": "string (approved/rejected), 必填",
@@ -531,11 +581,13 @@ status: string, 状态筛选
 ```
 
 **业务规则说明**：
+
 - 当 `status=approved` 时：系统会将该宠物状态更新为 `adopted`，并自动驳回同一宠物的其他 `pending` 申请。
 - 自动驳回的申请会写入 `review_comment`：`该宠物已被其他申请人领养，当前申请已自动驳回`。
 - 当 `status=rejected` 且未传 `reviewComment` 时：系统会自动写入默认说明 `申请未通过审核，请联系管理员咨询具体原因`。
 
 **响应示例（通过）**：
+
 ```json
 {
   "code": 200,
@@ -545,6 +597,7 @@ status: string, 状态筛选
 ```
 
 **响应示例（驳回）**：
+
 ```json
 {
   "code": 200,
@@ -554,6 +607,7 @@ status: string, 状态筛选
 ```
 
 **错误响应**：
+
 ```json
 {
   "code": 400,
@@ -566,10 +620,12 @@ status: string, 状态筛选
 ## 4. 走失宠物模块
 
 ### 4.1 获取走失列表
+
 **接口地址**：`GET /lost-pets`
 **是否需要登录**：否
 
 **查询参数**：
+
 ```
 page: number (默认1), 页码
 pageSize: number (默认10), 每页数量
@@ -578,6 +634,7 @@ isFound: number (0/1), 是否已找到
 ```
 
 **响应示例**：
+
 ```json
 {
   "code": 200,
@@ -611,13 +668,16 @@ isFound: number (0/1), 是否已找到
 ---
 
 ### 4.2 获取走失详情
+
 **接口地址**：`GET /lost-pets/:id`
 **是否需要登录**：否
 
 **路径参数**：
+
 - `id`: number, 走失信息ID
 
 **响应示例**：
+
 ```json
 {
   "code": 200,
@@ -649,10 +709,12 @@ isFound: number (0/1), 是否已找到
 ---
 
 ### 4.3 发布走失信息
+
 **接口地址**：`POST /lost-pets`
 **是否需要登录**：是
 
 **请求参数**：
+
 ```json
 {
   "name": "string (2-50字符), 必填",
@@ -666,6 +728,7 @@ isFound: number (0/1), 是否已找到
 ```
 
 **响应示例**：
+
 ```json
 {
   "code": 200,
@@ -682,13 +745,16 @@ isFound: number (0/1), 是否已找到
 ---
 
 ### 4.4 更新走失信息
+
 **接口地址**：`PUT /lost-pets/:id`
 **是否需要登录**：是
 
 **路径参数**：
+
 - `id`: number, 走失信息ID
 
 **请求参数**：
+
 ```json
 {
   "name": "string, 可选",
@@ -702,6 +768,7 @@ isFound: number (0/1), 是否已找到
 ```
 
 **响应示例**：
+
 ```json
 {
   "code": 200,
@@ -714,6 +781,7 @@ isFound: number (0/1), 是否已找到
 ```
 
 **错误响应**：
+
 ```json
 {
   "code": 403,
@@ -724,13 +792,16 @@ isFound: number (0/1), 是否已找到
 ---
 
 ### 4.5 删除走失信息
+
 **接口地址**：`DELETE /lost-pets/:id`
 **是否需要登录**：是（发布者或管理员）
 
 **路径参数**：
+
 - `id`: number, 走失信息ID
 
 **响应示例**：
+
 ```json
 {
   "code": 200,
@@ -742,13 +813,16 @@ isFound: number (0/1), 是否已找到
 ---
 
 ### 4.6 标记已找到
+
 **接口地址**：`PATCH /lost-pets/:id/found`
 **是否需要登录**：是（发布者）
 
 **路径参数**：
+
 - `id`: number, 走失信息ID
 
 **响应示例**：
+
 ```json
 {
   "code": 200,
@@ -763,12 +837,14 @@ isFound: number (0/1), 是否已找到
 ---
 
 ### 4.7 获取我的走失信息
+
 **接口地址**：`GET /lost-pets/my`
 **是否需要登录**：是
 
 **查询参数**：无（当前版本返回当前用户全部记录，按时间倒序）
 
 **响应示例**：
+
 ```json
 {
   "code": 200,
@@ -791,10 +867,12 @@ isFound: number (0/1), 是否已找到
 ## 5. 社区互动模块
 
 ### 5.1 获取帖子列表
+
 **接口地址**：`GET /forum/posts`
 **是否需要登录**：否
 
 **查询参数**：
+
 ```
 page: number (默认1), 页码
 pageSize: number (默认10), 每页数量
@@ -802,6 +880,7 @@ category: string (经验分享/求助问答/宠物展示/闲聊灌水), 可选
 ```
 
 **响应示例**：
+
 ```json
 {
   "code": 200,
@@ -835,13 +914,16 @@ category: string (经验分享/求助问答/宠物展示/闲聊灌水), 可选
 ---
 
 ### 5.2 获取帖子详情
+
 **接口地址**：`GET /forum/posts/:id`
 **是否需要登录**：否
 
 **路径参数**：
+
 - `id`: number, 帖子ID
 
 **响应示例**：
+
 ```json
 {
   "code": 200,
@@ -899,10 +981,12 @@ category: string (经验分享/求助问答/宠物展示/闲聊灌水), 可选
 ---
 
 ### 5.3 发布帖子
+
 **接口地址**：`POST /forum/posts`
 **是否需要登录**：是
 
 **请求参数**：
+
 ```json
 {
   "title": "string (5-50字符), 必填",
@@ -913,6 +997,7 @@ category: string (经验分享/求助问答/宠物展示/闲聊灌水), 可选
 ```
 
 **响应示例**：
+
 ```json
 {
   "code": 200,
@@ -929,13 +1014,16 @@ category: string (经验分享/求助问答/宠物展示/闲聊灌水), 可选
 ---
 
 ### 5.4 更新帖子分类
+
 **接口地址**：`PUT /forum/posts/:id/category`
 **是否需要登录**：是（仅作者）
 
 **路径参数**：
+
 - `id`: number, 帖子ID
 
 **请求参数**：
+
 ```json
 {
   "category": "string (经验分享/求助问答/宠物展示/闲聊灌水), 必填"
@@ -943,6 +1031,7 @@ category: string (经验分享/求助问答/宠物展示/闲聊灌水), 可选
 ```
 
 **响应示例**：
+
 ```json
 {
   "code": 200,
@@ -958,13 +1047,16 @@ category: string (经验分享/求助问答/宠物展示/闲聊灌水), 可选
 ---
 
 ### 5.5 删除帖子
+
 **接口地址**：`DELETE /forum/posts/:id`
 **是否需要登录**：是（作者或管理员）
 
 **路径参数**：
+
 - `id`: number, 帖子ID
 
 **响应示例**：
+
 ```json
 {
   "code": 200,
@@ -976,13 +1068,16 @@ category: string (经验分享/求助问答/宠物展示/闲聊灌水), 可选
 ---
 
 ### 5.6 发表评论
+
 **接口地址**：`POST /forum/posts/:id/comments`
 **是否需要登录**：是
 
 **路径参数**：
+
 - `id`: number, 帖子ID
 
 **请求参数**：
+
 ```json
 {
   "content": "string (2-500字符), 必填",
@@ -991,6 +1086,7 @@ category: string (经验分享/求助问答/宠物展示/闲聊灌水), 可选
 ```
 
 **响应示例**：
+
 ```json
 {
   "code": 200,
@@ -1005,6 +1101,7 @@ category: string (经验分享/求助问答/宠物展示/闲聊灌水), 可选
 ```
 
 **错误响应**：
+
 ```json
 {
   "code": 400,
@@ -1015,13 +1112,16 @@ category: string (经验分享/求助问答/宠物展示/闲聊灌水), 可选
 ---
 
 ### 5.7 删除评论
+
 **接口地址**：`DELETE /forum/comments/:id`
 **是否需要登录**：是（作者或管理员）
 
 **路径参数**：
+
 - `id`: number, 评论ID
 
 **响应示例**：
+
 ```json
 {
   "code": 200,
@@ -1033,13 +1133,16 @@ category: string (经验分享/求助问答/宠物展示/闲聊灌水), 可选
 ---
 
 ### 5.8 点赞/取消点赞
+
 **接口地址**：`POST /forum/posts/:id/like`
 **是否需要登录**：是
 
 **路径参数**：
+
 - `id`: number, 帖子ID
 
 **响应示例**：
+
 ```json
 {
   "code": 200,
@@ -1054,15 +1157,18 @@ category: string (经验分享/求助问答/宠物展示/闲聊灌水), 可选
 ---
 
 ### 5.9 获取我的内容
+
 **接口地址**：`GET /forum/posts/my`
 **是否需要登录**：是
 
 **查询参数**：
+
 ```
 无（当前版本直接返回 posts/comments 两组数据）
 ```
 
 **响应示例**：
+
 ```json
 {
   "code": 200,
@@ -1088,6 +1194,7 @@ category: string (经验分享/求助问答/宠物展示/闲聊灌水), 可选
 ```
 
 **响应示例（comments）**：
+
 ```json
 {
   "code": 200,
@@ -1112,6 +1219,7 @@ category: string (经验分享/求助问答/宠物展示/闲聊灌水), 可选
 ```
 
 **响应示例（likes）**：
+
 ```json
 {
   "code": 200,
@@ -1138,15 +1246,18 @@ category: string (经验分享/求助问答/宠物展示/闲聊灌水), 可选
 ## 6. 文件上传模块
 
 ### 6.1 通用图片上传
+
 **接口地址**：`POST /upload/image`
 **是否需要登录**：是
 **Content-Type**：`multipart/form-data`
 
 **请求参数**：
+
 - `file`: File (图片文件, ≤5MB, jpg/jpeg/png/webp)
 - `type`: string (avatar/pet/lost/forum/common), 可选，默认 `common`
 
 **响应示例**：
+
 ```json
 {
   "code": 200,
@@ -1158,6 +1269,7 @@ category: string (经验分享/求助问答/宠物展示/闲聊灌水), 可选
 ```
 
 **错误响应**：
+
 ```json
 {
   "code": 400,
@@ -1177,10 +1289,12 @@ category: string (经验分享/求助问答/宠物展示/闲聊灌水), 可选
 ## 7. 统计数据模块（管理员）
 
 ### 7.1 获取仪表盘数据
+
 **接口地址**：`GET /admin/dashboard`
 **是否需要登录**：是（管理员）
 
 **响应示例**：
+
 ```json
 {
   "code": 200,
@@ -1198,55 +1312,195 @@ category: string (经验分享/求助问答/宠物展示/闲聊灌水), 可选
 
 ---
 
+### 7.2 发布系统公告（管理员）
+
+**接口地址**：`POST /admin/notifications/broadcast`
+**是否需要登录**：是（管理员）
+
+**请求参数**：
+
+```json
+{
+  "title": "string (1-120字符), 必填",
+  "content": "string (1-500字符), 必填",
+  "targetRole": "string (all/user/admin), 可选，默认all",
+  "excludeSender": "boolean, 可选，默认false"
+}
+```
+
+**响应示例**：
+
+```json
+{
+  "code": 200,
+  "message": "公告发布成功",
+  "data": {
+    "deliveredCount": 128,
+    "targetRole": "all",
+    "excludeSender": false
+  }
+}
+```
+
+---
+
+## 8. 通知模块
+
+### 8.1 获取通知列表
+
+**接口地址**：`GET /notifications`
+**是否需要登录**：是
+
+**查询参数**：
+
+```
+page: number (默认1), 页码
+pageSize: number (默认10), 每页数量
+unreadOnly: boolean (true/false), 是否仅未读
+type: string (adoption/forum/system), 通知类型筛选
+```
+
+**响应示例**：
+
+```json
+{
+  "code": 200,
+  "message": "操作成功",
+  "data": {
+    "list": [
+      {
+        "id": 101,
+        "user_id": 3,
+        "type": "adoption",
+        "title": "领养申请已通过",
+        "content": "您对宠物 #12 的领养申请已通过审核。",
+        "related_type": "adoption_application",
+        "related_id": 55,
+        "action_url": "/adoptions?focusId=55",
+        "is_read": 0,
+        "read_at": null,
+        "created_at": "2026-03-25T10:00:00Z"
+      }
+    ],
+    "total": 23,
+    "page": 1,
+    "pageSize": 10
+  }
+}
+```
+
+---
+
+### 8.2 获取未读通知数
+
+**接口地址**：`GET /notifications/unread-count`
+**是否需要登录**：是
+
+**响应示例**：
+
+```json
+{
+  "code": 200,
+  "message": "操作成功",
+  "data": {
+    "unreadCount": 5
+  }
+}
+```
+
+---
+
+### 8.3 标记单条通知为已读
+
+**接口地址**：`PUT /notifications/:id/read`
+**是否需要登录**：是
+
+**路径参数**：
+
+- `id`: number, 通知ID
+
+**响应示例**：
+
+```json
+{
+  "code": 200,
+  "message": "已标记为已读",
+  "data": null
+}
+```
+
+---
+
+### 8.4 全部标记为已读
+
+**接口地址**：`PUT /notifications/read-all`
+**是否需要登录**：是
+
+**响应示例**：
+
+```json
+{
+  "code": 200,
+  "message": "已全部标记为已读",
+  "data": {
+    "affected": 5
+  }
+}
+```
+
+---
+
 ## 错误码说明
 
-| 错误码 | 说明 |
-|-------|-----|
-| 200 | 操作成功 |
-| 400 | 请求参数错误 |
-| 401 | 未登录或token已过期 |
-| 403 | 无权限访问 |
-| 404 | 资源不存在 |
-| 409 | 资源冲突（如用户名已存在） |
-| 413 | 文件大小超过限制 |
-| 415 | 文件类型不支持 |
-| 500 | 服务器内部错误 |
+| 错误码 | 说明                       |
+| ------ | -------------------------- |
+| 200    | 操作成功                   |
+| 400    | 请求参数错误               |
+| 401    | 未登录或token已过期        |
+| 403    | 无权限访问                 |
+| 404    | 资源不存在                 |
+| 409    | 资源冲突（如用户名已存在） |
+| 413    | 文件大小超过限制           |
+| 415    | 文件类型不支持             |
+| 500    | 服务器内部错误             |
 
 ---
 
 ## 接口调用示例
 
 ### JavaScript (Axios)
+
 ```javascript
-import axios from 'axios';
+import axios from "axios";
 
 const api = axios.create({
-  baseURL: 'http://localhost:3000/api',
+  baseURL: "http://localhost:3000/api",
   headers: {
-    'Authorization': `Bearer ${token}`
-  }
+    Authorization: `Bearer ${token}`,
+  },
 });
 
 // 获取宠物列表
 const getPets = async () => {
-  const response = await api.get('/pets', {
+  const response = await api.get("/pets", {
     params: {
       page: 1,
       pageSize: 10,
-      status: 'available'
-    }
+      status: "available",
+    },
   });
   return response.data;
 };
 
 // 提交领养申请
 const submitApplication = async (data) => {
-  const response = await api.post('/adoptions', data);
+  const response = await api.post("/adoptions", data);
   return response.data;
 };
 ```
 
 ### cURL
+
 ```bash
 # 用户登录
 curl -X POST http://localhost:3000/api/auth/login \
@@ -1270,6 +1524,6 @@ curl -X POST http://localhost:3000/api/adoptions \
 
 ---
 
-**文档版本**：v1.0
-**编写日期**：2026年3月7日
+**文档版本**：v1.1
+**编写日期**：2026年3月25日
 **文档状态**：已完成
