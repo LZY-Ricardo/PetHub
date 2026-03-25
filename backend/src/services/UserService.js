@@ -164,6 +164,19 @@ class UserService {
   }
 
   /**
+   * 获取当前用户账号统计
+   * @param {number} userId - 用户ID
+   */
+  async getUserStats(userId) {
+    const user = await UserDAO.findById(userId);
+    if (!user) {
+      throw new Error('用户不存在');
+    }
+
+    return await UserDAO.getUserStats(userId);
+  }
+
+  /**
    * 格式化用户信息（移除敏感字段）
    * @param {object} user - 用户数据
    */

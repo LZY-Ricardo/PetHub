@@ -129,6 +129,25 @@ class UserDAO extends BaseDAO {
     const [result] = await this.pool.query(sql, [status, id]);
     return result.affectedRows > 0;
   }
+
+  /**
+   * 获取用户账号统计
+   * @param {number} userId - 用户ID
+   */
+  async getUserStats(userId) {
+    const sql = `
+      SELECT
+        (SELECT COUNT(*) FROM adoption_application WHERE user_id = ?) AS adoptionCount,
+        (SELECT COUNT(*) FROM lost_pet WHERE user_id = ?) AS lostPetCount,
+        (SELECT COUNT(*) FROM forum_post WHERE user_id = ?) AS forumPostCount
+    `;
+    const [rows] = await this.pool.query(sql, [userId, userId, userId]);
+    return rows[0] || {
+      adoptionCount: 0,
+      lostPetCount: 0,
+      forumPostCount: 0
+    };
+  }
 }
 
 module.exports = new UserDAO();

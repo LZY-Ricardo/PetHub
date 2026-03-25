@@ -14,6 +14,52 @@ function ProfilePage() {
   const [form] = Form.useForm();
   const [passwordForm] = Form.useForm();
   const [avatarUploading, setAvatarUploading] = React.useState(false);
+  const [statsLoading, setStatsLoading] = React.useState(true);
+  const [stats, setStats] = React.useState({
+    adoptionCount: 0,
+    lostPetCount: 0,
+    forumPostCount: 0
+  });
+
+  React.useEffect(() => {
+    const fetchUserStats = async () => {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        setStatsLoading(false);
+        return;
+      }
+
+      try {
+        setStatsLoading(true);
+        const response = await fetch('/api/auth/user/stats', {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        if (response.status === 401) {
+          handleTokenExpired();
+          navigate('/login', { replace: true });
+          return;
+        }
+
+        const data = await response.json();
+        if (data.code === 200 && data.data) {
+          setStats({
+            adoptionCount: Number(data.data.adoptionCount) || 0,
+            lostPetCount: Number(data.data.lostPetCount) || 0,
+            forumPostCount: Number(data.data.forumPostCount) || 0
+          });
+        }
+      } catch (error) {
+        // 忽略统计接口错误，页面其余内容可正常展示
+      } finally {
+        setStatsLoading(false);
+      }
+    };
+
+    fetchUserStats();
+  }, [handleTokenExpired, navigate]);
 
   const handleAvatarUpload = async (file) => {
     const isValid = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'].includes(file.type);
@@ -246,15 +292,15 @@ function ProfilePage() {
           <h3>账号统计</h3>
           <div className="stats-grid">
             <div className="stat-item">
-              <div className="stat-value">0</div>
+              <div className="stat-value">{statsLoading ? '-' : stats.adoptionCount}</div>
               <div className="stat-label">领养申请</div>
             </div>
             <div className="stat-item">
-              <div className="stat-value">0</div>
+              <div className="stat-value">{statsLoading ? '-' : stats.lostPetCount}</div>
               <div className="stat-label">寻宠发布</div>
             </div>
             <div className="stat-item">
-              <div className="stat-value">0</div>
+              <div className="stat-value">{statsLoading ? '-' : stats.forumPostCount}</div>
               <div className="stat-label">社区帖子</div>
             </div>
           </div>

@@ -76,6 +76,19 @@ class AuthController {
   }
 
   /**
+   * 获取当前用户账号统计
+   */
+  async getUserStats(ctx) {
+    try {
+      const userId = ctx.state.user.userId;
+      const stats = await UserService.getUserStats(userId);
+      success(ctx, stats);
+    } catch (err) {
+      error(ctx, err.message, 404);
+    }
+  }
+
+  /**
    * 更新用户信息
    */
   async updateUserInfo(ctx) {

@@ -30,6 +30,13 @@ router.post('/login', AuthController.login);
 router.get('/user', authMiddleware, AuthController.getUserInfo);
 
 /**
+ * @route GET /api/auth/user/stats
+ * @desc 获取当前用户账号统计
+ * @access private
+ */
+router.get('/user/stats', authMiddleware, AuthController.getUserStats);
+
+/**
  * @route PUT /api/auth/user
  * @desc 更新用户信息
  * @access private
