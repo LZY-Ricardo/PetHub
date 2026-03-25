@@ -15,7 +15,7 @@ function ForumPage() {
   const [submitting, setSubmitting] = useState(false);
   const [activeCategory, setActiveCategory] = useState('全部');
   const [form] = Form.useForm();
-  const { user } = useAuth();
+  const { user, handleTokenExpired } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -68,6 +68,14 @@ function ForumPage() {
           userId: user.id
         })
       });
+
+      if (response.status === 401) {
+        handleTokenExpired();
+        setPostVisible(false);
+        navigate('/login', { replace: true });
+        return;
+      }
+
       const data = await response.json();
       if (data.code === 200 || data.code === 201) {
         message.success('发布成功');

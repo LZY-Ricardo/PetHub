@@ -11,7 +11,7 @@ function ForumDetailPage() {
   const categoryOptions = ['经验分享', '求助问答', '宠物展示', '闲聊灌水'];
   const { id } = useParams();
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, handleTokenExpired } = useAuth();
   const [post, setPost] = useState(null);
   const [comments, setComments] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -73,6 +73,13 @@ function ForumDetailPage() {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
+
+      if (response.status === 401) {
+        handleTokenExpired();
+        navigate('/login', { replace: true });
+        return;
+      }
+
       const data = await response.json();
       if (data.code === 200) {
         const nextLiked = Boolean(data.data?.liked);
@@ -111,6 +118,13 @@ function ForumDetailPage() {
           content: commentText
         })
       });
+
+      if (response.status === 401) {
+        handleTokenExpired();
+        navigate('/login', { replace: true });
+        return;
+      }
+
       const data = await response.json();
       if (data.code === 200 || data.code === 201) {
         message.success('评论成功');
@@ -134,6 +148,13 @@ function ForumDetailPage() {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
+
+      if (response.status === 401) {
+        handleTokenExpired();
+        navigate('/login', { replace: true });
+        return;
+      }
+
       const data = await response.json();
       if (data.code === 200) {
         message.success('删除成功');
@@ -179,6 +200,13 @@ function ForumDetailPage() {
         },
         body: JSON.stringify({ category: selectedCategory })
       });
+
+      if (response.status === 401) {
+        handleTokenExpired();
+        setCategoryModalVisible(false);
+        navigate('/login', { replace: true });
+        return;
+      }
 
       const data = await response.json();
       if (data.code === 200) {

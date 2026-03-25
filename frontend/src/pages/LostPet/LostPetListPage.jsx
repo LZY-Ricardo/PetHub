@@ -15,7 +15,8 @@ function LostPetListPage() {
   const [reportVisible, setReportVisible] = useState(false);
   const [form] = Form.useForm();
   const [submitting, setSubmitting] = useState(false);
-  const { user } = useAuth();
+  const { user, handleTokenExpired } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchLostPets();
@@ -76,6 +77,14 @@ function LostPetListPage() {
         },
         body: JSON.stringify(submitData)
       });
+
+      if (response.status === 401) {
+        handleTokenExpired();
+        setReportVisible(false);
+        navigate('/login', { replace: true });
+        return;
+      }
+
       const data = await response.json();
       if (data.code === 200 || data.code === 201) {
         message.success('发布成功');

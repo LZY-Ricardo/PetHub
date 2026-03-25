@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Card, Table, Tag, Button, Modal, Input, Space, message } from 'antd';
 import { EyeOutlined } from '@ant-design/icons';
 import { useAuth } from '../../contexts/AuthContext';
-import { useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import './AdoptionListPage.css';
 
 function AdoptionListPage() {
@@ -15,8 +15,9 @@ function AdoptionListPage() {
   const [reviewComment, setReviewComment] = useState('');
   const [reviewing, setReviewing] = useState(false);
   const [reviewTarget, setReviewTarget] = useState(null);
+  const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
-  const { user } = useAuth();
+  const { user, handleTokenExpired } = useAuth();
   const isAdminView = user?.role === 'admin';
   const focusId = searchParams.get('focusId');
 
@@ -61,11 +62,10 @@ function AdoptionListPage() {
 
       // 处理401未授权（token过期或无效）
       if (response.status === 401) {
-        message.error('登录已过期，请重新登录');
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
+        handleTokenExpired();
         setAdoptions([]);
         setLoading(false);
+        navigate('/login', { replace: true });
         return;
       }
 
@@ -138,9 +138,8 @@ function AdoptionListPage() {
       });
 
       if (response.status === 401) {
-        message.error('登录已过期，请重新登录');
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
+        handleTokenExpired();
+        navigate('/login', { replace: true });
         return;
       }
 

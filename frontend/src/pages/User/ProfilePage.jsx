@@ -1,11 +1,13 @@
 import React from 'react';
 import { Card, Descriptions, Button, Tag, Space, Divider, Avatar, message, Modal, Form, Input, Select, Upload, Spin } from 'antd';
 import { UserOutlined, MailOutlined, PhoneOutlined, EditOutlined, LockOutlined, CameraOutlined } from '@ant-design/icons';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import './ProfilePage.css';
 
 function ProfilePage() {
-  const { user, updateUser } = useAuth();
+  const { user, updateUser, handleTokenExpired, logout } = useAuth();
+  const navigate = useNavigate();
   const [editModalVisible, setEditModalVisible] = React.useState(false);
   const [passwordModalVisible, setPasswordModalVisible] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
@@ -37,6 +39,13 @@ function ProfilePage() {
         },
         body: formData
       });
+
+      if (response.status === 401) {
+        handleTokenExpired();
+        navigate('/login', { replace: true });
+        return false;
+      }
+
       const data = await response.json();
       if (data.code === 200) {
         message.success('头像上传成功');
@@ -73,6 +82,12 @@ function ProfilePage() {
         body: JSON.stringify(values)
       });
 
+      if (response.status === 401) {
+        handleTokenExpired();
+        navigate('/login', { replace: true });
+        return;
+      }
+
       const data = await response.json();
 
       if (data.code === 200) {
@@ -102,6 +117,12 @@ function ProfilePage() {
         body: JSON.stringify(values)
       });
 
+      if (response.status === 401) {
+        handleTokenExpired();
+        navigate('/login', { replace: true });
+        return;
+      }
+
       const data = await response.json();
 
       if (data.code === 200) {
@@ -110,9 +131,8 @@ function ProfilePage() {
         passwordForm.resetFields();
         // 延迟1秒后退出登录
         setTimeout(() => {
-          localStorage.removeItem('token');
-          localStorage.removeItem('user');
-          window.location.href = '/login';
+          logout(false);
+          navigate('/login', { replace: true });
         }, 1000);
       } else {
         message.error(data.message || '密码修改失败');

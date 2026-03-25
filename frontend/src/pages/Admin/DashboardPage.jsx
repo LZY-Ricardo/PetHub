@@ -8,6 +8,7 @@ import {
   ClockCircleOutlined
 } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../contexts/AuthContext';
 import './DashboardPage.css';
 
 function DashboardPage() {
@@ -20,6 +21,7 @@ function DashboardPage() {
   const [adoptions, setAdoptions] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const { handleTokenExpired } = useAuth();
 
   useEffect(() => {
     fetchStats();
@@ -35,7 +37,13 @@ function DashboardPage() {
         headers: { 'Authorization': `Bearer ${token}` }
       });
 
-      if (response.status === 401 || response.status === 403) {
+      if (response.status === 401) {
+        handleTokenExpired();
+        navigate('/login', { replace: true });
+        return;
+      }
+
+      if (response.status === 403) {
         message.error('无权限访问管理数据');
         return;
       }
@@ -66,6 +74,14 @@ function DashboardPage() {
       const response = await fetch('/api/adoptions?page=1&pageSize=20&status=pending', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
+
+      if (response.status === 401) {
+        handleTokenExpired();
+        setAdoptions([]);
+        navigate('/login', { replace: true });
+        return;
+      }
+
       const data = await response.json();
       if (data.code === 200) {
         const pending = data.data?.list || [];

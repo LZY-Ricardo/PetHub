@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Card, Row, Col, Tag, Button, Descriptions, Modal, Form, Input, message } from 'antd';
 import { HeartOutlined, EnvironmentOutlined, LeftOutlined, UserOutlined } from '@ant-design/icons';
+import { useAuth } from '../../contexts/AuthContext';
 import './PetDetailPage.css';
 
 function PetDetailPage() {
@@ -12,6 +13,7 @@ function PetDetailPage() {
   const [adoVisible, setAdoVisible] = useState(false);
   const [adoLoading, setAdoLoading] = useState(false);
   const [form] = Form.useForm();
+  const { handleTokenExpired } = useAuth();
 
   useEffect(() => {
     fetchPetDetail();
@@ -58,6 +60,14 @@ function PetDetailPage() {
           address: values.address
         })
       });
+
+      if (response.status === 401) {
+        handleTokenExpired();
+        setAdoVisible(false);
+        navigate('/login', { replace: true });
+        return;
+      }
+
       const data = await response.json();
       if (data.code === 200 || data.code === 201) {
         message.success('领养申请已提交');

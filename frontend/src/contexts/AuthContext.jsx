@@ -15,6 +15,12 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  const clearAuth = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    setUser(null);
+  };
+
   useEffect(() => {
     // Check for stored token and user
     const token = localStorage.getItem('token');
@@ -24,8 +30,7 @@ export const AuthProvider = ({ children }) => {
       try {
         setUser(JSON.parse(storedUser));
       } catch (e) {
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
+        clearAuth();
       }
     }
 
@@ -81,11 +86,16 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const logout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    setUser(null);
-    message.success('已退出登录');
+  const logout = (showMessage = true) => {
+    clearAuth();
+    if (showMessage) {
+      message.success('已退出登录');
+    }
+  };
+
+  const handleTokenExpired = () => {
+    clearAuth();
+    message.error('登录已过期，请重新登录');
   };
 
   const updateUser = (updatedUser) => {
@@ -103,6 +113,7 @@ export const AuthProvider = ({ children }) => {
     login,
     register,
     logout,
+    handleTokenExpired,
     updateUser,
     isAdmin
   };
