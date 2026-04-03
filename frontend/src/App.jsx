@@ -15,7 +15,11 @@ import ForumDetailPage from './pages/Forum/ForumDetailPage';
 import MyForumPostsPage from './pages/Forum/MyForumPostsPage';
 import DashboardPage from './pages/Admin/DashboardPage';
 import ProfilePage from './pages/User/ProfilePage';
+import MyPetProfilesPage from './pages/User/MyPetProfilesPage';
 import NotificationPage from './pages/Notification/NotificationPage';
+import BoardingApplicationPage from './pages/Boarding/BoardingApplicationPage';
+import MyBoardingListPage from './pages/Boarding/MyBoardingListPage';
+import BoardingManagementPage from './pages/Admin/BoardingManagementPage';
 import { AuthProvider } from './contexts/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import './App.css';
@@ -58,6 +62,21 @@ function App() {
                   <ProfilePage />
                 </ProtectedRoute>
               } />
+              <Route path="my-pets" element={
+                <ProtectedRoute>
+                  <MyPetProfilesPage />
+                </ProtectedRoute>
+              } />
+              <Route path="boarding/apply" element={
+                <ProtectedRoute>
+                  <BoardingApplicationPage />
+                </ProtectedRoute>
+              } />
+              <Route path="boarding" element={
+                <ProtectedRoute>
+                  <MyBoardingListPage />
+                </ProtectedRoute>
+              } />
               <Route path="notifications" element={
                 <ProtectedRoute>
                   <NotificationPage />
@@ -66,6 +85,11 @@ function App() {
               <Route path="admin/dashboard" element={
                 <ProtectedRoute requireAdmin>
                   <DashboardPage />
+                </ProtectedRoute>
+              } />
+              <Route path="admin/boarding" element={
+                <ProtectedRoute requireAdmin>
+                  <BoardingManagementPage />
                 </ProtectedRoute>
               } />
             </Route>

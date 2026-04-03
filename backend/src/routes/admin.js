@@ -1,5 +1,6 @@
 const Router = require('koa-router');
 const AdminController = require('../controllers/AdminController');
+const BoardingController = require('../controllers/BoardingController');
 const { authMiddleware, adminMiddleware } = require('../middlewares/auth');
 
 const router = new Router({
@@ -19,5 +20,11 @@ router.get('/dashboard', authMiddleware, adminMiddleware, AdminController.getDas
  * @access private (admin)
  */
 router.post('/notifications/broadcast', authMiddleware, adminMiddleware, AdminController.publishAnnouncement);
+router.get('/boarding-applications', authMiddleware, adminMiddleware, BoardingController.getAdminApplicationList);
+router.get('/boarding-applications/:id', authMiddleware, adminMiddleware, BoardingController.getAdminApplicationDetail);
+router.patch('/boarding-applications/:id/review', authMiddleware, adminMiddleware, BoardingController.reviewApplication);
+router.patch('/boarding-applications/:id/check-in', authMiddleware, adminMiddleware, BoardingController.checkInApplication);
+router.patch('/boarding-applications/:id/complete', authMiddleware, adminMiddleware, BoardingController.completeApplication);
+router.patch('/boarding-applications/:id/cancel', authMiddleware, adminMiddleware, BoardingController.cancelApplicationByAdmin);
 
 module.exports = router;

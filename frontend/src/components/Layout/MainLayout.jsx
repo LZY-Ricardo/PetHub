@@ -102,6 +102,11 @@ const MainLayout = () => {
         </Badge>
       ),
       label: '消息通知'
+    },
+    {
+      key: '/boarding',
+      icon: <HeartOutlined />,
+      label: '公益寄养'
     }
   ];
 
@@ -110,6 +115,11 @@ const MainLayout = () => {
       key: '/admin/dashboard',
       icon: <DashboardOutlined />,
       label: '管理后台'
+    });
+    menuItems.push({
+      key: '/admin/boarding',
+      icon: <HeartOutlined />,
+      label: '寄养管理'
     });
   }
 
@@ -125,6 +135,18 @@ const MainLayout = () => {
       icon: <BellOutlined />,
       label: unreadCount > 0 ? `消息通知（${unreadCount}）` : '消息通知',
       onClick: () => navigate('/notifications')
+    },
+    {
+      key: 'myPets',
+      icon: <HeartOutlined />,
+      label: '我的宠物档案',
+      onClick: () => navigate('/my-pets')
+    },
+    {
+      key: 'myBoarding',
+      icon: <HeartOutlined />,
+      label: '我的寄养申请',
+      onClick: () => navigate('/boarding')
     },
     {
       key: 'myAdoptions',

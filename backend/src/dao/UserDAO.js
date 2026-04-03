@@ -138,12 +138,14 @@ class UserDAO extends BaseDAO {
     const sql = `
       SELECT
         (SELECT COUNT(*) FROM adoption_application WHERE user_id = ?) AS adoptionCount,
+        (SELECT COUNT(*) FROM boarding_application WHERE user_id = ?) AS boardingCount,
         (SELECT COUNT(*) FROM lost_pet WHERE user_id = ?) AS lostPetCount,
         (SELECT COUNT(*) FROM forum_post WHERE user_id = ?) AS forumPostCount
     `;
-    const [rows] = await this.pool.query(sql, [userId, userId, userId]);
+    const [rows] = await this.pool.query(sql, [userId, userId, userId, userId]);
     return rows[0] || {
       adoptionCount: 0,
+      boardingCount: 0,
       lostPetCount: 0,
       forumPostCount: 0
     };

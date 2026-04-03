@@ -101,6 +101,10 @@ function DashboardPage() {
     navigate('/adoptions');
   };
 
+  const handleViewBoarding = () => {
+    navigate('/admin/boarding');
+  };
+
   const handlePublishAnnouncement = async (values) => {
     setPublishing(true);
     try {
@@ -270,6 +274,11 @@ function DashboardPage() {
         className="announcement-card"
         title="发布系统公告"
       >
+        <Space style={{ marginBottom: 16 }}>
+          <Button onClick={handleViewBoarding}>
+            寄养管理
+          </Button>
+        </Space>
         <Form
           form={announceForm}
           layout="vertical"

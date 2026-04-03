@@ -17,6 +17,7 @@ function ProfilePage() {
   const [statsLoading, setStatsLoading] = React.useState(true);
   const [stats, setStats] = React.useState({
     adoptionCount: 0,
+    boardingCount: 0,
     lostPetCount: 0,
     forumPostCount: 0
   });
@@ -47,6 +48,7 @@ function ProfilePage() {
         if (data.code === 200 && data.data) {
           setStats({
             adoptionCount: Number(data.data.adoptionCount) || 0,
+            boardingCount: Number(data.data.boardingCount) || 0,
             lostPetCount: Number(data.data.lostPetCount) || 0,
             forumPostCount: Number(data.data.forumPostCount) || 0
           });
@@ -294,6 +296,14 @@ function ProfilePage() {
             <div className="stat-item" onClick={() => navigate('/adoptions')}>
               <div className="stat-value">{statsLoading ? '-' : stats.adoptionCount}</div>
               <div className="stat-label">领养申请</div>
+            </div>
+            <div className="stat-item" onClick={() => navigate('/boarding')}>
+              <div className="stat-value">{statsLoading ? '-' : stats.boardingCount}</div>
+              <div className="stat-label">寄养申请</div>
+            </div>
+            <div className="stat-item" onClick={() => navigate('/my-pets')}>
+              <div className="stat-value">档案</div>
+              <div className="stat-label">我的宠物</div>
             </div>
             <div className="stat-item" onClick={() => navigate('/my-lost-pets')}>
               <div className="stat-value">{statsLoading ? '-' : stats.lostPetCount}</div>

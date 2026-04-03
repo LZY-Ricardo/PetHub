@@ -108,12 +108,14 @@ function NotificationPage() {
 
   const getTypeText = (type) => {
     if (type === 'adoption') return '领养';
+    if (type === 'boarding') return '寄养';
     if (type === 'forum') return '社区';
     return '系统';
   };
 
   const getTypeColor = (type) => {
     if (type === 'adoption') return 'green';
+    if (type === 'boarding') return 'orange';
     if (type === 'forum') return 'blue';
     return 'default';
   };
@@ -136,7 +138,7 @@ function NotificationPage() {
             <h1 className="notification-title">
               <BellOutlined /> 消息通知
             </h1>
-            <p className="notification-subtitle">查看系统消息、领养审核和社区互动提醒</p>
+            <p className="notification-subtitle">查看系统消息、寄养进度和业务提醒</p>
           </div>
           <Space>
             <Button

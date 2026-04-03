@@ -18,6 +18,8 @@ const userRoutes = require('./routes/users');
 const adminRoutes = require('./routes/admin');
 const uploadRoutes = require('./routes/upload');
 const notificationRoutes = require('./routes/notifications');
+const boardingRoutes = require('./routes/boarding');
+const userPetRoutes = require('./routes/userPets');
 
 const app = new Koa();
 
@@ -81,6 +83,12 @@ app.use(uploadRoutes.allowedMethods());
 
 app.use(notificationRoutes.routes());
 app.use(notificationRoutes.allowedMethods());
+
+app.use(boardingRoutes.routes());
+app.use(boardingRoutes.allowedMethods());
+
+app.use(userPetRoutes.routes());
+app.use(userPetRoutes.allowedMethods());
 
 // 健康检查接口
 app.use(async (ctx) => {

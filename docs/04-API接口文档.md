@@ -1450,6 +1450,248 @@ type: string (adoption/forum/system), 通知类型筛选
 
 ---
 
+## 9. 用户宠物档案模块
+
+### 9.1 获取我的宠物档案列表
+
+**接口地址**：`GET /user-pets`
+**是否需要登录**：是
+
+**响应示例**：
+
+```json
+{
+  "code": 200,
+  "message": "操作成功",
+  "data": [
+    {
+      "id": 1,
+      "name": "团子",
+      "petType": "狗",
+      "breed": "柯基",
+      "gender": "male",
+      "age": "3岁",
+      "healthNotes": "已完成基础疫苗，胃口正常",
+      "isSterilized": true,
+      "remark": "性格外向，喜欢玩球"
+    }
+  ]
+}
+```
+
+---
+
+### 9.2 新增我的宠物档案
+
+**接口地址**：`POST /user-pets`
+**是否需要登录**：是
+
+**请求参数**：
+
+```json
+{
+  "name": "团子",
+  "petType": "狗",
+  "breed": "柯基",
+  "gender": "male",
+  "age": "3岁",
+  "healthNotes": "已完成基础疫苗，胃口正常",
+  "isSterilized": true,
+  "remark": "性格外向，喜欢玩球"
+}
+```
+
+---
+
+### 9.3 更新我的宠物档案
+
+**接口地址**：`PUT /user-pets/:id`
+**是否需要登录**：是
+
+**路径参数**：
+
+- `id`: number, 宠物档案ID
+
+**请求参数**：同新增接口
+
+---
+
+### 9.4 删除我的宠物档案
+
+**接口地址**：`DELETE /user-pets/:id`
+**是否需要登录**：是
+
+**路径参数**：
+
+- `id`: number, 宠物档案ID
+
+---
+
+## 10. 公益寄养模块
+
+### 10.1 提交寄养申请
+
+**接口地址**：`POST /boarding-applications`
+**是否需要登录**：是
+
+**请求参数**：
+
+```json
+{
+  "sourceType": "profile",
+  "linkedPetId": 1,
+  "petSnapshot": null,
+  "startDate": "2026-04-10 09:00:00",
+  "endDate": "2026-04-15 18:00:00",
+  "contactPhone": "13800000002",
+  "emergencyContact": "小明妈妈 13800000999",
+  "specialCareNotes": "需要按时遛狗，两餐制",
+  "remark": "五一前临时出差，希望提供短期公益寄养"
+}
+```
+
+`sourceType = manual` 时：
+
+```json
+{
+  "sourceType": "manual",
+  "linkedPetId": null,
+  "petSnapshot": {
+    "name": "团团",
+    "type": "猫",
+    "breed": "英短",
+    "age": "1.5",
+    "gender": "female",
+    "healthNotes": "有轻微肠胃敏感"
+  },
+  "startDate": "2026-04-08 10:00:00",
+  "endDate": "2026-04-12 17:00:00",
+  "contactPhone": "13800000003",
+  "emergencyContact": "小红姐姐 13800000888",
+  "specialCareNotes": "胆小，陌生环境需要安抚",
+  "remark": "希望有安静环境"
+}
+```
+
+---
+
+### 10.2 获取我的寄养申请列表
+
+**接口地址**：`GET /boarding-applications/my`
+**是否需要登录**：是
+
+---
+
+### 10.3 获取寄养申请详情
+
+**接口地址**：`GET /boarding-applications/:id`
+**是否需要登录**：是
+
+**路径参数**：
+
+- `id`: number, 寄养申请ID
+
+---
+
+### 10.4 用户取消寄养申请
+
+**接口地址**：`PATCH /boarding-applications/:id/cancel`
+**是否需要登录**：是
+
+**请求参数**：
+
+```json
+{
+  "cancelReason": "行程变更，暂不需要寄养"
+}
+```
+
+---
+
+### 10.5 管理员获取寄养申请列表
+
+**接口地址**：`GET /admin/boarding-applications`
+**是否需要登录**：是（管理员）
+
+**查询参数**：
+
+```
+page: number
+pageSize: number
+status: string
+keyword: string
+sourceType: string
+startDateFrom: string
+startDateTo: string
+```
+
+---
+
+### 10.6 管理员审核寄养申请
+
+**接口地址**：`PATCH /admin/boarding-applications/:id/review`
+**是否需要登录**：是（管理员）
+
+**请求参数**：
+
+```json
+{
+  "action": "approve",
+  "reviewComment": "可安排下周入住"
+}
+```
+
+`action` 可选：
+- `approve`
+- `reject`
+
+---
+
+### 10.7 管理员登记入住
+
+**接口地址**：`PATCH /admin/boarding-applications/:id/check-in`
+**是否需要登录**：是（管理员）
+
+**请求参数**：
+
+```json
+{
+  "checkInNote": "已完成现场交接"
+}
+```
+
+---
+
+### 10.8 管理员标记完成
+
+**接口地址**：`PATCH /admin/boarding-applications/:id/complete`
+**是否需要登录**：是（管理员）
+
+**请求参数**：
+
+```json
+{
+  "completionNote": "已完成接回"
+}
+```
+
+---
+
+### 10.9 管理员取消寄养申请
+
+**接口地址**：`PATCH /admin/boarding-applications/:id/cancel`
+**是否需要登录**：是（管理员）
+
+**请求参数**：
+
+```json
+{
+  "cancelReason": "当前寄养资源已满"
+}
+```
+
+---
+
 ## 错误码说明
 
 | 错误码 | 说明                       |
