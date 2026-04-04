@@ -98,7 +98,11 @@ function DashboardPage() {
   };
 
   const handleViewAdoptions = () => {
-    navigate('/adoptions');
+    navigate('/admin/adoptions');
+  };
+
+  const handleViewPetSubmissions = () => {
+    navigate('/admin/pet-submissions');
   };
 
   const handleViewBoarding = () => {
@@ -275,6 +279,9 @@ function DashboardPage() {
         title="发布系统公告"
       >
         <Space style={{ marginBottom: 16 }}>
+          <Button onClick={handleViewPetSubmissions}>
+            送养审核
+          </Button>
           <Button onClick={handleViewBoarding}>
             寄养管理
           </Button>

@@ -1,0 +1,120 @@
+.admin-layout {
+  min-height: 100vh;
+  background: #f5f7fb;
+}
+
+.admin-sider {
+  position: fixed !important;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  z-index: 1000;
+  height: 100vh;
+  overflow: hidden;
+  box-shadow: 8px 0 24px rgba(15, 23, 42, 0.08);
+}
+
+.admin-sider .ant-layout-sider-children {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.admin-logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 72px;
+  margin: 0 16px;
+  color: #fff;
+  font-size: 18px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.admin-logo-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.admin-logo-text {
+  white-space: nowrap;
+}
+
+.admin-menu {
+  flex: 1;
+  overflow-y: auto;
+  border-inline-end: 0;
+}
+
+.admin-main-layout {
+  min-height: 100vh;
+  transition: margin-left 0.2s ease;
+}
+
+.admin-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  background: #fff;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.04);
+}
+
+.admin-trigger {
+  font-size: 18px;
+}
+
+.admin-user {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+}
+
+.admin-user-meta {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.admin-user-name {
+  color: #1f2937;
+  font-weight: 600;
+}
+
+.admin-user-role {
+  color: #6b7280;
+  font-size: 12px;
+}
+
+.admin-content {
+  min-height: calc(100vh - 64px);
+  padding: 24px;
+}
+
+@media (max-width: 991px) {
+  .admin-main-layout {
+    margin-left: 80px !important;
+  }
+
+  .admin-header {
+    padding: 0 16px;
+  }
+
+  .admin-content {
+    padding: 16px;
+  }
+
+  .admin-user-meta {
+    display: none;
+  }
+}

@@ -101,7 +101,7 @@ const ensureNotificationTable = async () => {
       CREATE TABLE IF NOT EXISTS user_notification (
         id INT PRIMARY KEY AUTO_INCREMENT COMMENT '通知ID',
         user_id INT NOT NULL COMMENT '接收用户ID',
-        type ENUM('adoption', 'forum', 'system') DEFAULT 'system' COMMENT '通知类型',
+        type ENUM('adoption', 'forum', 'system', 'boarding') DEFAULT 'system' COMMENT '通知类型',
         title VARCHAR(120) NOT NULL COMMENT '通知标题',
         content VARCHAR(500) NOT NULL COMMENT '通知内容',
         related_type VARCHAR(50) DEFAULT NULL COMMENT '关联资源类型',
@@ -122,11 +122,84 @@ const ensureNotificationTable = async () => {
   }
 };
 
+/**
+ * 确保 pet_info 表具备送养发布相关字段
+ */
+const ensurePetSubmissionColumns = async () => {
+  try {
+    const database = process.env.DB_DATABASE || 'pet_management_platform';
+    const [columns] = await promisePool.query(`
+      SELECT COLUMN_NAME, COLUMN_TYPE
+      FROM INFORMATION_SCHEMA.COLUMNS
+      WHERE TABLE_SCHEMA = ? AND TABLE_NAME = 'pet_info'
+    `, [database]);
+
+    const columnNames = new Set(columns.map((item) => item.COLUMN_NAME));
+    const statusColumn = columns.find((item) => item.COLUMN_NAME === 'status');
+    const alterStatements = [];
+
+    if (!columnNames.has('source_type')) {
+      alterStatements.push(`
+        ADD COLUMN source_type ENUM('platform', 'user')
+        NOT NULL DEFAULT 'platform' COMMENT '发布来源'
+        AFTER sterilized
+      `);
+    }
+
+    if (!columnNames.has('submission_status')) {
+      alterStatements.push(`
+        ADD COLUMN submission_status ENUM('pending', 'approved', 'rejected')
+        NOT NULL DEFAULT 'approved' COMMENT '发布审核状态'
+        AFTER source_type
+      `);
+    }
+
+    if (!columnNames.has('submission_comment')) {
+      alterStatements.push(`
+        ADD COLUMN submission_comment VARCHAR(200) DEFAULT NULL COMMENT '审核备注'
+        AFTER submission_status
+      `);
+    }
+
+    if (!columnNames.has('owner_user_id')) {
+      alterStatements.push(`
+        ADD COLUMN owner_user_id INT DEFAULT NULL COMMENT '送养发布用户ID'
+        AFTER created_by
+      `);
+    }
+
+    if (statusColumn && !statusColumn.COLUMN_TYPE.includes('off_shelf')) {
+      alterStatements.push(`
+        MODIFY COLUMN status ENUM('available', 'pending', 'adopted', 'off_shelf')
+        DEFAULT 'available' COMMENT '状态'
+      `);
+    }
+
+    if (alterStatements.length > 0) {
+      console.log('🛠️  检测到 pet_info 缺少送养发布字段，正在自动迁移...');
+      await promisePool.query(`
+        ALTER TABLE pet_info
+        ${alterStatements.join(',')}
+      `);
+    }
+
+    await promisePool.query(`
+      UPDATE pet_info
+      SET source_type = COALESCE(source_type, 'platform'),
+          submission_status = COALESCE(submission_status, 'approved')
+    `);
+  } catch (error) {
+    console.error('❌ pet_info 送养发布字段自动迁移失败:', error.message);
+    throw error;
+  }
+};
+
 module.exports = {
   pool,
   promisePool,
   testConnection,
   ensureForumCategoryColumn,
   ensureAdoptionPetStatusConsistency,
-  ensureNotificationTable
+  ensureNotificationTable,
+  ensurePetSubmissionColumns
 };

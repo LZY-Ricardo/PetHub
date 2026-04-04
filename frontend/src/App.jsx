@@ -1,12 +1,15 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { ConfigProvider, Layout } from 'antd';
+import { ConfigProvider } from 'antd';
 import MainLayout from './components/Layout/MainLayout';
+import AdminLayout from './components/Layout/AdminLayout';
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/Auth/LoginPage';
 import RegisterPage from './pages/Auth/RegisterPage';
 import PetListPage from './pages/Pet/PetListPage';
 import PetDetailPage from './pages/Pet/PetDetailPage';
+import PetSubmissionPage from './pages/Pet/PetSubmissionPage';
+import MyPetSubmissionsPage from './pages/Pet/MyPetSubmissionsPage';
 import AdoptionListPage from './pages/Adoption/AdoptionListPage';
 import LostPetListPage from './pages/LostPet/LostPetListPage';
 import MyLostPetPage from './pages/LostPet/MyLostPetPage';
@@ -14,6 +17,15 @@ import ForumPage from './pages/Forum/ForumPage';
 import ForumDetailPage from './pages/Forum/ForumDetailPage';
 import MyForumPostsPage from './pages/Forum/MyForumPostsPage';
 import DashboardPage from './pages/Admin/DashboardPage';
+import AdminPlaceholderPage from './pages/Admin/AdminPlaceholderPage';
+import AdoptionManagementPage from './pages/Admin/AdoptionManagementPage';
+import PetSubmissionReviewPage from './pages/Admin/PetSubmissionReviewPage';
+import PetManagementPage from './pages/Admin/PetManagementPage';
+import AnnouncementPage from './pages/Admin/AnnouncementPage';
+import LostPetManagementPage from './pages/Admin/LostPetManagementPage';
+import ForumManagementPage from './pages/Admin/ForumManagementPage';
+import AdminAccountPage from './pages/Admin/AdminAccountPage';
+import UserManagementPage from './pages/Admin/UserManagementPage';
 import ProfilePage from './pages/User/ProfilePage';
 import MyPetProfilesPage from './pages/User/MyPetProfilesPage';
 import NotificationPage from './pages/Notification/NotificationPage';
@@ -42,6 +54,16 @@ function App() {
               <Route path="adoptions" element={
                 <ProtectedRoute>
                   <AdoptionListPage />
+                </ProtectedRoute>
+              } />
+              <Route path="pet-submissions/new" element={
+                <ProtectedRoute>
+                  <PetSubmissionPage />
+                </ProtectedRoute>
+              } />
+              <Route path="my-pet-submissions" element={
+                <ProtectedRoute>
+                  <MyPetSubmissionsPage />
                 </ProtectedRoute>
               } />
               <Route path="lost-pets" element={<LostPetListPage />} />
@@ -82,16 +104,25 @@ function App() {
                   <NotificationPage />
                 </ProtectedRoute>
               } />
-              <Route path="admin/dashboard" element={
-                <ProtectedRoute requireAdmin>
-                  <DashboardPage />
-                </ProtectedRoute>
-              } />
-              <Route path="admin/boarding" element={
-                <ProtectedRoute requireAdmin>
-                  <BoardingManagementPage />
-                </ProtectedRoute>
-              } />
+            </Route>
+
+            <Route path="/admin" element={
+              <ProtectedRoute requireAdmin>
+                <AdminLayout />
+              </ProtectedRoute>
+            }>
+              <Route index element={<Navigate to="/admin/dashboard" replace />} />
+              <Route path="dashboard" element={<DashboardPage />} />
+              <Route path="pets" element={<PetManagementPage />} />
+              <Route path="pet-submissions" element={<PetSubmissionReviewPage />} />
+              <Route path="adoptions" element={<AdoptionManagementPage />} />
+              <Route path="announcements" element={<AnnouncementPage />} />
+              <Route path="lost-pets" element={<LostPetManagementPage />} />
+              <Route path="boarding" element={<BoardingManagementPage />} />
+              <Route path="forum" element={<ForumManagementPage />} />
+              <Route path="notifications" element={<AdminPlaceholderPage title="消息通知管理" />} />
+              <Route path="admin-accounts" element={<AdminAccountPage />} />
+              <Route path="users" element={<UserManagementPage />} />
             </Route>
 
             {/* Fallback */}

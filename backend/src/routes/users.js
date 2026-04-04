@@ -6,6 +6,8 @@ const router = new Router({
   prefix: '/api/users'
 });
 
+router.get('/admin-accounts', authMiddleware, adminMiddleware, UserController.getAdminAccountList);
+
 /**
  * @route GET /api/users
  * @desc 获取用户列表

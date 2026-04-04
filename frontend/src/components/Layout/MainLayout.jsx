@@ -116,11 +116,6 @@ const MainLayout = () => {
       icon: <DashboardOutlined />,
       label: '管理后台'
     });
-    menuItems.push({
-      key: '/admin/boarding',
-      icon: <HeartOutlined />,
-      label: '寄养管理'
-    });
   }
 
   const userMenuItems = [
@@ -130,6 +125,12 @@ const MainLayout = () => {
       label: '个人中心',
       onClick: () => navigate('/profile')
     },
+    ...(isAdmin() ? [{
+      key: 'adminDashboard',
+      icon: <DashboardOutlined />,
+      label: '后台管理',
+      onClick: () => navigate('/admin/dashboard')
+    }] : []),
     {
       key: 'notifications',
       icon: <BellOutlined />,
@@ -141,6 +142,18 @@ const MainLayout = () => {
       icon: <HeartOutlined />,
       label: '我的宠物档案',
       onClick: () => navigate('/my-pets')
+    },
+    {
+      key: 'publishSubmission',
+      icon: <HeartOutlined />,
+      label: '发布送养',
+      onClick: () => navigate('/pet-submissions/new')
+    },
+    {
+      key: 'myPetSubmissions',
+      icon: <HeartOutlined />,
+      label: '我的送养发布',
+      onClick: () => navigate('/my-pet-submissions')
     },
     {
       key: 'myBoarding',
