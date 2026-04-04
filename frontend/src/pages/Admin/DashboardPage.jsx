@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Card, Row, Col, Statistic, Button, message } from 'antd';
+import { Card, Row, Col, Statistic, Button } from 'antd';
+import { message } from '../../utils/antdApp';
 import {
   UserOutlined,
   HeartOutlined,

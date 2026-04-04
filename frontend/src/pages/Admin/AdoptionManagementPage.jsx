@@ -12,9 +12,9 @@ import {
   Space,
   Statistic,
   Table,
-  Tag,
-  message
+  Tag
 } from 'antd';
+import { message } from '../../utils/antdApp';
 import { CheckOutlined, CloseOutlined, EyeOutlined } from '@ant-design/icons';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';

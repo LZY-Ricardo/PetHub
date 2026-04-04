@@ -1,6 +1,5 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { ConfigProvider } from 'antd';
 import MainLayout from './components/Layout/MainLayout';
 import AdminLayout from './components/Layout/AdminLayout';
 import HomePage from './pages/HomePage';
@@ -38,10 +37,9 @@ import './App.css';
 
 function App() {
   return (
-    <ConfigProvider>
-      <AuthProvider>
-        <Router>
-          <Routes>
+    <AuthProvider>
+      <Router>
+        <Routes>
             {/* Public routes without layout */}
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
@@ -127,10 +125,9 @@ function App() {
 
             {/* Fallback */}
             <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
-        </Router>
-      </AuthProvider>
-    </ConfigProvider>
+        </Routes>
+      </Router>
+    </AuthProvider>
   );
 }
 

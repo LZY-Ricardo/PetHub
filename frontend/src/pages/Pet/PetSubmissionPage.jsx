@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Card, Form, Input, InputNumber, Select, Switch, Button, Upload, message } from 'antd';
+import { Card, Form, Input, InputNumber, Select, Switch, Button, Upload } from 'antd';
+import { message } from '../../utils/antdApp';
 import { PlusOutlined, InboxOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';

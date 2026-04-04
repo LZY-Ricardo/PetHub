@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Button, Card, Col, Form, Input, Row, Select, Switch, message } from 'antd';
+import { Button, Card, Col, Form, Input, Row, Select, Switch } from 'antd';
+import { message } from '../../utils/antdApp';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import './AdminManagementPage.css';

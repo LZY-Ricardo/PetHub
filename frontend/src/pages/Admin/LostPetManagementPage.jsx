@@ -9,9 +9,9 @@ import {
   Space,
   Statistic,
   Table,
-  Tag,
-  message
+  Tag
 } from 'antd';
+import { message } from '../../utils/antdApp';
 import { CheckOutlined, DeleteOutlined, EyeOutlined } from '@ant-design/icons';
 import { useAuth } from '../../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';

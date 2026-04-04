@@ -16,9 +16,9 @@ import {
   Statistic,
   Switch,
   Table,
-  Tag,
-  message
+  Tag
 } from 'antd';
+import { message } from '../../utils/antdApp';
 import { DeleteOutlined, EditOutlined, EyeOutlined, ReloadOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';

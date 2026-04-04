@@ -1,8 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { ConfigProvider } from 'antd';
+import { App as AntdApp, ConfigProvider } from 'antd';
 import zhCN from 'antd/locale/zh_CN';
 import App from './App';
+import { AntdAppBridge } from './utils/antdApp';
 import './index.css';
 
 // Custom theme - Warm & Playful Editorial style
@@ -56,7 +57,10 @@ const theme = {
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <ConfigProvider theme={theme} locale={zhCN}>
-      <App />
+      <AntdApp>
+        <AntdAppBridge />
+        <App />
+      </AntdApp>
     </ConfigProvider>
   </React.StrictMode>
 );

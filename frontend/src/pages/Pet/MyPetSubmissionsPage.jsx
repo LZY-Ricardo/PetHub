@@ -5,7 +5,6 @@ import {
   Form,
   Input,
   InputNumber,
-  message,
   Modal,
   Select,
   Space,
@@ -14,6 +13,7 @@ import {
   Tag,
   Upload
 } from 'antd';
+import { message } from '../../utils/antdApp';
 import { EditOutlined, RedoOutlined, PlusOutlined, InboxOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';

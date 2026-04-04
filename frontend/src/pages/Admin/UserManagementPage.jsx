@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Card, Input, Table, Tag, message } from 'antd';
+import { Button, Card, Input, Table, Tag } from 'antd';
+import { message } from '../../utils/antdApp';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import './AdminManagementPage.css';

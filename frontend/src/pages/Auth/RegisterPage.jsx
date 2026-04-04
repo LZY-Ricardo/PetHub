@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Card, Form, Input, Button, message } from 'antd';
+import { Card, Form, Input, Button } from 'antd';
+import { message } from '../../utils/antdApp';
 import { UserOutlined, LockOutlined, MailOutlined, PhoneOutlined } from '@ant-design/icons';
 import { useAuth } from '../../contexts/AuthContext';
 import './AuthPage.css';

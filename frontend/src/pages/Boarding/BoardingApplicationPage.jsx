@@ -1,5 +1,6 @@
 import React from 'react';
-import { Card, message } from 'antd';
+import { Card } from 'antd';
+import { message } from '../../utils/antdApp';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import BoardingApplicationForm from '../../components/Boarding/BoardingApplicationForm';

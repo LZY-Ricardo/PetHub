@@ -1,5 +1,6 @@
 import React from 'react';
-import { Card, Descriptions, Button, Tag, Space, Divider, Avatar, message, Modal, Form, Input, Select, Upload, Spin } from 'antd';
+import { Card, Descriptions, Button, Tag, Space, Divider, Avatar, Modal, Form, Input, Select, Upload, Spin } from 'antd';
+import { message } from '../../utils/antdApp';
 import { UserOutlined, MailOutlined, PhoneOutlined, EditOutlined, LockOutlined, CameraOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';

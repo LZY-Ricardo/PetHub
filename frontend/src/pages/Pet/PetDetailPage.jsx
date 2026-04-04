@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Card, Row, Col, Tag, Button, Descriptions, Modal, Form, Input, message } from 'antd';
+import { Card, Row, Col, Tag, Button, Descriptions, Modal, Form, Input } from 'antd';
+import { message } from '../../utils/antdApp';
 import { HeartOutlined, EnvironmentOutlined, LeftOutlined, UserOutlined } from '@ant-design/icons';
 import { useAuth } from '../../contexts/AuthContext';
 import './PetDetailPage.css';

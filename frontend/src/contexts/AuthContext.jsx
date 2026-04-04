@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { message } from 'antd';
+import { message } from '../utils/antdApp';
 
 const AuthContext = createContext(null);
 

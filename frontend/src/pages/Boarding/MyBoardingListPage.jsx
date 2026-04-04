@@ -1,5 +1,6 @@
 import React from 'react';
-import { Button, Card, Descriptions, Input, Modal, Space, Table, message } from 'antd';
+import { Button, Card, Descriptions, Input, Modal, Space, Table } from 'antd';
+import { message } from '../../utils/antdApp';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import BoardingStatusTag from '../../components/Boarding/BoardingStatusTag';

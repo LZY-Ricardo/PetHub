@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Badge, Button, Card, Empty, List, Space, Tag, Typography, message } from 'antd';
+import { Badge, Button, Card, Empty, List, Space, Tag, Typography } from 'antd';
+import { message } from '../../utils/antdApp';
 import { BellOutlined, CheckCircleOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';

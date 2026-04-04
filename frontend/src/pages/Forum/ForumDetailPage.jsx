@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Card, Button, Input, message, Avatar, List, Tag, Popconfirm, Modal, Select } from 'antd';
+import { Card, Button, Input, Avatar, List, Tag, Popconfirm, Modal, Select } from 'antd';
+import { message } from '../../utils/antdApp';
 import { LeftOutlined, LikeOutlined, MessageOutlined, DeleteOutlined, EditOutlined } from '@ant-design/icons';
 import { useAuth } from '../../contexts/AuthContext';
 import './ForumDetailPage.css';

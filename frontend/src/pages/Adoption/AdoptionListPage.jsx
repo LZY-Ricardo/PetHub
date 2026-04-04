@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Table, Tag, Button, Modal, Input, Space, message } from 'antd';
+import { Card, Table, Tag, Button, Modal, Input, Space } from 'antd';
+import { message } from '../../utils/antdApp';
 import { EyeOutlined } from '@ant-design/icons';
 import { useAuth } from '../../contexts/AuthContext';
 import { useNavigate, useSearchParams } from 'react-router-dom';

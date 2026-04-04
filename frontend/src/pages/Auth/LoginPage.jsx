@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Form, Input, Button, Card, Divider, message } from 'antd';
+import { Form, Input, Button, Card, Divider } from 'antd';
+import { message } from '../../utils/antdApp';
 import {
   UserOutlined,
   LockOutlined,

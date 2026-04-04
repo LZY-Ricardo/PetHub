@@ -1,5 +1,6 @@
 import React from 'react';
-import { Button, Card, Form, Input, Modal, Popconfirm, Select, Space, Table, Tag, message } from 'antd';
+import { Button, Card, Form, Input, Modal, Popconfirm, Select, Space, Table, Tag } from 'antd';
+import { message } from '../../utils/antdApp';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { PET_GENDER_OPTIONS, USER_PET_TYPE_OPTIONS } from '../../components/Boarding/boardingConstants';
