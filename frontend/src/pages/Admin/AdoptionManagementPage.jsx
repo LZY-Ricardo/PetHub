@@ -361,7 +361,7 @@ function AdoptionManagementPage() {
             setSearchParams(nextParams, { replace: true });
           }
         }}
-        destroyOnClose
+        destroyOnHidden
       >
         {currentRecord && !detailLoading && (
           <>
@@ -421,7 +421,7 @@ function AdoptionManagementPage() {
         confirmLoading={reviewing}
         okText="确认"
         cancelText="取消"
-        destroyOnClose
+        destroyOnHidden
       >
         <p style={{ marginBottom: 12 }}>
           {reviewTarget ? `申请 #${reviewTarget.id} · ${reviewTarget.pet_name}` : ''}

@@ -132,7 +132,7 @@ function NotificationPage() {
 
   return (
     <div className="notification-page">
-      <Card className="notification-card" bordered={false}>
+      <Card className="notification-card" variant="borderless">
         <div className="notification-header">
           <div>
             <h1 className="notification-title">

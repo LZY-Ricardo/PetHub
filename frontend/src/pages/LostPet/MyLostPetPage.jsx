@@ -192,7 +192,7 @@ function MyLostPetPage() {
 
   return (
     <div className="my-lost-page">
-      <Card className="my-lost-card" bordered={false}>
+      <Card className="my-lost-card" variant="borderless">
         <div className="my-lost-header">
           <div>
             <h1>我的寻宠发布</h1>

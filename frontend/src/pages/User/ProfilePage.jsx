@@ -209,7 +209,7 @@ function ProfilePage() {
 
   return (
     <div className="profile-page">
-      <Card className="profile-card" bordered={false}>
+      <Card className="profile-card" variant="borderless">
         <div className="profile-header">
           <Upload
             showUploadList={false}

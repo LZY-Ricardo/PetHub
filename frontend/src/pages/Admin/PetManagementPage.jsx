@@ -474,7 +474,7 @@ function PetManagementPage() {
         width={560}
         open={detailVisible}
         onClose={() => setDetailVisible(false)}
-        destroyOnClose
+        destroyOnHidden
       >
         {currentPet && !detailLoading && (
           <>
@@ -523,7 +523,7 @@ function PetManagementPage() {
         }}
         onOk={() => form.submit()}
         confirmLoading={submitting}
-        destroyOnClose
+        destroyOnHidden
         width={720}
       >
         <Form form={form} layout="vertical" onFinish={handleUpdatePet}>

@@ -242,7 +242,7 @@ function ForumDetailPage() {
           返回社区
         </Button>
 
-        <Card className="post-detail-card" bordered={false}>
+        <Card className="post-detail-card" variant="borderless">
           <div className="post-header">
             <Avatar
               size={56}
@@ -295,7 +295,7 @@ function ForumDetailPage() {
           </div>
         </Card>
 
-        <Card className="comments-card" bordered={false}>
+        <Card className="comments-card" variant="borderless">
           <h3 className="comments-title">评论 ({comments.length})</h3>
 
           <div className="comment-input">

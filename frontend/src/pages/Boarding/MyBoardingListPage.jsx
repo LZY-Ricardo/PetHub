@@ -127,7 +127,7 @@ function MyBoardingListPage() {
   return (
     <div className="my-boarding-list-page">
       <Card
-        bordered={false}
+        variant="borderless"
         title="我的寄养申请"
         extra={<Button type="primary" onClick={() => navigate('/boarding/apply')}>新建申请</Button>}
       >

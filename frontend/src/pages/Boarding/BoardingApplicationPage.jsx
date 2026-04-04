@@ -76,7 +76,7 @@ function BoardingApplicationPage() {
 
   return (
     <div className="boarding-application-page">
-      <Card bordered={false} title="公益寄养申请">
+      <Card variant="borderless" title="公益寄养申请">
         <BoardingApplicationForm
           userPets={userPets}
           onSubmit={handleSubmit}

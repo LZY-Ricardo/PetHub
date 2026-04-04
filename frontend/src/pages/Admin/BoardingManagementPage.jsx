@@ -127,7 +127,7 @@ function BoardingManagementPage() {
 
   return (
     <div className="boarding-management-page">
-      <Card bordered={false} title="宠物寄养管理">
+      <Card variant="borderless" title="宠物寄养管理">
         <Space style={{ marginBottom: 16 }}>
           <Select
             allowClear

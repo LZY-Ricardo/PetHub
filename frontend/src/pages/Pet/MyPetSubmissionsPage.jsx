@@ -236,7 +236,7 @@ function MyPetSubmissionsPage() {
 
   return (
     <div>
-      <Card bordered={false}>
+      <Card variant="borderless">
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
           <div>
             <h1 style={{ marginBottom: 8 }}>我的送养发布</h1>

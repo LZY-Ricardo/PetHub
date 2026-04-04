@@ -263,7 +263,7 @@ function LostPetManagementPage() {
         width={560}
         open={detailVisible}
         onClose={() => setDetailVisible(false)}
-        destroyOnClose
+        destroyOnHidden
       >
         {currentRecord && !detailLoading && (
           <>

@@ -1,11 +1,14 @@
-import React, { useState, useEffect } from 'react';
-import { Card, Row, Col, Statistic, Table, Button, Space, message, Form, Input, Select, Switch } from 'antd';
+import React, { useEffect, useMemo, useState } from 'react';
+import { Card, Row, Col, Statistic, Button, message } from 'antd';
 import {
   UserOutlined,
   HeartOutlined,
   MessageOutlined,
-  CheckCircleOutlined,
-  ClockCircleOutlined
+  ClockCircleOutlined,
+  AuditOutlined,
+  SolutionOutlined,
+  ShopOutlined,
+  NotificationOutlined
 } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
@@ -16,27 +19,29 @@ function DashboardPage() {
     totalUsers: 0,
     totalPets: 0,
     totalPosts: 0,
-    pendingAdoptions: 0
+    pendingAdoptions: 0,
+    pendingSubmissions: 0,
+    pendingBoarding: 0
   });
-  const [adoptions, setAdoptions] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [publishing, setPublishing] = useState(false);
-  const [announceForm] = Form.useForm();
   const navigate = useNavigate();
   const { handleTokenExpired } = useAuth();
 
   useEffect(() => {
     fetchStats();
-    fetchPendingAdoptions();
   }, []);
 
   const fetchStats = async () => {
+    setLoading(true);
     try {
       const token = localStorage.getItem('token');
-      if (!token) return;
+      if (!token) {
+        setLoading(false);
+        return;
+      }
 
       const response = await fetch('/api/admin/dashboard', {
-        headers: { 'Authorization': `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${token}` }
       });
 
       if (response.status === 401) {
@@ -53,162 +58,107 @@ function DashboardPage() {
       const data = await response.json();
       if (data.code === 200) {
         setStats({
-          totalUsers: data.data?.user_count || 0,
-          totalPets: data.data?.pet_count || 0,
-          totalPosts: data.data?.post_count || 0,
-          pendingAdoptions: data.data?.pending_adoption_count || 0
+          totalUsers: Number(data.data?.user_count) || 0,
+          totalPets: Number(data.data?.pet_count) || 0,
+          totalPosts: Number(data.data?.post_count) || 0,
+          pendingAdoptions: Number(data.data?.pending_adoption_count) || 0,
+          pendingSubmissions: Number(data.data?.pending_submission_count) || 0,
+          pendingBoarding: Number(data.data?.pending_boarding_count) || 0
         });
+      } else {
+        message.error(data.message || '获取仪表盘数据失败');
       }
     } catch (error) {
-      console.error('Failed to fetch stats:', error);
-    }
-  };
-
-  const fetchPendingAdoptions = async () => {
-    setLoading(true);
-    try {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        setAdoptions([]);
-        return;
-      }
-
-      const response = await fetch('/api/adoptions?page=1&pageSize=20&status=pending', {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-
-      if (response.status === 401) {
-        handleTokenExpired();
-        setAdoptions([]);
-        navigate('/login', { replace: true });
-        return;
-      }
-
-      const data = await response.json();
-      if (data.code === 200) {
-        const pending = data.data?.list || [];
-        setAdoptions(pending);
-        setStats(prev => ({ ...prev, pendingAdoptions: data.data?.total || prev.pendingAdoptions }));
-      }
-    } catch (error) {
-      console.error('Failed to fetch pending adoptions:', error);
+      message.error('获取仪表盘数据失败');
     } finally {
       setLoading(false);
     }
   };
 
-  const handleViewAdoptions = () => {
-    navigate('/admin/adoptions');
-  };
+  const totalPending = useMemo(() => {
+    return stats.pendingSubmissions + stats.pendingAdoptions + stats.pendingBoarding;
+  }, [stats.pendingAdoptions, stats.pendingBoarding, stats.pendingSubmissions]);
 
-  const handleViewPetSubmissions = () => {
-    navigate('/admin/pet-submissions');
-  };
-
-  const handleViewBoarding = () => {
-    navigate('/admin/boarding');
-  };
-
-  const handlePublishAnnouncement = async (values) => {
-    setPublishing(true);
-    try {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        message.warning('请先登录');
-        return;
-      }
-
-      const response = await fetch('/api/admin/notifications/broadcast', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(values)
-      });
-
-      if (response.status === 401) {
-        handleTokenExpired();
-        navigate('/login', { replace: true });
-        return;
-      }
-
-      if (response.status === 403) {
-        message.error('无权限发布公告');
-        return;
-      }
-
-      const data = await response.json();
-      if (data.code === 200) {
-        message.success(`公告发布成功，已发送给 ${data.data?.deliveredCount || 0} 位用户`);
-        announceForm.resetFields();
-      } else {
-        message.error(data.message || '公告发布失败');
-      }
-    } catch (error) {
-      message.error('公告发布失败，请稍后重试');
-    } finally {
-      setPublishing(false);
+  const pendingCards = [
+    {
+      key: 'submission',
+      title: '待审核送养发布',
+      value: stats.pendingSubmissions,
+      icon: <AuditOutlined />,
+      actionLabel: '去审核',
+      onClick: () => navigate('/admin/pet-submissions')
+    },
+    {
+      key: 'adoption',
+      title: '待处理领养申请',
+      value: stats.pendingAdoptions,
+      icon: <SolutionOutlined />,
+      actionLabel: '去处理',
+      onClick: () => navigate('/admin/adoptions')
+    },
+    {
+      key: 'boarding',
+      title: '待处理寄养申请',
+      value: stats.pendingBoarding,
+      icon: <ShopOutlined />,
+      actionLabel: '去处理',
+      onClick: () => navigate('/admin/boarding')
     }
-  };
+  ];
 
-  const columns = [
+  const quickLinks = [
     {
-      title: '申请ID',
-      dataIndex: 'id',
-      key: 'id',
-      width: 100,
+      key: 'pet-submissions',
+      title: '送养审核',
+      description: '处理用户发布的待审核送养信息',
+      icon: <AuditOutlined />,
+      onClick: () => navigate('/admin/pet-submissions')
     },
     {
-      title: '宠物名称',
-      dataIndex: 'pet_name',
-      key: 'pet_name',
+      key: 'adoptions',
+      title: '领养申请',
+      description: '查看并审核用户领养申请',
+      icon: <SolutionOutlined />,
+      onClick: () => navigate('/admin/adoptions')
     },
     {
-      title: '申请人',
-      dataIndex: 'user_name',
-      key: 'user_name',
+      key: 'boarding',
+      title: '寄养管理',
+      description: '跟进公益寄养申请状态流转',
+      icon: <ShopOutlined />,
+      onClick: () => navigate('/admin/boarding')
     },
     {
-      title: '联系电话',
-      dataIndex: 'contact',
-      key: 'contact',
-      render: (text) => text || '-',
-    },
-    {
-      title: '申请时间',
-      dataIndex: 'created_at',
-      key: 'created_at',
-      render: (time) => new Date(time).toLocaleDateString('zh-CN')
-    },
-    {
-      title: '操作',
-      key: 'action',
-      width: 150,
-      render: (_, record) => (
-        <Button
-          type="link"
-          onClick={() => navigate(`/admin/adoptions?focusId=${record.id}`)}
-        >
-          查看详情
-        </Button>
-      ),
-    },
+      key: 'announcements',
+      title: '系统公告',
+      description: '统一发布系统公告和通知',
+      icon: <NotificationOutlined />,
+      onClick: () => navigate('/admin/announcements')
+    }
   ];
 
   return (
     <div className="dashboard-page">
       <section className="dashboard-hero">
         <div className="dashboard-hero-inner">
-          <h1 className="dashboard-hero-title">管理控制台</h1>
-          <p className="dashboard-hero-subtitle">系统数据统计与管理</p>
+          <div>
+            <h1 className="dashboard-hero-title">管理控制台</h1>
+            <p className="dashboard-hero-subtitle">查看核心数据、待处理事项和常用入口</p>
+          </div>
+          <div className="dashboard-hero-badge">
+            <span className="dashboard-hero-badge-label">当前待处理</span>
+            <span className="dashboard-hero-badge-value">{totalPending}</span>
+          </div>
         </div>
       </section>
 
-      <div className="stats-wrap">
+      <div className="dashboard-section">
+        <div className="dashboard-section-header">
+          <h2>核心统计</h2>
+        </div>
         <Row gutter={[24, 24]} className="stats-row">
           <Col xs={24} sm={12} lg={6}>
-            <Card className="stat-card stat-users">
+            <Card className="stat-card stat-users" loading={loading}>
               <Statistic
                 title="总用户数"
                 value={stats.totalUsers}
@@ -218,7 +168,7 @@ function DashboardPage() {
             </Card>
           </Col>
           <Col xs={24} sm={12} lg={6}>
-            <Card className="stat-card stat-pets">
+            <Card className="stat-card stat-pets" loading={loading}>
               <Statistic
                 title="总宠物数"
                 value={stats.totalPets}
@@ -228,7 +178,7 @@ function DashboardPage() {
             </Card>
           </Col>
           <Col xs={24} sm={12} lg={6}>
-            <Card className="stat-card stat-posts">
+            <Card className="stat-card stat-posts" loading={loading}>
               <Statistic
                 title="总帖子数"
                 value={stats.totalPosts}
@@ -238,10 +188,10 @@ function DashboardPage() {
             </Card>
           </Col>
           <Col xs={24} sm={12} lg={6}>
-            <Card className="stat-card stat-pending">
+            <Card className="stat-card stat-pending" loading={loading}>
               <Statistic
-                title="待审核"
-                value={stats.pendingAdoptions}
+                title="总待处理"
+                value={totalPending}
                 prefix={<ClockCircleOutlined />}
                 valueStyle={{ color: '#26D07C' }}
               />
@@ -250,92 +200,42 @@ function DashboardPage() {
         </Row>
       </div>
 
-      <Card
-        className="pending-card"
-        title={
-          <div className="card-title">
-            <CheckCircleOutlined />
-            <span>待审核领养申请</span>
-          </div>
-        }
-        extra={
-          <Button onClick={handleViewAdoptions}>
-            查看全部
-          </Button>
-        }
-      >
-        <Table
-          columns={columns}
-          dataSource={adoptions}
-          loading={loading}
-          rowKey="id"
-          pagination={{ pageSize: 5 }}
-          locale={{ emptyText: '暂无待审核申请' }}
-        />
-      </Card>
-
-      <Card
-        className="announcement-card"
-        title="发布系统公告"
-      >
-        <Space style={{ marginBottom: 16 }}>
-          <Button onClick={handleViewPetSubmissions}>
-            送养审核
-          </Button>
-          <Button onClick={handleViewBoarding}>
-            寄养管理
-          </Button>
-        </Space>
-        <Form
-          form={announceForm}
-          layout="vertical"
-          onFinish={handlePublishAnnouncement}
-          initialValues={{ targetRole: 'all', excludeSender: false }}
-        >
-          <Row gutter={16}>
-            <Col xs={24} md={12}>
-              <Form.Item
-                label="公告标题"
-                name="title"
-                rules={[{ required: true, message: '请输入公告标题' }]}
-              >
-                <Input maxLength={120} placeholder="例如：系统维护通知" />
-              </Form.Item>
+      <div className="dashboard-section">
+        <div className="dashboard-section-header">
+          <h2>待处理事项</h2>
+        </div>
+        <Row gutter={[24, 24]}>
+          {pendingCards.map((item) => (
+            <Col key={item.key} xs={24} md={8}>
+              <Card className="queue-card" loading={loading}>
+                <div className="queue-card-header">
+                  <span className="queue-card-icon">{item.icon}</span>
+                  <span className="queue-card-title">{item.title}</span>
+                </div>
+                <div className="queue-card-value">{item.value}</div>
+                <Button onClick={item.onClick}>{item.actionLabel}</Button>
+              </Card>
             </Col>
-            <Col xs={24} md={12}>
-              <Form.Item
-                label="发送范围"
-                name="targetRole"
-                rules={[{ required: true, message: '请选择发送范围' }]}
-              >
-                <Select
-                  options={[
-                    { label: '全部用户', value: 'all' },
-                    { label: '普通用户', value: 'user' },
-                    { label: '管理员', value: 'admin' }
-                  ]}
-                />
-              </Form.Item>
+          ))}
+        </Row>
+      </div>
+
+      <div className="dashboard-section">
+        <div className="dashboard-section-header">
+          <h2>快捷入口</h2>
+        </div>
+        <Row gutter={[24, 24]}>
+          {quickLinks.map((item) => (
+            <Col key={item.key} xs={24} sm={12} xl={6}>
+              <Card className="quick-link-card" hoverable onClick={item.onClick}>
+                <div className="quick-link-icon">{item.icon}</div>
+                <div className="quick-link-title">{item.title}</div>
+                <div className="quick-link-description">{item.description}</div>
+              </Card>
             </Col>
-          </Row>
-
-          <Form.Item
-            label="公告内容"
-            name="content"
-            rules={[{ required: true, message: '请输入公告内容' }]}
-          >
-            <Input.TextArea rows={4} maxLength={500} showCount placeholder="请输入公告详情" />
-          </Form.Item>
-
-          <Form.Item name="excludeSender" valuePropName="checked">
-            <Switch checkedChildren="不发送给自己" unCheckedChildren="包含自己" />
-          </Form.Item>
-
-          <Button type="primary" htmlType="submit" loading={publishing}>
-            发布公告
-          </Button>
-        </Form>
-      </Card>
+          ))}
+        </Row>
+      </div>
     </div>
   );
 }

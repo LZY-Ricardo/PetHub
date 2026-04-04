@@ -36,7 +36,7 @@ function BoardingApplicationForm({ userPets = [], onSubmit, submitting = false, 
   };
 
   return (
-    <Card bordered={false}>
+    <Card variant="borderless">
       <Form
         form={form}
         layout="vertical"

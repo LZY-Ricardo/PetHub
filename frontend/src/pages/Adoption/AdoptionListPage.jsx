@@ -268,7 +268,7 @@ function AdoptionListPage() {
 
   return (
     <div className="adoption-list-page">
-      <Card className="adoption-card" bordered={false}>
+      <Card className="adoption-card" variant="borderless">
         <div className="page-header-content">
           <h1 className="page-title">{isAdminView ? '领养申请管理' : '我的领养申请'}</h1>
           <p className="page-subtitle">

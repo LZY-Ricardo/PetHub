@@ -91,7 +91,7 @@ function PetSubmissionPage() {
 
   return (
     <div style={{ maxWidth: 900, margin: '0 auto' }}>
-      <Card bordered={false}>
+      <Card variant="borderless">
         <div style={{ marginBottom: 24 }}>
           <h1 style={{ marginBottom: 8 }}>发布送养</h1>
           <p style={{ margin: 0, color: '#6b7280' }}>填写宠物信息后提交审核</p>

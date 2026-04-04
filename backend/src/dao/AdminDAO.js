@@ -21,7 +21,8 @@ class AdminDAO extends BaseDAO {
         (SELECT COUNT(*) FROM forum_post) AS post_count,
         (SELECT COUNT(*) FROM lost_pet) AS lost_count,
         (SELECT COUNT(*) FROM adoption_application WHERE status = 'pending') AS pending_adoption_count,
-        (SELECT COUNT(*) FROM pet_info WHERE source_type = 'user' AND submission_status = 'pending') AS pending_submission_count
+        (SELECT COUNT(*) FROM pet_info WHERE source_type = 'user' AND submission_status = 'pending') AS pending_submission_count,
+        (SELECT COUNT(*) FROM boarding_application WHERE status = 'pending') AS pending_boarding_count
     `;
 
     const rows = await this.execute(sql);

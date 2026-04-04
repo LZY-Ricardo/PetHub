@@ -185,7 +185,7 @@ function MyPetProfilesPage() {
   return (
     <div className="my-pet-profiles-page">
       <Card
-        bordered={false}
+        variant="borderless"
         title="我的宠物档案"
         extra={<Button type="primary" onClick={openCreateModal}>新增宠物档案</Button>}
       >

@@ -256,7 +256,7 @@ function ForumManagementPage() {
         width={680}
         open={detailVisible}
         onClose={() => setDetailVisible(false)}
-        destroyOnClose
+        destroyOnHidden
       >
         {currentPost && !detailLoading && (
           <>

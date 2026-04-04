@@ -173,7 +173,7 @@ function MyForumPostsPage() {
 
   return (
     <div className="my-forum-page">
-      <Card className="my-forum-card" bordered={false}>
+      <Card className="my-forum-card" variant="borderless">
         <div className="my-forum-header">
           <div>
             <h1>我的社区帖子</h1>
@@ -186,17 +186,17 @@ function MyForumPostsPage() {
 
         <Row gutter={16} className="my-forum-stats">
           <Col xs={24} sm={8}>
-            <Card bordered={false} className="my-forum-stat-card">
+            <Card variant="borderless" className="my-forum-stat-card">
               <Statistic title="我的帖子" value={posts.length} />
             </Card>
           </Col>
           <Col xs={24} sm={8}>
-            <Card bordered={false} className="my-forum-stat-card">
+            <Card variant="borderless" className="my-forum-stat-card">
               <Statistic title="我的评论" value={comments.length} />
             </Card>
           </Col>
           <Col xs={24} sm={8}>
-            <Card bordered={false} className="my-forum-stat-card">
+            <Card variant="borderless" className="my-forum-stat-card">
               <Statistic
                 title="累计获赞"
                 value={posts.reduce((sum, item) => sum + (Number(item.like_count) || 0), 0)}

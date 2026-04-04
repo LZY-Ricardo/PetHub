@@ -57,10 +57,23 @@
   margin: 0;
 }
 
-.stats-wrap {
+.dashboard-section {
   width: 100%;
   max-width: 1400px;
-  margin: 0 auto 32px;
+  margin: 0 auto 28px;
+}
+
+.dashboard-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.dashboard-section-header h2 {
+  margin: 0;
+  font-size: 22px;
+  color: #1f2937;
 }
 
 .stats-row {
@@ -106,29 +119,89 @@
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
 }
 
-.pending-card {
-  max-width: 1400px;
-  margin: 0 auto 24px;
-  border-radius: 20px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
-  border: none;
-}
-
-.announcement-card {
+.dashboard-hero-inner {
   max-width: 1400px;
   margin: 0 auto;
-  border-radius: 20px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
-  border: none;
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
 }
 
-.card-title {
+.dashboard-hero-badge {
+  min-width: 180px;
+  padding: 18px 20px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(10px);
+  color: #2c2c2c;
+}
+
+.dashboard-hero-badge-label {
+  display: block;
+  font-size: 14px;
+  opacity: 0.88;
+  margin-bottom: 6px;
+}
+
+.dashboard-hero-badge-value {
+  display: block;
+  font-size: 40px;
+  line-height: 1;
+  font-weight: 800;
+}
+
+.queue-card,
+.quick-link-card {
+  border-radius: 18px;
+  border: none;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+}
+
+.queue-card-header {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.queue-card-icon,
+.quick-link-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  background: rgba(255, 159, 67, 0.12);
+  color: #ff9f43;
   font-size: 18px;
+}
+
+.queue-card-title,
+.quick-link-title {
   font-weight: 600;
-  color: var(--color-text-primary);
+  color: #1f2937;
+}
+
+.queue-card-value {
+  margin-bottom: 18px;
+  font-size: 38px;
+  line-height: 1;
+  font-weight: 800;
+  color: #111827;
+}
+
+.quick-link-card {
+  height: 100%;
+}
+
+.quick-link-description {
+  margin-top: 10px;
+  color: #6b7280;
+  line-height: 1.6;
 }
 
 @media (max-width: 768px) {
@@ -149,11 +222,19 @@
     font-size: 14px;
   }
 
+  .dashboard-hero-inner {
+    flex-direction: column;
+  }
+
+  .dashboard-hero-badge {
+    width: 100%;
+  }
+
   .stats-row {
     width: 100%;
   }
 
-  .stats-wrap {
-    margin-bottom: 24px;
+  .dashboard-section-header h2 {
+    font-size: 18px;
   }
 }

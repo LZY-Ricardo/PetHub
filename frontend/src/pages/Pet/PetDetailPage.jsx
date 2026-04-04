@@ -110,7 +110,7 @@ function PetDetailPage() {
           返回列表
         </Button>
 
-        <Card className="pet-detail-card" bordered={false}>
+        <Card className="pet-detail-card" variant="borderless">
           <Row gutter={40}>
             <Col xs={24} md={12}>
               <div className="pet-gallery">
@@ -175,7 +175,7 @@ function PetDetailPage() {
           </Row>
         </Card>
 
-        <Card className="shelter-card" bordered={false}>
+        <Card className="shelter-card" variant="borderless">
           <h3>送养人信息</h3>
           <Descriptions column={2}>
             <Descriptions.Item label="联系人">{pet.shelter_name || '暂无'}</Descriptions.Item>
