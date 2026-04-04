@@ -43,3 +43,7 @@ backend/uploads/*
 *.tmp
 .cache/
 .worktrees/
+
+# 本地过程文档与草稿
+docs/superpowers/
+docs/宠物功能添加.md
