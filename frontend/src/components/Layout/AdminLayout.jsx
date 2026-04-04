@@ -24,6 +24,12 @@ const AdminLayout = () => {
 
   const userMenuItems = [
     {
+      key: 'profile',
+      icon: <UserOutlined />,
+      label: '个人中心',
+      onClick: () => navigate('/profile')
+    },
+    {
       key: 'goHome',
       icon: <HomeOutlined />,
       label: '前台首页',

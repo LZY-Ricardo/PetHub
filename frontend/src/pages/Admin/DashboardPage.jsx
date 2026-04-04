@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Row, Col, Statistic, Table, Button, message, Form, Input, Select, Switch } from 'antd';
+import { Card, Row, Col, Statistic, Table, Button, Space, message, Form, Input, Select, Switch } from 'antd';
 import {
   UserOutlined,
   HeartOutlined,
@@ -188,7 +188,7 @@ function DashboardPage() {
       render: (_, record) => (
         <Button
           type="link"
-          onClick={() => navigate(`/adoptions?focusId=${record.id}`)}
+          onClick={() => navigate(`/admin/adoptions?focusId=${record.id}`)}
         >
           查看详情
         </Button>
