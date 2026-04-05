@@ -15,6 +15,7 @@ import { message } from '../../utils/antdApp';
 import { CheckOutlined, DeleteOutlined, EyeOutlined } from '@ant-design/icons';
 import { useAuth } from '../../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import { apiClient } from '../../utils/apiClient';
 import './AdminManagementPage.css';
 
 function LostPetManagementPage() {
@@ -27,28 +28,10 @@ function LostPetManagementPage() {
   const { handleTokenExpired } = useAuth();
   const navigate = useNavigate();
 
-  const requestJson = async (url, options = {}) => {
-    const token = localStorage.getItem('token');
-    const response = await fetch(url, {
-      ...options,
-      headers: {
-        ...(options.headers || {}),
-        Authorization: `Bearer ${token}`
-      }
-    });
-
-    if (response.status === 401) {
-      handleTokenExpired();
-      navigate('/login', { replace: true });
-      return null;
-    }
-
-    const data = await response.json();
-    if (data.code !== 200) {
-      throw new Error(data.message || '请求失败');
-    }
-    return data.data;
-  };
+  const requestJson = async (url, options = {}) => apiClient.request(url, {
+    ...options,
+    auth: 'required'
+  });
 
   const fetchList = async (nextFilters = filters) => {
     setLoading(true);

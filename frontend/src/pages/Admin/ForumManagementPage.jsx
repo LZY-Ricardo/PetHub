@@ -18,6 +18,7 @@ import { message } from '../../utils/antdApp';
 import { DeleteOutlined, EyeOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import { apiClient } from '../../utils/apiClient';
 import './AdminManagementPage.css';
 
 const categoryOptions = ['经验分享', '求助问答', '宠物展示', '闲聊灌水'];
@@ -35,28 +36,10 @@ function ForumManagementPage() {
   const { handleTokenExpired } = useAuth();
   const navigate = useNavigate();
 
-  const requestJson = async (url, options = {}) => {
-    const token = localStorage.getItem('token');
-    const response = await fetch(url, {
-      ...options,
-      headers: {
-        ...(options.headers || {}),
-        Authorization: token ? `Bearer ${token}` : undefined
-      }
-    });
-
-    if (response.status === 401) {
-      handleTokenExpired();
-      navigate('/login', { replace: true });
-      return null;
-    }
-
-    const data = await response.json();
-    if (data.code !== 200) {
-      throw new Error(data.message || '请求失败');
-    }
-    return data.data;
-  };
+  const requestJson = async (url, options = {}) => apiClient.request(url, {
+    ...options,
+    auth: 'required'
+  });
 
   const fetchList = async (nextCategory = category) => {
     setLoading(true);
@@ -114,8 +97,7 @@ function ForumManagementPage() {
     try {
       await requestJson(`/api/forum/posts/${categoryTarget.id}/category`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ category: nextCategory })
+        body: { category: nextCategory }
       });
       message.success('分类已更新');
       setCategoryModalOpen(false);

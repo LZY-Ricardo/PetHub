@@ -4,6 +4,7 @@ import { Card, Row, Col, Tag, Button, Descriptions, Modal, Form, Input } from 'a
 import { message } from '../../utils/antdApp';
 import { HeartOutlined, EnvironmentOutlined, LeftOutlined, UserOutlined } from '@ant-design/icons';
 import { useAuth } from '../../contexts/AuthContext';
+import { apiClient } from '../../utils/apiClient';
 import './PetDetailPage.css';
 
 function PetDetailPage() {
@@ -14,7 +15,7 @@ function PetDetailPage() {
   const [adoVisible, setAdoVisible] = useState(false);
   const [adoLoading, setAdoLoading] = useState(false);
   const [form] = Form.useForm();
-  const { handleTokenExpired } = useAuth();
+  const { user, handleTokenExpired } = useAuth();
 
   useEffect(() => {
     fetchPetDetail();
@@ -23,11 +24,8 @@ function PetDetailPage() {
   const fetchPetDetail = async () => {
     setLoading(true);
     try {
-      const response = await fetch(`/api/pets/${id}`);
-      const data = await response.json();
-      if (data.code === 200) {
-        setPet(data.data);
-      }
+      const data = await apiClient.get(`/api/pets/${id}`);
+      setPet(data);
     } catch (error) {
       console.error('Failed to fetch pet detail:', error);
     } finally {
@@ -36,7 +34,6 @@ function PetDetailPage() {
   };
 
   const handleAdopt = () => {
-    const user = JSON.parse(localStorage.getItem('user') || '{}');
     if (!user.id) {
       message.warning('请先登录');
       navigate('/login');
@@ -48,37 +45,17 @@ function PetDetailPage() {
   const handleAdoSubmit = async (values) => {
     setAdoLoading(true);
     try {
-      const response = await fetch('/api/adoptions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        },
-        body: JSON.stringify({
+      await apiClient.post('/api/adoptions', {
           petId: parseInt(id),
           reason: values.reason,
-          contact: values.phone,  // 映射字段名
+          contact: values.phone,
           address: values.address
-        })
-      });
-
-      if (response.status === 401) {
-        handleTokenExpired();
-        setAdoVisible(false);
-        navigate('/login', { replace: true });
-        return;
-      }
-
-      const data = await response.json();
-      if (data.code === 200 || data.code === 201) {
-        message.success('领养申请已提交');
-        setAdoVisible(false);
-        form.resetFields();
-      } else {
-        message.error(data.message || '提交失败');
-      }
+        }, { auth: 'required' });
+      message.success('领养申请已提交');
+      setAdoVisible(false);
+      form.resetFields();
     } catch (error) {
-      message.error('提交失败');
+      message.error(error.message || '提交失败');
     } finally {
       setAdoLoading(false);
     }

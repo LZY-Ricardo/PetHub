@@ -13,6 +13,7 @@ import {
 } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import { apiClient, isApiError } from '../../utils/apiClient';
 import './DashboardPage.css';
 
 function DashboardPage() {
@@ -35,42 +36,21 @@ function DashboardPage() {
   const fetchStats = async () => {
     setLoading(true);
     try {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        setLoading(false);
-        return;
-      }
-
-      const response = await fetch('/api/admin/dashboard', {
-        headers: { Authorization: `Bearer ${token}` }
+      const data = await apiClient.get('/api/admin/dashboard', { auth: 'required' });
+      setStats({
+        totalUsers: Number(data?.user_count) || 0,
+        totalPets: Number(data?.pet_count) || 0,
+        totalPosts: Number(data?.post_count) || 0,
+        pendingAdoptions: Number(data?.pending_adoption_count) || 0,
+        pendingSubmissions: Number(data?.pending_submission_count) || 0,
+        pendingBoarding: Number(data?.pending_boarding_count) || 0
       });
-
-      if (response.status === 401) {
-        handleTokenExpired();
-        navigate('/login', { replace: true });
-        return;
-      }
-
-      if (response.status === 403) {
-        message.error('无权限访问管理数据');
-        return;
-      }
-
-      const data = await response.json();
-      if (data.code === 200) {
-        setStats({
-          totalUsers: Number(data.data?.user_count) || 0,
-          totalPets: Number(data.data?.pet_count) || 0,
-          totalPosts: Number(data.data?.post_count) || 0,
-          pendingAdoptions: Number(data.data?.pending_adoption_count) || 0,
-          pendingSubmissions: Number(data.data?.pending_submission_count) || 0,
-          pendingBoarding: Number(data.data?.pending_boarding_count) || 0
-        });
-      } else {
-        message.error(data.message || '获取仪表盘数据失败');
-      }
     } catch (error) {
-      message.error('获取仪表盘数据失败');
+      if (isApiError(error) && error.status === 403) {
+        message.error('无权限访问管理数据');
+      } else {
+        message.error(error.message || '获取仪表盘数据失败');
+      }
     } finally {
       setLoading(false);
     }

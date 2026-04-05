@@ -3,6 +3,7 @@ import { Card, Table, Tag } from 'antd';
 import { message } from '../../utils/antdApp';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import { apiClient } from '../../utils/apiClient';
 import './AdminManagementPage.css';
 
 function AdminAccountPage() {
@@ -12,26 +13,7 @@ function AdminAccountPage() {
   const { handleTokenExpired } = useAuth();
   const navigate = useNavigate();
 
-  const requestJson = async (url) => {
-    const token = localStorage.getItem('token');
-    const response = await fetch(url, {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    });
-
-    if (response.status === 401) {
-      handleTokenExpired();
-      navigate('/login', { replace: true });
-      return null;
-    }
-
-    const data = await response.json();
-    if (data.code !== 200) {
-      throw new Error(data.message || '请求失败');
-    }
-    return data.data;
-  };
+  const requestJson = async (url) => apiClient.get(url, { auth: 'required' });
 
   const fetchList = async (nextPagination = pagination) => {
     setLoading(true);

@@ -4,6 +4,7 @@ import { message } from '../../utils/antdApp';
 import { BellOutlined, CheckCircleOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import { apiClient } from '../../utils/apiClient';
 import './NotificationPage.css';
 
 const { Text } = Typography;
@@ -23,32 +24,20 @@ function NotificationPage() {
     fetchNotifications();
   }, [unreadOnly]);
 
-  const getAuthHeader = () => {
-    const token = localStorage.getItem('token');
-    return token ? { Authorization: `Bearer ${token}` } : {};
-  };
-
   const fetchNotifications = async () => {
     setLoading(true);
     try {
-      const response = await fetch(`/api/notifications?page=1&pageSize=100&unreadOnly=${unreadOnly}`, {
-        headers: getAuthHeader()
+      const data = await apiClient.get('/api/notifications', {
+        auth: 'required',
+        params: {
+          page: 1,
+          pageSize: 100,
+          unreadOnly
+        }
       });
-
-      if (response.status === 401) {
-        handleTokenExpired();
-        navigate('/login', { replace: true });
-        return;
-      }
-
-      const data = await response.json();
-      if (data.code === 200) {
-        setNotifications(data.data?.list || []);
-      } else {
-        message.error(data.message || '获取通知失败');
-      }
+      setNotifications(data?.list || []);
     } catch (err) {
-      message.error('获取通知失败，请稍后重试');
+      message.error(err.message || '获取通知失败，请稍后重试');
     } finally {
       setLoading(false);
     }
@@ -56,54 +45,28 @@ function NotificationPage() {
 
   const markAsRead = async (id) => {
     try {
-      const response = await fetch(`/api/notifications/${id}/read`, {
-        method: 'PUT',
-        headers: getAuthHeader()
-      });
-
-      if (response.status === 401) {
-        handleTokenExpired();
-        navigate('/login', { replace: true });
-        return;
-      }
-
-      const data = await response.json();
-      if (data.code === 200) {
-        setNotifications((prev) => prev.map((item) => (
-          item.id === id ? { ...item, is_read: 1, read_at: new Date().toISOString() } : item
-        )));
-        notifyUnreadCountChanged();
-      }
+      await apiClient.put(`/api/notifications/${id}/read`, undefined, { auth: 'required' });
+      setNotifications((prev) => prev.map((item) => (
+        item.id === id ? { ...item, is_read: 1, read_at: new Date().toISOString() } : item
+      )));
+      notifyUnreadCountChanged();
     } catch (err) {
-      message.error('标记已读失败');
+      message.error(err.message || '标记已读失败');
     }
   };
 
   const markAllAsRead = async () => {
     try {
-      const response = await fetch('/api/notifications/read-all', {
-        method: 'PUT',
-        headers: getAuthHeader()
-      });
-
-      if (response.status === 401) {
-        handleTokenExpired();
-        navigate('/login', { replace: true });
-        return;
-      }
-
-      const data = await response.json();
-      if (data.code === 200) {
-        message.success('已全部标记为已读');
-        setNotifications((prev) => prev.map((item) => ({
-          ...item,
-          is_read: 1,
-          read_at: item.read_at || new Date().toISOString()
-        })));
-        notifyUnreadCountChanged();
-      }
+      await apiClient.put('/api/notifications/read-all', undefined, { auth: 'required' });
+      message.success('已全部标记为已读');
+      setNotifications((prev) => prev.map((item) => ({
+        ...item,
+        is_read: 1,
+        read_at: item.read_at || new Date().toISOString()
+      })));
+      notifyUnreadCountChanged();
     } catch (err) {
-      message.error('操作失败');
+      message.error(err.message || '操作失败');
     }
   };
 

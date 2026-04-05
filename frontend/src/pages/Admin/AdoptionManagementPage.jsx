@@ -18,6 +18,7 @@ import { message } from '../../utils/antdApp';
 import { CheckOutlined, CloseOutlined, EyeOutlined } from '@ant-design/icons';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import { apiClient } from '../../utils/apiClient';
 import './AdminManagementPage.css';
 
 const statusOptions = [
@@ -63,28 +64,10 @@ function AdoptionManagementPage() {
   const navigate = useNavigate();
   const { handleTokenExpired } = useAuth();
 
-  const requestJson = async (url, options = {}) => {
-    const token = localStorage.getItem('token');
-    const response = await fetch(url, {
-      ...options,
-      headers: {
-        ...(options.headers || {}),
-        Authorization: `Bearer ${token}`
-      }
-    });
-
-    if (response.status === 401) {
-      handleTokenExpired();
-      navigate('/login', { replace: true });
-      return null;
-    }
-
-    const data = await response.json();
-    if (data.code !== 200) {
-      throw new Error(data.message || '请求失败');
-    }
-    return data.data;
-  };
+  const requestJson = async (url, options = {}) => apiClient.request(url, {
+    ...options,
+    auth: 'required'
+  });
 
   const fetchStats = async () => {
     try {
@@ -192,13 +175,10 @@ function AdoptionManagementPage() {
     try {
       await requestJson(`/api/adoptions/${reviewTarget.id}/review`, {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
+        body: {
           status: reviewStatus,
           reviewComment: reviewComment.trim()
-        })
+        }
       });
 
       message.success(reviewStatus === 'approved' ? '申请已通过' : '申请已驳回');

@@ -17,6 +17,7 @@ import { message } from '../../utils/antdApp';
 import { EditOutlined, RedoOutlined, PlusOutlined, InboxOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import { apiClient } from '../../utils/apiClient';
 
 const { TextArea } = Input;
 
@@ -33,27 +34,10 @@ function MyPetSubmissionsPage() {
   const fetchList = async () => {
     setLoading(true);
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch('/api/pets/my-submissions', {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
-
-      if (response.status === 401) {
-        handleTokenExpired();
-        navigate('/login', { replace: true });
-        return;
-      }
-
-      const data = await response.json();
-      if (data.code === 200) {
-        setList(data.data || []);
-      } else {
-        message.error(data.message || '获取送养发布失败');
-      }
+      const data = await apiClient.get('/api/pets/my-submissions', { auth: 'required' });
+      setList(data || []);
     } catch (error) {
-      message.error('获取送养发布失败');
+      message.error(error.message || '获取送养发布失败');
     } finally {
       setLoading(false);
     }
@@ -65,25 +49,12 @@ function MyPetSubmissionsPage() {
 
   const uploadImage = async ({ file, onSuccess, onError }) => {
     try {
-      const token = localStorage.getItem('token');
       const formData = new FormData();
       formData.append('file', file);
       formData.append('type', 'pet');
 
-      const response = await fetch('/api/upload/image', {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${token}`
-        },
-        body: formData
-      });
-
-      const data = await response.json();
-      if (data.code === 200) {
-        onSuccess({ url: data.data.url });
-      } else {
-        onError(new Error(data.message || '上传失败'));
-      }
+      const data = await apiClient.post('/api/upload/image', formData, { auth: 'required' });
+      onSuccess({ url: data.url });
     } catch (error) {
       onError(error);
     }
@@ -117,38 +88,18 @@ function MyPetSubmissionsPage() {
 
     setSubmitting(true);
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch(`/api/pets/my-submissions/${editingItem.id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`
-        },
-        body: JSON.stringify({
+      await apiClient.put(`/api/pets/my-submissions/${editingItem.id}`, {
           ...values,
           photos: fileList
             .filter((item) => item.status === 'done')
             .map((item) => item.response?.url || item.url)
-        })
-      });
-
-      if (response.status === 401) {
-        handleTokenExpired();
-        navigate('/login', { replace: true });
-        return;
-      }
-
-      const data = await response.json();
-      if (data.code === 200) {
-        message.success('更新成功');
-        setEditingItem(null);
-        form.resetFields();
-        fetchList();
-      } else {
-        message.error(data.message || '更新失败');
-      }
+        }, { auth: 'required' });
+      message.success('更新成功');
+      setEditingItem(null);
+      form.resetFields();
+      fetchList();
     } catch (error) {
-      message.error('更新失败');
+      message.error(error.message || '更新失败');
     } finally {
       setSubmitting(false);
     }
@@ -156,29 +107,11 @@ function MyPetSubmissionsPage() {
 
   const handleResubmit = async (id) => {
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch(`/api/pets/my-submissions/${id}/resubmit`, {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
-
-      if (response.status === 401) {
-        handleTokenExpired();
-        navigate('/login', { replace: true });
-        return;
-      }
-
-      const data = await response.json();
-      if (data.code === 200) {
-        message.success('已重新提交审核');
-        fetchList();
-      } else {
-        message.error(data.message || '提交失败');
-      }
+      await apiClient.post(`/api/pets/my-submissions/${id}/resubmit`, undefined, { auth: 'required' });
+      message.success('已重新提交审核');
+      fetchList();
     } catch (error) {
-      message.error('提交失败');
+      message.error(error.message || '提交失败');
     }
   };
 

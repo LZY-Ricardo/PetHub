@@ -3,6 +3,7 @@ import { Button, Card, Form, Input, Modal, Popconfirm, Select, Space, Table, Tag
 import { message } from '../../utils/antdApp';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import { apiClient } from '../../utils/apiClient';
 import { PET_GENDER_OPTIONS, USER_PET_TYPE_OPTIONS } from '../../components/Boarding/boardingConstants';
 import './MyPetProfilesPage.css';
 
@@ -16,36 +17,17 @@ function MyPetProfilesPage() {
   const [modalOpen, setModalOpen] = React.useState(false);
   const [form] = Form.useForm();
 
-  const getAuthHeader = React.useCallback(() => {
-    const token = localStorage.getItem('token');
-    return token ? { Authorization: `Bearer ${token}` } : {};
-  }, []);
-
   const fetchPets = React.useCallback(async () => {
     setLoading(true);
     try {
-      const response = await fetch('/api/user-pets', {
-        headers: getAuthHeader()
-      });
-
-      if (response.status === 401) {
-        handleTokenExpired();
-        navigate('/login', { replace: true });
-        return;
-      }
-
-      const data = await response.json();
-      if (data.code === 200) {
-        setPets(data.data || []);
-      } else {
-        message.error(data.message || '获取宠物档案失败');
-      }
+      const data = await apiClient.get('/api/user-pets', { auth: 'required' });
+      setPets(data || []);
     } catch (error) {
-      message.error('获取宠物档案失败');
+      message.error(error.message || '获取宠物档案失败');
     } finally {
       setLoading(false);
     }
-  }, [getAuthHeader, handleTokenExpired, navigate]);
+  }, [handleTokenExpired, navigate]);
 
   React.useEffect(() => {
     fetchPets();
@@ -76,31 +58,16 @@ function MyPetProfilesPage() {
   const handleSave = async (values) => {
     setSaving(true);
     try {
-      const response = await fetch(editingPet ? `/api/user-pets/${editingPet.id}` : '/api/user-pets', {
+      await apiClient.request(editingPet ? `/api/user-pets/${editingPet.id}` : '/api/user-pets', {
         method: editingPet ? 'PUT' : 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...getAuthHeader()
-        },
-        body: JSON.stringify(values)
+        auth: 'required',
+        body: values
       });
-
-      if (response.status === 401) {
-        handleTokenExpired();
-        navigate('/login', { replace: true });
-        return;
-      }
-
-      const data = await response.json();
-      if (data.code === 200 || data.code === 201) {
-        message.success(editingPet ? '宠物档案已更新' : '宠物档案已创建');
-        setModalOpen(false);
-        fetchPets();
-      } else {
-        message.error(data.message || '保存失败');
-      }
+      message.success(editingPet ? '宠物档案已更新' : '宠物档案已创建');
+      setModalOpen(false);
+      fetchPets();
     } catch (error) {
-      message.error('保存失败');
+      message.error(error.message || '保存失败');
     } finally {
       setSaving(false);
     }
@@ -108,26 +75,11 @@ function MyPetProfilesPage() {
 
   const handleDelete = async (id) => {
     try {
-      const response = await fetch(`/api/user-pets/${id}`, {
-        method: 'DELETE',
-        headers: getAuthHeader()
-      });
-
-      if (response.status === 401) {
-        handleTokenExpired();
-        navigate('/login', { replace: true });
-        return;
-      }
-
-      const data = await response.json();
-      if (data.code === 200) {
-        message.success('宠物档案已删除');
-        fetchPets();
-      } else {
-        message.error(data.message || '删除失败');
-      }
+      await apiClient.delete(`/api/user-pets/${id}`, { auth: 'required' });
+      message.success('宠物档案已删除');
+      fetchPets();
     } catch (error) {
-      message.error('删除失败');
+      message.error(error.message || '删除失败');
     }
   };
 

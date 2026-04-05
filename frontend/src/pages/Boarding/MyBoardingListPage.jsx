@@ -3,6 +3,7 @@ import { Button, Card, Descriptions, Input, Modal, Space, Table } from 'antd';
 import { message } from '../../utils/antdApp';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import { apiClient } from '../../utils/apiClient';
 import BoardingStatusTag from '../../components/Boarding/BoardingStatusTag';
 import BoardingActionPanel from '../../components/Boarding/BoardingActionPanel';
 import './MyBoardingListPage.css';
@@ -17,36 +18,17 @@ function MyBoardingListPage() {
   const [cancelReason, setCancelReason] = React.useState('');
   const [actionLoading, setActionLoading] = React.useState(false);
 
-  const getAuthHeader = React.useCallback(() => {
-    const token = localStorage.getItem('token');
-    return token ? { Authorization: `Bearer ${token}` } : {};
-  }, []);
-
   const fetchRecords = React.useCallback(async () => {
     setLoading(true);
     try {
-      const response = await fetch('/api/boarding-applications/my', {
-        headers: getAuthHeader()
-      });
-
-      if (response.status === 401) {
-        handleTokenExpired();
-        navigate('/login', { replace: true });
-        return;
-      }
-
-      const data = await response.json();
-      if (data.code === 200) {
-        setRecords(data.data || []);
-      } else {
-        message.error(data.message || '获取寄养申请失败');
-      }
+      const data = await apiClient.get('/api/boarding-applications/my', { auth: 'required' });
+      setRecords(data || []);
     } catch (error) {
-      message.error('获取寄养申请失败');
+      message.error(error.message || '获取寄养申请失败');
     } finally {
       setLoading(false);
     }
-  }, [getAuthHeader, handleTokenExpired, navigate]);
+  }, [handleTokenExpired, navigate]);
 
   React.useEffect(() => {
     fetchRecords();
@@ -64,32 +46,17 @@ function MyBoardingListPage() {
 
     setActionLoading(true);
     try {
-      const response = await fetch(`/api/boarding-applications/${detailRecord.id}/cancel`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          ...getAuthHeader()
-        },
-        body: JSON.stringify({ cancelReason })
-      });
-
-      if (response.status === 401) {
-        handleTokenExpired();
-        navigate('/login', { replace: true });
-        return;
-      }
-
-      const data = await response.json();
-      if (data.code === 200) {
-        message.success('寄养申请已取消');
-        setCancelModalOpen(false);
-        setCancelReason('');
-        fetchRecords();
-      } else {
-        message.error(data.message || '取消失败');
-      }
+      await apiClient.patch(
+        `/api/boarding-applications/${detailRecord.id}/cancel`,
+        { cancelReason },
+        { auth: 'required' }
+      );
+      message.success('寄养申请已取消');
+      setCancelModalOpen(false);
+      setCancelReason('');
+      fetchRecords();
     } catch (error) {
-      message.error('取消失败');
+      message.error(error.message || '取消失败');
     } finally {
       setActionLoading(false);
     }

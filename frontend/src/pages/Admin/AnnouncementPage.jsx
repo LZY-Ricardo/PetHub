@@ -3,6 +3,7 @@ import { Button, Card, Col, Form, Input, Row, Select, Switch } from 'antd';
 import { message } from '../../utils/antdApp';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import { apiClient, isApiError } from '../../utils/apiClient';
 import './AdminManagementPage.css';
 
 function AnnouncementPage() {
@@ -14,41 +15,15 @@ function AnnouncementPage() {
   const handlePublishAnnouncement = async (values) => {
     setPublishing(true);
     try {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        message.warning('请先登录');
-        return;
-      }
-
-      const response = await fetch('/api/admin/notifications/broadcast', {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(values)
-      });
-
-      if (response.status === 401) {
-        handleTokenExpired();
-        navigate('/login', { replace: true });
-        return;
-      }
-
-      if (response.status === 403) {
-        message.error('无权限发布公告');
-        return;
-      }
-
-      const data = await response.json();
-      if (data.code === 200) {
-        message.success(`公告发布成功，已发送给 ${data.data?.deliveredCount || 0} 位用户`);
-        announceForm.resetFields();
-      } else {
-        message.error(data.message || '公告发布失败');
-      }
+      const data = await apiClient.post('/api/admin/notifications/broadcast', values, { auth: 'required' });
+      message.success(`公告发布成功，已发送给 ${data?.deliveredCount || 0} 位用户`);
+      announceForm.resetFields();
     } catch (error) {
-      message.error('公告发布失败，请稍后重试');
+      if (isApiError(error) && error.status === 403) {
+        message.error('无权限发布公告');
+      } else {
+        message.error(error.message || '公告发布失败，请稍后重试');
+      }
     } finally {
       setPublishing(false);
     }

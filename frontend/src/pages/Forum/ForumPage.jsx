@@ -4,6 +4,7 @@ import { message } from '../../utils/antdApp';
 import { MessageOutlined, PlusOutlined, EyeOutlined, LikeOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import { apiClient } from '../../utils/apiClient';
 import './ForumPage.css';
 
 const { TextArea } = Input;
@@ -26,18 +27,12 @@ function ForumPage() {
   const fetchPosts = async () => {
     setLoading(true);
     try {
-      const params = new URLSearchParams();
-      if (activeCategory !== '全部') {
-        params.append('category', activeCategory);
-      }
-
-      const response = await fetch(`/api/forum/posts${params.toString() ? `?${params.toString()}` : ''}`);
-      const data = await response.json();
-      if (data.code === 200) {
-        setPosts(data.data?.list || []);
-      } else {
-        message.error(data.message || '获取帖子失败');
-      }
+      const data = await apiClient.get('/api/forum/posts', {
+        params: {
+          category: activeCategory !== '全部' ? activeCategory : ''
+        }
+      });
+      setPosts(data?.list || []);
     } catch (error) {
       console.error('Failed to fetch posts:', error);
       message.error('获取帖子失败');
@@ -58,36 +53,16 @@ function ForumPage() {
   const handleSubmit = async (values) => {
     setSubmitting(true);
     try {
-      const response = await fetch('/api/forum/posts', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        },
-        body: JSON.stringify({
+      await apiClient.post('/api/forum/posts', {
           ...values,
           userId: user.id
-        })
-      });
-
-      if (response.status === 401) {
-        handleTokenExpired();
-        setPostVisible(false);
-        navigate('/login', { replace: true });
-        return;
-      }
-
-      const data = await response.json();
-      if (data.code === 200 || data.code === 201) {
-        message.success('发布成功');
-        setPostVisible(false);
-        form.resetFields();
-        fetchPosts();
-      } else {
-        message.error(data.message || '发布失败');
-      }
+        }, { auth: 'required' });
+      message.success('发布成功');
+      setPostVisible(false);
+      form.resetFields();
+      fetchPosts();
     } catch (error) {
-      message.error('发布失败');
+      message.error(error.message || '发布失败');
     } finally {
       setSubmitting(false);
     }

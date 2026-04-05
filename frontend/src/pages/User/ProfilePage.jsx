@@ -4,6 +4,7 @@ import { message } from '../../utils/antdApp';
 import { UserOutlined, MailOutlined, PhoneOutlined, EditOutlined, LockOutlined, CameraOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import { apiClient } from '../../utils/apiClient';
 import './ProfilePage.css';
 
 function ProfilePage() {
@@ -25,33 +26,15 @@ function ProfilePage() {
 
   React.useEffect(() => {
     const fetchUserStats = async () => {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        setStatsLoading(false);
-        return;
-      }
-
       try {
         setStatsLoading(true);
-        const response = await fetch('/api/auth/user/stats', {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        });
-
-        if (response.status === 401) {
-          handleTokenExpired();
-          navigate('/login', { replace: true });
-          return;
-        }
-
-        const data = await response.json();
-        if (data.code === 200 && data.data) {
+        const data = await apiClient.get('/api/auth/user/stats', { auth: 'required' });
+        if (data) {
           setStats({
-            adoptionCount: Number(data.data.adoptionCount) || 0,
-            boardingCount: Number(data.data.boardingCount) || 0,
-            lostPetCount: Number(data.data.lostPetCount) || 0,
-            forumPostCount: Number(data.data.forumPostCount) || 0
+            adoptionCount: Number(data.adoptionCount) || 0,
+            boardingCount: Number(data.boardingCount) || 0,
+            lostPetCount: Number(data.lostPetCount) || 0,
+            forumPostCount: Number(data.forumPostCount) || 0
           });
         }
       } catch (error) {
@@ -80,30 +63,11 @@ function ProfilePage() {
 
     setAvatarUploading(true);
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch('/api/auth/avatar', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`
-        },
-        body: formData
-      });
-
-      if (response.status === 401) {
-        handleTokenExpired();
-        navigate('/login', { replace: true });
-        return false;
-      }
-
-      const data = await response.json();
-      if (data.code === 200) {
-        message.success('头像上传成功');
-        updateUser({ ...user, avatar: data.data.avatar });
-      } else {
-        message.error(data.message || '头像上传失败');
-      }
+      const data = await apiClient.post('/api/auth/avatar', formData, { auth: 'required' });
+      message.success('头像上传成功');
+      updateUser({ ...user, avatar: data.avatar });
     } catch (error) {
-      message.error('网络错误，请稍后重试');
+      message.error(error.message || '网络错误，请稍后重试');
     } finally {
       setAvatarUploading(false);
     }
@@ -121,33 +85,12 @@ function ProfilePage() {
   const handleUpdateProfile = async (values) => {
     setLoading(true);
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch('/api/auth/user', {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(values)
-      });
-
-      if (response.status === 401) {
-        handleTokenExpired();
-        navigate('/login', { replace: true });
-        return;
-      }
-
-      const data = await response.json();
-
-      if (data.code === 200) {
-        message.success('个人信息更新成功');
-        updateUser(data.data);
-        setEditModalVisible(false);
-      } else {
-        message.error(data.message || '更新失败');
-      }
+      const data = await apiClient.put('/api/auth/user', values, { auth: 'required' });
+      message.success('个人信息更新成功');
+      updateUser(data);
+      setEditModalVisible(false);
     } catch (error) {
-      message.error('网络错误，请稍后重试');
+      message.error(error.message || '网络错误，请稍后重试');
     } finally {
       setLoading(false);
     }
@@ -156,38 +99,16 @@ function ProfilePage() {
   const handleChangePassword = async (values) => {
     setLoading(true);
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch('/api/auth/change-password', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(values)
-      });
-
-      if (response.status === 401) {
-        handleTokenExpired();
+      await apiClient.post('/api/auth/change-password', values, { auth: 'required' });
+      message.success('密码修改成功，请重新登录');
+      setPasswordModalVisible(false);
+      passwordForm.resetFields();
+      setTimeout(() => {
+        logout(false);
         navigate('/login', { replace: true });
-        return;
-      }
-
-      const data = await response.json();
-
-      if (data.code === 200) {
-        message.success('密码修改成功，请重新登录');
-        setPasswordModalVisible(false);
-        passwordForm.resetFields();
-        // 延迟1秒后退出登录
-        setTimeout(() => {
-          logout(false);
-          navigate('/login', { replace: true });
-        }, 1000);
-      } else {
-        message.error(data.message || '密码修改失败');
-      }
+      }, 1000);
     } catch (error) {
-      message.error('网络错误，请稍后重试');
+      message.error(error.message || '网络错误，请稍后重试');
     } finally {
       setLoading(false);
     }

@@ -4,6 +4,7 @@ import { message } from '../../utils/antdApp';
 import { SearchOutlined, EnvironmentOutlined, PlusOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import { apiClient } from '../../utils/apiClient';
 import './LostPetListPage.css';
 
 const { Search } = Input;
@@ -26,11 +27,8 @@ function LostPetListPage() {
   const fetchLostPets = async () => {
     setLoading(true);
     try {
-      const response = await fetch('/api/lost-pets');
-      const data = await response.json();
-      if (data.code === 200) {
-        setLostPets(data.data?.list || []);
-      }
+      const data = await apiClient.get('/api/lost-pets');
+      setLostPets(data?.list || []);
     } catch (error) {
       console.error('Failed to fetch lost pets:', error);
     } finally {
@@ -70,33 +68,13 @@ function LostPetListPage() {
         }
       });
 
-      const response = await fetch('/api/lost-pets', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        },
-        body: JSON.stringify(submitData)
-      });
-
-      if (response.status === 401) {
-        handleTokenExpired();
-        setReportVisible(false);
-        navigate('/login', { replace: true });
-        return;
-      }
-
-      const data = await response.json();
-      if (data.code === 200 || data.code === 201) {
-        message.success('发布成功');
-        setReportVisible(false);
-        form.resetFields();
-        fetchLostPets();
-      } else {
-        message.error(data.message || '发布失败');
-      }
+      await apiClient.post('/api/lost-pets', submitData, { auth: 'required' });
+      message.success('发布成功');
+      setReportVisible(false);
+      form.resetFields();
+      fetchLostPets();
     } catch (error) {
-      message.error('发布失败');
+      message.error(error.message || '发布失败');
     } finally {
       setSubmitting(false);
     }

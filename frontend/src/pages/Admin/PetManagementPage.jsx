@@ -22,6 +22,7 @@ import { message } from '../../utils/antdApp';
 import { DeleteOutlined, EditOutlined, EyeOutlined, ReloadOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import { apiClient } from '../../utils/apiClient';
 import './AdminManagementPage.css';
 
 const sourceOptions = [
@@ -109,28 +110,10 @@ function PetManagementPage() {
   const navigate = useNavigate();
   const { handleTokenExpired } = useAuth();
 
-  const requestJson = async (url, options = {}) => {
-    const token = localStorage.getItem('token');
-    const response = await fetch(url, {
-      ...options,
-      headers: {
-        ...(options.headers || {}),
-        Authorization: `Bearer ${token}`
-      }
-    });
-
-    if (response.status === 401) {
-      handleTokenExpired();
-      navigate('/login', { replace: true });
-      return null;
-    }
-
-    const data = await response.json();
-    if (data.code !== 200) {
-      throw new Error(data.message || '请求失败');
-    }
-    return data.data;
-  };
+  const requestJson = async (url, options = {}) => apiClient.request(url, {
+    ...options,
+    auth: 'required'
+  });
 
   const fetchStats = async () => {
     try {
@@ -243,10 +226,7 @@ function PetManagementPage() {
     try {
       await requestJson(`/api/pets/${editingPet.id}`, {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(values)
+        body: values
       });
       message.success('宠物信息已更新');
       setEditVisible(false);
@@ -267,12 +247,9 @@ function PetManagementPage() {
     try {
       await requestJson(`/api/pets/${record.id}`, {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
+        body: {
           status: nextStatus
-        })
+        }
       });
       message.success(nextStatus === 'off_shelf' ? '宠物已下架' : '宠物已重新上架');
       fetchStats();

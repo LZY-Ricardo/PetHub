@@ -4,6 +4,7 @@ import { message } from '../../utils/antdApp';
 import { CheckOutlined } from '@ant-design/icons';
 import { useAuth } from '../../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import { apiClient } from '../../utils/apiClient';
 
 function PetSubmissionReviewPage() {
   const [list, setList] = useState([]);
@@ -18,25 +19,13 @@ function PetSubmissionReviewPage() {
   const fetchList = async () => {
     setLoading(true);
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch('/api/pets/pending-submissions?page=1&pageSize=100', {
-        headers: { Authorization: `Bearer ${token}` }
+      const data = await apiClient.get('/api/pets/pending-submissions', {
+        auth: 'required',
+        params: { page: 1, pageSize: 100 }
       });
-
-      if (response.status === 401) {
-        handleTokenExpired();
-        navigate('/login', { replace: true });
-        return;
-      }
-
-      const data = await response.json();
-      if (data.code === 200) {
-        setList(data.data?.list || []);
-      } else {
-        message.error(data.message || '获取待审核列表失败');
-      }
+      setList(data?.list || []);
     } catch (error) {
-      message.error('获取待审核列表失败');
+      message.error(error.message || '获取待审核列表失败');
     } finally {
       setLoading(false);
     }
@@ -53,36 +42,16 @@ function PetSubmissionReviewPage() {
 
     setSubmitting(true);
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch(`/api/pets/submissions/${reviewingItem.id}/review`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`
-        },
-        body: JSON.stringify({
+      await apiClient.put(`/api/pets/submissions/${reviewingItem.id}/review`, {
           status: reviewStatus,
           reviewComment
-        })
-      });
-
-      if (response.status === 401) {
-        handleTokenExpired();
-        navigate('/login', { replace: true });
-        return;
-      }
-
-      const data = await response.json();
-      if (data.code === 200) {
-        message.success('审核完成');
-        setReviewingItem(null);
-        setReviewComment('');
-        fetchList();
-      } else {
-        message.error(data.message || '审核失败');
-      }
+      }, { auth: 'required' });
+      message.success('审核完成');
+      setReviewingItem(null);
+      setReviewComment('');
+      fetchList();
     } catch (error) {
-      message.error('审核失败');
+      message.error(error.message || '审核失败');
     } finally {
       setSubmitting(false);
     }

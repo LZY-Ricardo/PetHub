@@ -4,6 +4,7 @@ import { message } from '../../utils/antdApp';
 import { PlusOutlined, InboxOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import { apiClient } from '../../utils/apiClient';
 
 const { TextArea } = Input;
 
@@ -16,31 +17,12 @@ function PetSubmissionPage() {
 
   const uploadImage = async ({ file, onSuccess, onError }) => {
     try {
-      const token = localStorage.getItem('token');
       const formData = new FormData();
       formData.append('file', file);
       formData.append('type', 'pet');
 
-      const response = await fetch('/api/upload/image', {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${token}`
-        },
-        body: formData
-      });
-
-      if (response.status === 401) {
-        handleTokenExpired();
-        navigate('/login', { replace: true });
-        return;
-      }
-
-      const data = await response.json();
-      if (data.code === 200) {
-        onSuccess({ url: data.data.url });
-      } else {
-        onError(new Error(data.message || '上传失败'));
-      }
+      const data = await apiClient.post('/api/upload/image', formData, { auth: 'required' });
+      onSuccess({ url: data.url });
     } catch (error) {
       onError(error);
     }
@@ -49,42 +31,16 @@ function PetSubmissionPage() {
   const handleSubmit = async (values) => {
     setSubmitting(true);
     try {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        message.warning('请先登录');
-        navigate('/login', { replace: true });
-        return;
-      }
-
-      const response = await fetch('/api/pets/submissions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`
-        },
-        body: JSON.stringify({
+      await apiClient.post('/api/pets/submissions', {
           ...values,
           photos: fileList
             .filter((item) => item.status === 'done')
             .map((item) => item.response?.url || item.url)
-        })
-      });
-
-      if (response.status === 401) {
-        handleTokenExpired();
-        navigate('/login', { replace: true });
-        return;
-      }
-
-      const data = await response.json();
-      if (data.code === 201 || data.code === 200) {
-        message.success(data.message || '发布成功');
-        navigate('/my-pet-submissions', { replace: true });
-      } else {
-        message.error(data.message || '发布失败');
-      }
+        }, { auth: 'required' });
+      message.success('发布成功');
+      navigate('/my-pet-submissions', { replace: true });
     } catch (error) {
-      message.error('发布失败，请稍后重试');
+      message.error(error.message || '发布失败，请稍后重试');
     } finally {
       setSubmitting(false);
     }

@@ -4,6 +4,7 @@ import { message } from '../../utils/antdApp';
 import { useNavigate } from 'react-router-dom';
 import { CheckCircleOutlined, DeleteOutlined, PlusOutlined } from '@ant-design/icons';
 import { useAuth } from '../../contexts/AuthContext';
+import { apiClient } from '../../utils/apiClient';
 import './MyLostPetPage.css';
 
 function MyLostPetPage() {
@@ -14,35 +15,12 @@ function MyLostPetPage() {
   const navigate = useNavigate();
 
   const fetchMyLostPets = async () => {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      message.warning('请先登录');
-      navigate('/login', { replace: true });
-      return;
-    }
-
     setLoading(true);
     try {
-      const response = await fetch('/api/lost-pets/my', {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-
-      if (response.status === 401) {
-        handleTokenExpired();
-        navigate('/login', { replace: true });
-        return;
-      }
-
-      const data = await response.json();
-      if (data.code === 200) {
-        setList(data.data || []);
-      } else {
-        message.error(data.message || '获取我的寻宠信息失败');
-      }
+      const data = await apiClient.get('/api/lost-pets/my', { auth: 'required' });
+      setList(data || []);
     } catch (error) {
-      message.error('网络错误，请稍后重试');
+      message.error(error.message || '网络错误，请稍后重试');
     } finally {
       setLoading(false);
     }
@@ -53,66 +31,26 @@ function MyLostPetPage() {
   }, []);
 
   const handleMarkAsFound = async (id) => {
-    const token = localStorage.getItem('token');
-    if (!token) return;
-
     setActionLoading(true);
     try {
-      const response = await fetch(`/api/lost-pets/${id}/found`, {
-        method: 'PATCH',
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-
-      if (response.status === 401) {
-        handleTokenExpired();
-        navigate('/login', { replace: true });
-        return;
-      }
-
-      const data = await response.json();
-      if (data.code === 200) {
-        message.success('已标记为找回');
-        fetchMyLostPets();
-      } else {
-        message.error(data.message || '操作失败');
-      }
+      await apiClient.patch(`/api/lost-pets/${id}/found`, undefined, { auth: 'required' });
+      message.success('已标记为找回');
+      fetchMyLostPets();
     } catch (error) {
-      message.error('网络错误，请稍后重试');
+      message.error(error.message || '网络错误，请稍后重试');
     } finally {
       setActionLoading(false);
     }
   };
 
   const handleDelete = async (id) => {
-    const token = localStorage.getItem('token');
-    if (!token) return;
-
     setActionLoading(true);
     try {
-      const response = await fetch(`/api/lost-pets/${id}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-
-      if (response.status === 401) {
-        handleTokenExpired();
-        navigate('/login', { replace: true });
-        return;
-      }
-
-      const data = await response.json();
-      if (data.code === 200) {
-        message.success('删除成功');
-        fetchMyLostPets();
-      } else {
-        message.error(data.message || '删除失败');
-      }
+      await apiClient.delete(`/api/lost-pets/${id}`, { auth: 'required' });
+      message.success('删除成功');
+      fetchMyLostPets();
     } catch (error) {
-      message.error('网络错误，请稍后重试');
+      message.error(error.message || '网络错误，请稍后重试');
     } finally {
       setActionLoading(false);
     }

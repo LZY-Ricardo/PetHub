@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Card, Row, Col, Tag, Button, Input, Select, Space, Empty } from 'antd';
 import { HeartOutlined, EnvironmentOutlined, SearchOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
+import { apiClient } from '../../utils/apiClient';
 import './PetListPage.css';
 
 const { Search } = Input;
@@ -24,16 +25,14 @@ function PetListPage() {
   const fetchPets = async () => {
     setLoading(true);
     try {
-      const params = new URLSearchParams();
-      if (filters.keyword) params.append('keyword', filters.keyword);
-      if (filters.species) params.append('species', filters.species);
-      if (filters.status) params.append('status', filters.status);
-
-      const response = await fetch(`/api/pets?${params}`);
-      const data = await response.json();
-      if (data.code === 200) {
-        setPets(data.data?.list || []);
-      }
+      const data = await apiClient.get('/api/pets', {
+        params: {
+          keyword: filters.keyword,
+          species: filters.species,
+          status: filters.status
+        }
+      });
+      setPets(data?.list || []);
     } catch (error) {
       console.error('Failed to fetch pets:', error);
     } finally {

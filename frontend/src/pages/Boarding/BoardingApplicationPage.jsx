@@ -3,6 +3,7 @@ import { Card } from 'antd';
 import { message } from '../../utils/antdApp';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import { apiClient } from '../../utils/apiClient';
 import BoardingApplicationForm from '../../components/Boarding/BoardingApplicationForm';
 import './BoardingApplicationPage.css';
 
@@ -12,31 +13,14 @@ function BoardingApplicationPage() {
   const [userPets, setUserPets] = React.useState([]);
   const [loading, setLoading] = React.useState(false);
 
-  const getAuthHeader = React.useCallback(() => {
-    const token = localStorage.getItem('token');
-    return token ? { Authorization: `Bearer ${token}` } : {};
-  }, []);
-
   const fetchUserPets = React.useCallback(async () => {
     try {
-      const response = await fetch('/api/user-pets', {
-        headers: getAuthHeader()
-      });
-
-      if (response.status === 401) {
-        handleTokenExpired();
-        navigate('/login', { replace: true });
-        return;
-      }
-
-      const data = await response.json();
-      if (data.code === 200) {
-        setUserPets(data.data || []);
-      }
+      const data = await apiClient.get('/api/user-pets', { auth: 'required' });
+      setUserPets(data || []);
     } catch (error) {
-      message.error('获取宠物档案失败');
+      message.error(error.message || '获取宠物档案失败');
     }
-  }, [getAuthHeader, handleTokenExpired, navigate]);
+  }, [handleTokenExpired, navigate]);
 
   React.useEffect(() => {
     fetchUserPets();
@@ -45,31 +29,12 @@ function BoardingApplicationPage() {
   const handleSubmit = async (payload, form) => {
     setLoading(true);
     try {
-      const response = await fetch('/api/boarding-applications', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...getAuthHeader()
-        },
-        body: JSON.stringify(payload)
-      });
-
-      if (response.status === 401) {
-        handleTokenExpired();
-        navigate('/login', { replace: true });
-        return;
-      }
-
-      const data = await response.json();
-      if (data.code === 201) {
-        message.success('寄养申请已提交');
-        form.resetFields();
-        navigate('/boarding');
-      } else {
-        message.error(data.message || '提交失败');
-      }
+      await apiClient.post('/api/boarding-applications', payload, { auth: 'required' });
+      message.success('寄养申请已提交');
+      form.resetFields();
+      navigate('/boarding');
     } catch (error) {
-      message.error('提交失败，请稍后重试');
+      message.error(error.message || '提交失败，请稍后重试');
     } finally {
       setLoading(false);
     }

@@ -4,6 +4,7 @@ import { Card, Button, Input, Avatar, List, Tag, Popconfirm, Modal, Select } fro
 import { message } from '../../utils/antdApp';
 import { LeftOutlined, LikeOutlined, MessageOutlined, DeleteOutlined, EditOutlined } from '@ant-design/icons';
 import { useAuth } from '../../contexts/AuthContext';
+import { apiClient } from '../../utils/apiClient';
 import './ForumDetailPage.css';
 
 const { TextArea } = Input;
@@ -32,16 +33,12 @@ function ForumDetailPage() {
   const fetchPostDetail = async () => {
     setLoading(true);
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch(`/api/forum/posts/${id}`, {
-        headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+      const data = await apiClient.get(`/api/forum/posts/${id}`, {
+        auth: 'optional'
       });
-      const data = await response.json();
-      if (data.code === 200) {
-        setPost(data.data);
-        setLikeCount(data.data.like_count || 0);
-        setLiked(Boolean(data.data.hasLiked));
-      }
+      setPost(data);
+      setLikeCount(data?.like_count || 0);
+      setLiked(Boolean(data?.hasLiked));
     } catch (error) {
       console.error('Failed to fetch post detail:', error);
     } finally {
@@ -51,11 +48,8 @@ function ForumDetailPage() {
 
   const fetchComments = async () => {
     try {
-      const response = await fetch(`/api/forum/posts/${id}/comments`);
-      const data = await response.json();
-      if (data.code === 200) {
-        setComments(data.data || []);
-      }
+      const data = await apiClient.get(`/api/forum/posts/${id}/comments`);
+      setComments(data || []);
     } catch (error) {
       console.error('Failed to fetch comments:', error);
     }
@@ -68,30 +62,15 @@ function ForumDetailPage() {
     }
 
     try {
-      const response = await fetch(`/api/forum/posts/${id}/like`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
-      });
-
-      if (response.status === 401) {
-        handleTokenExpired();
-        navigate('/login', { replace: true });
-        return;
+      const data = await apiClient.post(`/api/forum/posts/${id}/like`, undefined, { auth: 'required' });
+      const nextLiked = Boolean(data?.liked);
+      setLiked(nextLiked);
+      if (typeof data?.like_count === 'number') {
+        setLikeCount(data.like_count);
       }
-
-      const data = await response.json();
-      if (data.code === 200) {
-        const nextLiked = Boolean(data.data?.liked);
-        setLiked(nextLiked);
-        if (typeof data.data?.like_count === 'number') {
-          setLikeCount(data.data.like_count);
-        }
-        message.success(nextLiked ? '点赞成功' : '取消点赞');
-      }
+      message.success(nextLiked ? '点赞成功' : '取消点赞');
     } catch (error) {
-      message.error('操作失败');
+      message.error(error.message || '操作失败');
     }
   };
 
@@ -108,34 +87,15 @@ function ForumDetailPage() {
 
     setSubmitting(true);
     try {
-      const response = await fetch(`/api/forum/posts/${id}/comments`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        },
-        body: JSON.stringify({
+      await apiClient.post(`/api/forum/posts/${id}/comments`, {
           userId: user.id,
           content: commentText
-        })
-      });
-
-      if (response.status === 401) {
-        handleTokenExpired();
-        navigate('/login', { replace: true });
-        return;
-      }
-
-      const data = await response.json();
-      if (data.code === 200 || data.code === 201) {
-        message.success('评论成功');
-        setCommentText('');
-        fetchComments();
-      } else {
-        message.error(data.message || '评论失败');
-      }
+        }, { auth: 'required' });
+      message.success('评论成功');
+      setCommentText('');
+      fetchComments();
     } catch (error) {
-      message.error('评论失败');
+      message.error(error.message || '评论失败');
     } finally {
       setSubmitting(false);
     }
@@ -143,28 +103,11 @@ function ForumDetailPage() {
 
   const handleDeleteComment = async (commentId) => {
     try {
-      const response = await fetch(`/api/forum/comments/${commentId}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
-      });
-
-      if (response.status === 401) {
-        handleTokenExpired();
-        navigate('/login', { replace: true });
-        return;
-      }
-
-      const data = await response.json();
-      if (data.code === 200) {
-        message.success('删除成功');
-        fetchComments();
-      } else {
-        message.error(data.message || '删除失败');
-      }
+      await apiClient.delete(`/api/forum/comments/${commentId}`, { auth: 'required' });
+      message.success('删除成功');
+      fetchComments();
     } catch (error) {
-      message.error('删除失败');
+      message.error(error.message || '删除失败');
     }
   };
 
@@ -193,32 +136,14 @@ function ForumDetailPage() {
 
     setUpdatingCategory(true);
     try {
-      const response = await fetch(`/api/forum/posts/${id}/category`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        },
-        body: JSON.stringify({ category: selectedCategory })
-      });
-
-      if (response.status === 401) {
-        handleTokenExpired();
-        setCategoryModalVisible(false);
-        navigate('/login', { replace: true });
-        return;
-      }
-
-      const data = await response.json();
-      if (data.code === 200) {
-        setPost((prev) => ({ ...prev, category: data.data?.category || selectedCategory }));
-        setCategoryModalVisible(false);
-        message.success('分类更新成功');
-      } else {
-        message.error(data.message || '分类更新失败');
-      }
+      const data = await apiClient.put(`/api/forum/posts/${id}/category`, {
+        category: selectedCategory
+      }, { auth: 'required' });
+      setPost((prev) => ({ ...prev, category: data?.category || selectedCategory }));
+      setCategoryModalVisible(false);
+      message.success('分类更新成功');
     } catch (error) {
-      message.error('分类更新失败');
+      message.error(error.message || '分类更新失败');
     } finally {
       setUpdatingCategory(false);
     }

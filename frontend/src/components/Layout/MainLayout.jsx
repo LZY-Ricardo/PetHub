@@ -13,6 +13,7 @@ import {
   MenuOutlined
 } from '@ant-design/icons';
 import { useAuth } from '../../contexts/AuthContext';
+import { apiClient } from '../../utils/apiClient';
 import './MainLayout.css';
 
 const { Header, Content, Footer } = Layout;
@@ -31,27 +32,8 @@ const MainLayout = () => {
     }
 
     try {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        setUnreadCount(0);
-        return;
-      }
-
-      const response = await fetch('/api/notifications/unread-count', {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
-
-      if (response.status === 401) {
-        setUnreadCount(0);
-        return;
-      }
-
-      const data = await response.json();
-      if (data.code === 200) {
-        setUnreadCount(data.data?.unreadCount || 0);
-      }
+      const data = await apiClient.get('/api/notifications/unread-count', { auth: 'required' });
+      setUnreadCount(data?.unreadCount || 0);
     } catch (err) {
       setUnreadCount(0);
     }

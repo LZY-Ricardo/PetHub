@@ -4,6 +4,7 @@ import { message } from '../../utils/antdApp';
 import { DeleteOutlined, EyeOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import { apiClient } from '../../utils/apiClient';
 import './MyForumPostsPage.css';
 
 function MyForumPostsPage() {
@@ -15,36 +16,13 @@ function MyForumPostsPage() {
   const navigate = useNavigate();
 
   const fetchMyForumContent = async () => {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      message.warning('请先登录');
-      navigate('/login', { replace: true });
-      return;
-    }
-
     setLoading(true);
     try {
-      const response = await fetch('/api/forum/posts/my', {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-
-      if (response.status === 401) {
-        handleTokenExpired();
-        navigate('/login', { replace: true });
-        return;
-      }
-
-      const data = await response.json();
-      if (data.code === 200) {
-        setPosts(data.data?.posts || []);
-        setComments(data.data?.comments || []);
-      } else {
-        message.error(data.message || '获取我的帖子失败');
-      }
+      const data = await apiClient.get('/api/forum/posts/my', { auth: 'required' });
+      setPosts(data?.posts || []);
+      setComments(data?.comments || []);
     } catch (error) {
-      message.error('网络错误，请稍后重试');
+      message.error(error.message || '网络错误，请稍后重试');
     } finally {
       setLoading(false);
     }
@@ -55,33 +33,13 @@ function MyForumPostsPage() {
   }, []);
 
   const handleDeletePost = async (id) => {
-    const token = localStorage.getItem('token');
-    if (!token) return;
-
     setDeleting(true);
     try {
-      const response = await fetch(`/api/forum/posts/${id}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-
-      if (response.status === 401) {
-        handleTokenExpired();
-        navigate('/login', { replace: true });
-        return;
-      }
-
-      const data = await response.json();
-      if (data.code === 200) {
-        message.success('删除成功');
-        fetchMyForumContent();
-      } else {
-        message.error(data.message || '删除失败');
-      }
+      await apiClient.delete(`/api/forum/posts/${id}`, { auth: 'required' });
+      message.success('删除成功');
+      fetchMyForumContent();
     } catch (error) {
-      message.error('网络错误，请稍后重试');
+      message.error(error.message || '网络错误，请稍后重试');
     } finally {
       setDeleting(false);
     }

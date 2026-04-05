@@ -3,6 +3,7 @@ import { Button, Card, Descriptions, Form, Input, Modal, Select, Space, Table } 
 import { message } from '../../utils/antdApp';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import { apiClient } from '../../utils/apiClient';
 import BoardingStatusTag from '../../components/Boarding/BoardingStatusTag';
 import BoardingActionPanel from '../../components/Boarding/BoardingActionPanel';
 import { BOARDING_STATUS_META } from '../../components/Boarding/boardingConstants';
@@ -19,42 +20,25 @@ function BoardingManagementPage() {
   const [query, setQuery] = React.useState({ status: '', keyword: '' });
   const [form] = Form.useForm();
 
-  const getAuthHeader = React.useCallback(() => {
-    const token = localStorage.getItem('token');
-    return token ? { Authorization: `Bearer ${token}` } : {};
-  }, []);
-
   const fetchRecords = React.useCallback(async () => {
     setLoading(true);
     try {
-      const params = new URLSearchParams();
-      params.set('page', '1');
-      params.set('pageSize', '100');
-      if (query.status) params.set('status', query.status);
-      if (query.keyword) params.set('keyword', query.keyword);
-
-      const response = await fetch(`/api/admin/boarding-applications?${params.toString()}`, {
-        headers: getAuthHeader()
+      const data = await apiClient.get('/api/admin/boarding-applications', {
+        auth: 'required',
+        params: {
+          page: 1,
+          pageSize: 100,
+          status: query.status,
+          keyword: query.keyword
+        }
       });
-
-      if (response.status === 401) {
-        handleTokenExpired();
-        navigate('/login', { replace: true });
-        return;
-      }
-
-      const data = await response.json();
-      if (data.code === 200) {
-        setRecords(data.data?.list || []);
-      } else {
-        message.error(data.message || '获取寄养申请失败');
-      }
+      setRecords(data?.list || []);
     } catch (error) {
-      message.error('获取寄养申请失败');
+      message.error(error.message || '获取寄养申请失败');
     } finally {
       setLoading(false);
     }
-  }, [getAuthHeader, handleTokenExpired, navigate, query.keyword, query.status]);
+  }, [handleTokenExpired, navigate, query.keyword, query.status]);
 
   React.useEffect(() => {
     fetchRecords();
@@ -81,33 +65,16 @@ function BoardingManagementPage() {
         [config.payloadKey]: values.note
       };
 
-      const response = await fetch(`/api/admin/boarding-applications/${detailRecord.id}/${config.url}`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          ...getAuthHeader()
-        },
-        body: JSON.stringify(payload)
+      const data = await apiClient.patch(`/api/admin/boarding-applications/${detailRecord.id}/${config.url}`, payload, {
+        auth: 'required'
       });
-
-      if (response.status === 401) {
-        handleTokenExpired();
-        navigate('/login', { replace: true });
-        return;
-      }
-
-      const data = await response.json();
-      if (data.code === 200) {
-        message.success(`${config.title}成功`);
-        setActionModal({ open: false, action: null });
-        setDetailRecord(data.data);
-        form.resetFields();
-        fetchRecords();
-      } else {
-        message.error(data.message || `${config.title}失败`);
-      }
+      message.success(`${config.title}成功`);
+      setActionModal({ open: false, action: null });
+      setDetailRecord(data);
+      form.resetFields();
+      fetchRecords();
     } catch (error) {
-      message.error('操作失败');
+      message.error(error.message || '操作失败');
     } finally {
       setSubmitting(false);
     }

@@ -4,6 +4,7 @@ import { message } from '../../utils/antdApp';
 import { EyeOutlined } from '@ant-design/icons';
 import { useAuth } from '../../contexts/AuthContext';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import { apiClient, isApiError } from '../../utils/apiClient';
 import './AdoptionListPage.css';
 
 function AdoptionListPage() {
@@ -41,49 +42,23 @@ function AdoptionListPage() {
   const fetchAdoptions = async () => {
     setLoading(true);
     try {
-      const token = localStorage.getItem('token');
-
-      // 如果没有token，清空数据并提示登录
-      if (!token) {
-        message.warning('请先登录');
-        setAdoptions([]);
-        setLoading(false);
-        return;
-      }
-
-      const endpoint = isAdminView
-        ? '/api/adoptions?page=1&pageSize=100'
-        : '/api/adoptions/my';
-
-      const response = await fetch(endpoint, {
-        headers: {
-          'Authorization': `Bearer ${token}`
+      const data = await apiClient.get(
+        isAdminView ? '/api/adoptions' : '/api/adoptions/my',
+        {
+          auth: 'required',
+          params: isAdminView ? { page: 1, pageSize: 100 } : undefined
         }
-      });
+      );
 
-      // 处理401未授权（token过期或无效）
-      if (response.status === 401) {
-        handleTokenExpired();
-        setAdoptions([]);
-        setLoading(false);
-        navigate('/login', { replace: true });
-        return;
-      }
-
-      const data = await response.json();
-
-      // 处理API错误
-      if (data.code !== 200) {
-        message.error(data.message || '获取申请列表失败');
-        setAdoptions([]);
-        return;
-      }
-
-      const list = isAdminView ? (data.data?.list || []) : (data.data || []);
+      const list = isAdminView ? (data?.list || []) : (data || []);
       setAdoptions(list);
     } catch (error) {
-      console.error('Failed to fetch adoptions:', error);
-      message.error('网络错误，请稍后重试');
+      if (isApiError(error) && error.status === 401) {
+        setAdoptions([]);
+      } else {
+        console.error('Failed to fetch adoptions:', error);
+        message.error(error.message || '网络错误，请稍后重试');
+      }
     } finally {
       setLoading(false);
     }
@@ -118,43 +93,14 @@ function AdoptionListPage() {
 
     setReviewing(true);
     try {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        message.warning('请先登录');
-        return;
-      }
-
       const payload = {
         status: reviewStatus,
         reviewComment: reviewComment.trim()
       };
 
-      const response = await fetch(`/api/adoptions/${reviewTarget.id}/review`, {
-        method: 'PUT',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(payload)
+      await apiClient.put(`/api/adoptions/${reviewTarget.id}/review`, payload, {
+        auth: 'required'
       });
-
-      if (response.status === 401) {
-        handleTokenExpired();
-        navigate('/login', { replace: true });
-        return;
-      }
-
-      if (response.status === 403) {
-        message.error('无权限执行审核操作');
-        return;
-      }
-
-      const data = await response.json();
-      if (data.code !== 200) {
-        message.error(data.message || '审核失败');
-        return;
-      }
-
       message.success(reviewStatus === 'approved' ? '已通过申请' : '已驳回申请');
       setReviewVisible(false);
       setReviewTarget(null);
@@ -169,8 +115,12 @@ function AdoptionListPage() {
 
       fetchAdoptions();
     } catch (error) {
+      if (isApiError(error) && error.status === 403) {
+        message.error('无权限执行审核操作');
+        return;
+      }
       console.error('Failed to review adoption:', error);
-      message.error('网络错误，请稍后重试');
+      message.error(error.message || '网络错误，请稍后重试');
     } finally {
       setReviewing(false);
     }

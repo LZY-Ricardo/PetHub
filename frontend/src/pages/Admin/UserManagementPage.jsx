@@ -3,6 +3,7 @@ import { Button, Card, Input, Table, Tag } from 'antd';
 import { message } from '../../utils/antdApp';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import { apiClient } from '../../utils/apiClient';
 import './AdminManagementPage.css';
 
 function UserManagementPage() {
@@ -13,28 +14,10 @@ function UserManagementPage() {
   const { handleTokenExpired } = useAuth();
   const navigate = useNavigate();
 
-  const requestJson = async (url, options = {}) => {
-    const token = localStorage.getItem('token');
-    const response = await fetch(url, {
-      ...options,
-      headers: {
-        ...(options.headers || {}),
-        Authorization: `Bearer ${token}`
-      }
-    });
-
-    if (response.status === 401) {
-      handleTokenExpired();
-      navigate('/login', { replace: true });
-      return null;
-    }
-
-    const data = await response.json();
-    if (data.code !== 200) {
-      throw new Error(data.message || '请求失败');
-    }
-    return data.data;
-  };
+  const requestJson = async (url, options = {}) => apiClient.request(url, {
+    ...options,
+    auth: 'required'
+  });
 
   const fetchList = async (nextPagination = pagination, nextKeyword = keyword) => {
     setLoading(true);
@@ -73,8 +56,7 @@ function UserManagementPage() {
     try {
       await requestJson(`/api/users/${record.id}/status`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: Number(record.status) === 1 ? 0 : 1 })
+        body: { status: Number(record.status) === 1 ? 0 : 1 }
       });
       message.success(Number(record.status) === 1 ? '用户已禁用' : '用户已启用');
       fetchList();
