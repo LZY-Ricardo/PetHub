@@ -88,13 +88,23 @@ class UserDAO extends BaseDAO {
    * @param {number} pageSize - 每页数量
    * @param {string} role - 角色筛选
    */
-  async getUserList(page = 1, pageSize = 10, role = null) {
+  async getUserList(page = 1, pageSize = 10, role = 'user', keyword = '') {
     let sql = `SELECT id, username, nickname, avatar, role, contact_info, status, created_at FROM ${this.tableName}`;
     const params = [];
+    const conditions = [];
 
     if (role) {
-      sql += ` WHERE role = ?`;
+      conditions.push('role = ?');
       params.push(role);
+    }
+
+    if (keyword) {
+      conditions.push('(username LIKE ? OR nickname LIKE ?)');
+      params.push(`%${keyword}%`, `%${keyword}%`);
+    }
+
+    if (conditions.length > 0) {
+      sql += ` WHERE ${conditions.join(' AND ')}`;
     }
 
     sql += ` ORDER BY created_at DESC LIMIT ? OFFSET ?`;
@@ -105,9 +115,15 @@ class UserDAO extends BaseDAO {
     // 获取总数
     let countSql = `SELECT COUNT(*) as total FROM ${this.tableName}`;
     const countParams = [];
-    if (role) {
-      countSql += ` WHERE role = ?`;
-      countParams.push(role);
+
+    if (conditions.length > 0) {
+      countSql += ` WHERE ${conditions.join(' AND ')}`;
+      if (role) {
+        countParams.push(role);
+      }
+      if (keyword) {
+        countParams.push(`%${keyword}%`, `%${keyword}%`);
+      }
     }
     const [countResult] = await this.pool.query(countSql, countParams);
 

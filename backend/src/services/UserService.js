@@ -144,8 +144,13 @@ class UserService {
    * @param {number} pageSize - 每页数量
    * @param {string} role - 角色筛选
    */
-  async getUserList(page, pageSize, role) {
-    return await UserDAO.getUserList(page, pageSize, role);
+  async getUserList(page, pageSize, role, keyword = '') {
+    const normalizedRole = role === 'admin' ? 'user' : (role || 'user');
+    return await UserDAO.getUserList(page, pageSize, normalizedRole, keyword.trim());
+  }
+
+  async getAdminAccountList(page, pageSize, keyword = '') {
+    return await UserDAO.getUserList(page, pageSize, 'admin', keyword.trim());
   }
 
   /**
@@ -157,6 +162,10 @@ class UserService {
     const user = await UserDAO.findById(userId);
     if (!user) {
       throw new Error('用户不存在');
+    }
+
+    if (user.role === 'admin') {
+      throw new Error('管理员账号不允许在此处修改状态');
     }
 
     await UserDAO.updateUserStatus(userId, status);

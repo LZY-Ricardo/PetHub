@@ -6,6 +6,8 @@ const router = new Router({ prefix: '/api/adoptions' });
 
 // 获取所有申请（管理员）
 router.get('/', authMiddleware, adminMiddleware, AdoptionController.getApplicationList);
+router.get('/stats', authMiddleware, adminMiddleware, AdoptionController.getApplicationStats);
+router.get('/:id', authMiddleware, adminMiddleware, AdoptionController.getApplicationDetail);
 
 // 获取我的申请
 router.get('/my', authMiddleware, AdoptionController.getMyApplications);

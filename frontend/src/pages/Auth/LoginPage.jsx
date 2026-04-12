@@ -19,7 +19,7 @@ const LoginPage = () => {
     const result = await login(values.username, values.password);
 
     if (result.success) {
-      navigate('/');
+      navigate(result.redirectPath || '/', { replace: true });
     }
 
     setLoading(false);

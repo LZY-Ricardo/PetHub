@@ -4,7 +4,8 @@ const {
   testConnection,
   ensureForumCategoryColumn,
   ensureAdoptionPetStatusConsistency,
-  ensureNotificationTable
+  ensureNotificationTable,
+  ensurePetSubmissionColumns
 } = require('./config/db');
 
 const PORT = process.env.PORT || 3000;
@@ -29,6 +30,8 @@ const startServer = async () => {
     await ensureAdoptionPetStatusConsistency();
     // 自动迁移：确保通知表存在
     await ensureNotificationTable();
+    // 自动迁移：确保宠物送养发布字段存在
+    await ensurePetSubmissionColumns();
 
     // 启动HTTP服务器
     app.listen(PORT, () => {

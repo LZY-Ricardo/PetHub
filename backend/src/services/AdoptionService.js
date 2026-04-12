@@ -3,8 +3,20 @@ const PetDAO = require('../dao/PetDAO');
 const NotificationService = require('./NotificationService');
 
 class AdoptionService {
-  async getApplicationList(page, pageSize, status) {
-    return await AdoptionDAO.getApplicationList(page, pageSize, status);
+  async getApplicationList(page, pageSize, filters = {}) {
+    return await AdoptionDAO.getApplicationList(page, pageSize, filters);
+  }
+
+  async getApplicationStats() {
+    return await AdoptionDAO.getApplicationStats();
+  }
+
+  async getApplicationDetail(id) {
+    const application = await AdoptionDAO.getApplicationDetail(id);
+    if (!application) {
+      throw new Error('申请不存在');
+    }
+    return application;
   }
 
   async getUserApplications(userId) {

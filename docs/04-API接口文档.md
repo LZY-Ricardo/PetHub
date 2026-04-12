@@ -425,6 +425,110 @@ sortOrder: string (ASC/DESC), 排序方向
 
 ---
 
+### 2.6 发布送养信息
+
+**接口地址**：`POST /pets/submissions`
+**是否需要登录**：是
+
+**请求参数**：
+
+```json
+{
+  "name": "string, 必填",
+  "breed": "string, 必填",
+  "gender": "string (male/female), 必填",
+  "age": "number, 必填",
+  "healthStatus": "string (good/fair/poor), 可选",
+  "personality": "string, 可选",
+  "vaccination": "string, 可选",
+  "sterilized": "boolean, 可选",
+  "photos": ["string, 图片URL"],
+  "remarks": "string, 必填"
+}
+```
+
+**业务规则说明**：
+
+- 普通用户发布后，`submission_status` 默认为 `pending`
+- 审核通过前，前台领养列表不可见
+- 宠物状态初始化为 `pending`
+
+---
+
+### 2.7 获取我的送养发布
+
+**接口地址**：`GET /pets/my-submissions`
+**是否需要登录**：是
+
+**响应说明**：
+
+- 返回当前登录用户创建的全部送养发布
+- 包含 `submission_status`、`submission_comment`、`status` 等字段
+
+---
+
+### 2.8 更新我的送养发布
+
+**接口地址**：`PUT /pets/my-submissions/:id`
+**是否需要登录**：是
+
+**路径参数**：
+
+- `id`: number, 送养发布ID
+
+**业务规则说明**：
+
+- 仅记录所属发布人可更新
+- 仅 `submission_status` 为 `pending` 或 `rejected` 的记录允许更新
+- 更新后会重置为待审核状态
+
+---
+
+### 2.9 重新提交送养发布
+
+**接口地址**：`POST /pets/my-submissions/:id/resubmit`
+**是否需要登录**：是
+
+**业务规则说明**：
+
+- 仅 `submission_status=rejected` 的记录可重新提交
+- 重新提交后 `submission_status` 重置为 `pending`
+
+---
+
+### 2.10 获取待审核送养发布（管理员）
+
+**接口地址**：`GET /pets/pending-submissions`
+**是否需要登录**：是（管理员）
+
+**业务规则说明**：
+
+- 仅返回 `source_type=user` 且 `submission_status=pending` 的记录
+
+---
+
+### 2.11 审核送养发布（管理员）
+
+**接口地址**：`PUT /pets/submissions/:id/review`
+**是否需要登录**：是（管理员）
+
+**请求参数**：
+
+```json
+{
+  "status": "string (approved/rejected), 必填",
+  "reviewComment": "string, 可选"
+}
+```
+
+**业务规则说明**：
+
+- `approved`：`submission_status` 更新为 `approved`，`status` 更新为 `available`
+- `rejected`：`submission_status` 更新为 `rejected`，记录审核备注
+- 审核后向发布用户发送通知
+
+---
+
 ## 3. 领养申请模块
 
 ### 3.1 提交领养申请
@@ -1505,7 +1609,7 @@ const submitApplication = async (data) => {
 # 用户登录
 curl -X POST http://localhost:3000/api/auth/login \
   -H "Content-Type: application/json" \
-  -d '{"username":"testuser","password":"123456"}'
+  -d '{"username":"xiaoming","password":"123456"}'
 
 # 获取宠物列表
 curl -X GET "http://localhost:3000/api/pets?page=1&pageSize=10"

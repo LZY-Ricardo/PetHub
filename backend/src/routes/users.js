@@ -7,6 +7,13 @@ const router = new Router({
 });
 
 /**
+ * @route GET /api/users/admin-accounts
+ * @desc 获取管理员账户列表
+ * @access private (admin)
+ */
+router.get('/admin-accounts', authMiddleware, adminMiddleware, UserController.getAdminAccountList);
+
+/**
  * @route GET /api/users
  * @desc 获取用户列表
  * @access private (admin)

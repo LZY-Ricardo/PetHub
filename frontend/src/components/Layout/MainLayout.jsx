@@ -7,9 +7,9 @@ import {
   SearchOutlined,
   MessageOutlined,
   BellOutlined,
+  DashboardOutlined,
   UserOutlined,
   LogoutOutlined,
-  DashboardOutlined,
   MenuOutlined
 } from '@ant-design/icons';
 import { useAuth } from '../../contexts/AuthContext';
@@ -105,14 +105,6 @@ const MainLayout = () => {
     }
   ];
 
-  if (isAdmin()) {
-    menuItems.push({
-      key: '/admin/dashboard',
-      icon: <DashboardOutlined />,
-      label: '管理后台'
-    });
-  }
-
   const userMenuItems = [
     {
       key: 'profile',
@@ -120,6 +112,12 @@ const MainLayout = () => {
       label: '个人中心',
       onClick: () => navigate('/profile')
     },
+    ...(isAdmin() ? [{
+      key: 'adminDashboard',
+      icon: <DashboardOutlined />,
+      label: '后台管理',
+      onClick: () => navigate('/admin/dashboard')
+    }] : []),
     {
       key: 'notifications',
       icon: <BellOutlined />,
@@ -131,6 +129,18 @@ const MainLayout = () => {
       icon: <HeartOutlined />,
       label: '我的申请',
       onClick: () => navigate('/adoptions')
+    },
+    {
+      key: 'publishSubmission',
+      icon: <HeartOutlined />,
+      label: '发布送养',
+      onClick: () => navigate('/pet-submissions/new')
+    },
+    {
+      key: 'myPetSubmissions',
+      icon: <HeartOutlined />,
+      label: '我的送养发布',
+      onClick: () => navigate('/my-pet-submissions')
     },
     {
       key: 'myLostPets',

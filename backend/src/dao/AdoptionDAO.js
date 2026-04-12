@@ -11,7 +11,8 @@ class AdoptionDAO extends BaseDAO {
   /**
    * 获取申请列表（分页）
    */
-  async getApplicationList(page = 1, pageSize = 10, status = null) {
+  async getApplicationList(page = 1, pageSize = 10, filters = {}) {
+    const { status = null, keyword = '' } = filters;
     let sql = `
       SELECT a.*, u.username, u.nickname as user_name,
              p.name as pet_name, p.breed, p.photos as pet_photos
@@ -27,9 +28,32 @@ class AdoptionDAO extends BaseDAO {
       params.push(status);
     }
 
+    if (keyword) {
+      sql += ' AND (p.name LIKE ? OR u.nickname LIKE ? OR u.username LIKE ? OR a.contact LIKE ?)';
+      params.push(`%${keyword}%`, `%${keyword}%`, `%${keyword}%`, `%${keyword}%`);
+    }
+
     // 获取总数
-    const countSql = `SELECT COUNT(*) as total FROM ${this.tableName}${status ? ' WHERE status = ?' : ''}`;
-    const [countResult] = await this.pool.query(countSql, status ? [status] : []);
+    let countSql = `
+      SELECT COUNT(*) as total
+      FROM ${this.tableName} a
+      LEFT JOIN sys_user u ON a.user_id = u.id
+      LEFT JOIN pet_info p ON a.pet_id = p.id
+      WHERE 1=1
+    `;
+    const countParams = [];
+
+    if (status) {
+      countSql += ' AND a.status = ?';
+      countParams.push(status);
+    }
+
+    if (keyword) {
+      countSql += ' AND (p.name LIKE ? OR u.nickname LIKE ? OR u.username LIKE ? OR a.contact LIKE ?)';
+      countParams.push(`%${keyword}%`, `%${keyword}%`, `%${keyword}%`, `%${keyword}%`);
+    }
+
+    const [countResult] = await this.pool.query(countSql, countParams);
 
     // 分页
     sql += ' ORDER BY a.created_at DESC LIMIT ? OFFSET ?';
@@ -54,6 +78,49 @@ class AdoptionDAO extends BaseDAO {
       page,
       pageSize
     };
+  }
+
+  async getApplicationStats() {
+    const sql = `
+      SELECT
+        COUNT(*) AS total,
+        SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END) AS pending,
+        SUM(CASE WHEN status = 'approved' THEN 1 ELSE 0 END) AS approved,
+        SUM(CASE WHEN status = 'rejected' THEN 1 ELSE 0 END) AS rejected
+      FROM ${this.tableName}
+    `;
+    const [rows] = await this.pool.query(sql);
+    return rows[0];
+  }
+
+  async getApplicationDetail(id) {
+    const sql = `
+      SELECT a.*, u.username, u.nickname as user_name, u.contact_info as user_contact,
+             p.name as pet_name, p.breed, p.photos as pet_photos, p.status as pet_status,
+             reviewer.nickname as reviewer_name
+      FROM ${this.tableName} a
+      LEFT JOIN sys_user u ON a.user_id = u.id
+      LEFT JOIN pet_info p ON a.pet_id = p.id
+      LEFT JOIN sys_user reviewer ON a.reviewed_by = reviewer.id
+      WHERE a.id = ?
+      LIMIT 1
+    `;
+    const [rows] = await this.pool.query(sql, [id]);
+    const row = rows[0] || null;
+
+    if (row?.pet_photos) {
+      try {
+        row.pet_photos = JSON.parse(row.pet_photos);
+      } catch (e) {
+        row.pet_photos = row.pet_photos || [];
+      }
+    }
+
+    if (row?.contact) {
+      row.phone = row.contact;
+    }
+
+    return row;
   }
 
   /**

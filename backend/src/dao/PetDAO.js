@@ -9,136 +9,128 @@ class PetDAO extends BaseDAO {
     super('pet_info');
   }
 
-  /**
-   * 获取宠物列表（分页、筛选）
-   * @param {object} filters - 筛选条件
-   * @param {number} page - 页码
-   * @param {number} pageSize - 每页数量
-   */
-  async getPetList(filters = {}, page = 1, pageSize = 10) {
-    let sql = `
-      SELECT p.*, u.nickname as creator_name
-      FROM ${this.tableName} p
-      LEFT JOIN sys_user u ON p.created_by = u.id
-      WHERE 1=1
-    `;
-    const params = [];
+  parsePet(row) {
+    if (!row) {
+      return row;
+    }
 
-    // 筛选条件
+    let photos = [];
+    try {
+      photos = row.photos ? JSON.parse(row.photos) : [];
+    } catch (e) {
+      photos = row.photos || [];
+    }
+
+    return {
+      ...row,
+      photos
+    };
+  }
+
+  buildSpeciesFilter(species, sqlParts, params, alias = 'p') {
+    if (!species) {
+      return;
+    }
+
+    const speciesMap = {
+      '猫': ['猫', '猫科', '布偶', '英国短毛', '波斯', '暹罗', '折耳', '狸花', '橘猫', '黑白'],
+      '狗': ['狗', '金毛', '拉布拉多', '泰迪', '萨摩耶', '柯基', '哈士奇', '比熊', '贵宾', '边境牧羊犬', '中华田园犬'],
+      '其他': ['仓鼠', '兔子', '鸟', '龟', '蜥蜴']
+    };
+
+    const keywords = speciesMap[species] || [];
+    if (!keywords.length) {
+      return;
+    }
+
+    const breedConditions = keywords.map(() => `${alias}.breed LIKE ?`).join(' OR ');
+    sqlParts.push(`AND (${breedConditions})`);
+    keywords.forEach((keyword) => params.push(`%${keyword}%`));
+  }
+
+  appendFilters(filters, sqlParts, params, alias = 'p') {
     if (filters.status) {
-      sql += ' AND p.status = ?';
+      sqlParts.push(`AND ${alias}.status = ?`);
       params.push(filters.status);
     }
 
-    // 名称搜索（支持模糊匹配）
     if (filters.keyword) {
-      sql += ' AND p.name LIKE ?';
+      sqlParts.push(`AND ${alias}.name LIKE ?`);
       params.push(`%${filters.keyword}%`);
     }
 
-    // 品种筛选
     if (filters.breed) {
-      sql += ' AND p.breed LIKE ?';
+      sqlParts.push(`AND ${alias}.breed LIKE ?`);
       params.push(`%${filters.breed}%`);
     }
 
-    // 类型筛选（猫/狗/其他）
-    if (filters.species) {
-      const speciesMap = {
-        '猫': ['猫', '猫科', '布偶', '英国短毛', '波斯', '暹罗', '折耳', '狸花', '橘猫', '黑白'],
-        '狗': ['狗', '金毛', '拉布拉多', '泰迪', '萨摩耶', '柯基', '哈士奇', '比熊', '贵宾', '边境牧羊犬', '中华田园犬'],
-        '其他': ['仓鼠', '兔子', '鸟', '龟', '蜥蜴']
-      };
-
-      const keywords = speciesMap[filters.species] || [];
-      if (keywords.length > 0) {
-        const breedConditions = keywords.map(() => 'p.breed LIKE ?').join(' OR ');
-        sql += ` AND (${breedConditions})`;
-        keywords.forEach(keyword => {
-          params.push(`%${keyword}%`);
-        });
-      }
-    }
+    this.buildSpeciesFilter(filters.species, sqlParts, params, alias);
 
     if (filters.gender) {
-      sql += ' AND p.gender = ?';
+      sqlParts.push(`AND ${alias}.gender = ?`);
       params.push(filters.gender);
     }
 
     if (filters.minAge !== undefined) {
-      sql += ' AND p.age >= ?';
+      sqlParts.push(`AND ${alias}.age >= ?`);
       params.push(filters.minAge);
     }
 
     if (filters.maxAge !== undefined) {
-      sql += ' AND p.age <= ?';
+      sqlParts.push(`AND ${alias}.age <= ?`);
       params.push(filters.maxAge);
     }
 
-    // 获取总数
-    let countSql = `SELECT COUNT(*) as total FROM ${this.tableName} WHERE 1=1`;
+    if (filters.sourceType) {
+      sqlParts.push(`AND ${alias}.source_type = ?`);
+      params.push(filters.sourceType);
+    }
+
+    if (filters.submissionStatus) {
+      sqlParts.push(`AND ${alias}.submission_status = ?`);
+      params.push(filters.submissionStatus);
+    }
+
+    if (filters.ownerUserId) {
+      sqlParts.push(`AND ${alias}.owner_user_id = ?`);
+      params.push(filters.ownerUserId);
+    }
+  }
+
+  /**
+   * 获取宠物列表（分页、筛选）
+   */
+  async getPetList(filters = {}, page = 1, pageSize = 10, options = {}) {
+    const listSqlParts = [
+      `
+      SELECT p.*, creator.nickname as creator_name, owner.nickname as owner_name
+      FROM ${this.tableName} p
+      LEFT JOIN sys_user creator ON p.created_by = creator.id
+      LEFT JOIN sys_user owner ON p.owner_user_id = owner.id
+      WHERE 1=1
+      `
+    ];
+    const listParams = [];
+    const countSqlParts = [`SELECT COUNT(*) as total FROM ${this.tableName} p WHERE 1=1`];
     const countParams = [];
 
-    if (filters.status) {
-      countSql += ' AND status = ?';
-      countParams.push(filters.status);
+    if (!options.isAdminView) {
+      listSqlParts.push(`AND p.submission_status = 'approved'`);
+      countSqlParts.push(`AND p.submission_status = 'approved'`);
     }
 
-    // 名称搜索
-    if (filters.keyword) {
-      countSql += ' AND name LIKE ?';
-      countParams.push(`%${filters.keyword}%`);
-    }
+    this.appendFilters(filters, listSqlParts, listParams);
+    this.appendFilters(filters, countSqlParts, countParams);
 
-    // 品种筛选
-    if (filters.breed) {
-      countSql += ' AND breed LIKE ?';
-      countParams.push(`%${filters.breed}%`);
-    }
+    const [countResult] = await this.pool.query(countSqlParts.join('\n'), countParams);
 
-    // 类型筛选
-    if (filters.species) {
-      const speciesMap = {
-        '猫': ['猫', '猫科', '布偶', '英国短毛', '波斯', '暹罗', '折耳', '狸花', '橘猫', '黑白'],
-        '狗': ['狗', '金毛', '拉布拉多', '泰迪', '萨摩耶', '柯基', '哈士奇', '比熊', '贵宾', '边境牧羊犬', '中华田园犬'],
-        '其他': ['仓鼠', '兔子', '鸟', '龟', '蜥蜴']
-      };
+    listSqlParts.push('ORDER BY p.created_at DESC LIMIT ? OFFSET ?');
+    listParams.push(parseInt(pageSize, 10), parseInt((page - 1) * pageSize, 10));
 
-      const keywords = speciesMap[filters.species] || [];
-      if (keywords.length > 0) {
-        const breedConditions = keywords.map(() => 'breed LIKE ?').join(' OR ');
-        countSql += ` AND (${breedConditions})`;
-        keywords.forEach(keyword => {
-          countParams.push(`%${keyword}%`);
-        });
-      }
-    }
-
-    if (filters.gender) {
-      countSql += ' AND gender = ?';
-      countParams.push(filters.gender);
-    }
-
-    if (filters.minAge !== undefined) {
-      countSql += ' AND age >= ?';
-      countParams.push(filters.minAge);
-    }
-
-    if (filters.maxAge !== undefined) {
-      countSql += ' AND age <= ?';
-      countParams.push(filters.maxAge);
-    }
-
-    const [countResult] = await this.pool.query(countSql, countParams);
-
-    // 分页
-    sql += ' ORDER BY p.created_at DESC LIMIT ? OFFSET ?';
-    params.push(parseInt(pageSize), parseInt((page - 1) * pageSize));
-
-    const [rows] = await this.pool.query(sql, params);
+    const [rows] = await this.pool.query(listSqlParts.join('\n'), listParams);
 
     return {
-      list: rows,
+      list: rows.map((row) => this.parsePet(row)),
       total: countResult[0].total,
       page,
       pageSize
@@ -147,13 +139,13 @@ class PetDAO extends BaseDAO {
 
   /**
    * 获取宠物详情（包含创建者信息）
-   * @param {number} id - 宠物ID
    */
   async getPetDetail(id) {
     const sql = `
-      SELECT p.*, u.nickname as creator_name
+      SELECT p.*, creator.nickname as creator_name, owner.nickname as owner_name
       FROM ${this.tableName} p
-      LEFT JOIN sys_user u ON p.created_by = u.id
+      LEFT JOIN sys_user creator ON p.created_by = creator.id
+      LEFT JOIN sys_user owner ON p.owner_user_id = owner.id
       WHERE p.id = ?
     `;
     const [rows] = await this.pool.query(sql, [id]);
@@ -162,19 +154,20 @@ class PetDAO extends BaseDAO {
 
   /**
    * 创建宠物信息
-   * @param {object} petData - 宠物数据
-   * @param {number} createdBy - 创建人ID
    */
   async createPet(petData, createdBy) {
     const {
       name, breed, gender, age, healthStatus, personality,
-      vaccination, sterilized, status = 'available', photos, remarks
+      vaccination, sterilized, sourceType = 'platform',
+      submissionStatus = 'approved', submissionComment = null,
+      status = 'available', photos, remarks, ownerUserId = null
     } = petData;
 
     const sql = `
       INSERT INTO ${this.tableName}
-      (name, breed, gender, age, health_status, personality, vaccination, sterilized, status, photos, remarks, created_by)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      (name, breed, gender, age, health_status, personality, vaccination, sterilized,
+       source_type, submission_status, submission_comment, status, photos, remarks, created_by, owner_user_id)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
     const photosJson = Array.isArray(photos) ? JSON.stringify(photos) : null;
@@ -182,28 +175,29 @@ class PetDAO extends BaseDAO {
     const [result] = await this.pool.query(sql, [
       name, breed, gender, age, healthStatus || 'good',
       personality, vaccination, sterilized ? 1 : 0,
-      status, photosJson, remarks, createdBy
+      sourceType, submissionStatus, submissionComment,
+      status, photosJson, remarks, createdBy, ownerUserId
     ]);
 
     return result.insertId;
   }
 
   /**
-   * 更新宠物信息
-   * @param {number} id - 宠物ID
-   * @param {object} petData - 更新的数据
+   * 更新宠物信息（管理员）
    */
   async updatePet(id, petData) {
     const {
       name, breed, gender, age, healthStatus, personality,
-      vaccination, sterilized, status, photos, remarks
+      vaccination, sterilized, status, photos, remarks,
+      sourceType, submissionStatus, submissionComment, ownerUserId
     } = petData;
 
     const sql = `
       UPDATE ${this.tableName}
       SET name = ?, breed = ?, gender = ?, age = ?, health_status = ?,
-          personality = ?, vaccination = ?, sterilized = ?, status = ?,
-          photos = ?, remarks = ?
+          personality = ?, vaccination = ?, sterilized = ?, source_type = ?,
+          submission_status = ?, submission_comment = ?, status = ?,
+          photos = ?, remarks = ?, owner_user_id = ?
       WHERE id = ?
     `;
 
@@ -211,16 +205,76 @@ class PetDAO extends BaseDAO {
 
     const [result] = await this.pool.query(sql, [
       name, breed, gender, age, healthStatus || 'good',
-      personality, vaccination, sterilized ? 1 : 0,
-      status, photosJson, remarks, id
+      personality, vaccination, sterilized ? 1 : 0, sourceType,
+      submissionStatus, submissionComment, status, photosJson, remarks, ownerUserId, id
     ]);
 
     return result.affectedRows > 0;
   }
 
   /**
+   * 用户更新自己的送养发布
+   */
+  async updateUserSubmission(id, userId, petData) {
+    const fields = [];
+    const params = [];
+    const mappings = {
+      name: 'name',
+      breed: 'breed',
+      gender: 'gender',
+      age: 'age',
+      healthStatus: 'health_status',
+      personality: 'personality',
+      vaccination: 'vaccination',
+      remarks: 'remarks',
+      status: 'status',
+      submissionStatus: 'submission_status',
+      submissionComment: 'submission_comment'
+    };
+
+    Object.entries(mappings).forEach(([key, column]) => {
+      if (petData[key] !== undefined) {
+        fields.push(`${column} = ?`);
+        params.push(petData[key]);
+      }
+    });
+
+    if (petData.sterilized !== undefined) {
+      fields.push('sterilized = ?');
+      params.push(petData.sterilized ? 1 : 0);
+    }
+
+    if (petData.photos !== undefined) {
+      fields.push('photos = ?');
+      params.push(Array.isArray(petData.photos) ? JSON.stringify(petData.photos) : petData.photos);
+    }
+
+    if (!fields.length) {
+      return false;
+    }
+
+    const sql = `
+      UPDATE ${this.tableName}
+      SET ${fields.join(', ')}
+      WHERE id = ? AND owner_user_id = ?
+    `;
+
+    const [result] = await this.pool.query(sql, [...params, id, userId]);
+    return result.affectedRows > 0;
+  }
+
+  async reviewPetSubmission(id, submissionStatus, submissionComment, petStatus) {
+    const sql = `
+      UPDATE ${this.tableName}
+      SET submission_status = ?, submission_comment = ?, status = ?
+      WHERE id = ?
+    `;
+    const [result] = await this.pool.query(sql, [submissionStatus, submissionComment, petStatus, id]);
+    return result.affectedRows > 0;
+  }
+
+  /**
    * 删除宠物
-   * @param {number} id - 宠物ID
    */
   async deletePet(id) {
     const sql = `DELETE FROM ${this.tableName} WHERE id = ?`;
@@ -230,8 +284,6 @@ class PetDAO extends BaseDAO {
 
   /**
    * 更新宠物状态
-   * @param {number} id - 宠物ID
-   * @param {string} status - 状态
    */
   async updatePetStatus(id, status) {
     const sql = `UPDATE ${this.tableName} SET status = ? WHERE id = ?`;
@@ -249,6 +301,7 @@ class PetDAO extends BaseDAO {
         SUM(CASE WHEN status = 'available' THEN 1 ELSE 0 END) as available,
         SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END) as pending,
         SUM(CASE WHEN status = 'adopted' THEN 1 ELSE 0 END) as adopted,
+        SUM(CASE WHEN submission_status = 'pending' THEN 1 ELSE 0 END) as submission_pending,
         SUM(CASE WHEN gender = 'male' THEN 1 ELSE 0 END) as male,
         SUM(CASE WHEN gender = 'female' THEN 1 ELSE 0 END) as female
       FROM ${this.tableName}

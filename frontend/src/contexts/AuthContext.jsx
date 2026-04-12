@@ -15,6 +15,10 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  const getDefaultRouteByRole = (currentUser) => {
+    return currentUser?.role === 'admin' ? '/admin/dashboard' : '/';
+  };
+
   const clearAuth = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
@@ -52,7 +56,10 @@ export const AuthProvider = ({ children }) => {
         localStorage.setItem('user', JSON.stringify(data.data.user));
         setUser(data.data.user);
         message.success('登录成功！');
-        return { success: true };
+        return {
+          success: true,
+          redirectPath: getDefaultRouteByRole(data.data.user)
+        };
       } else {
         message.error(data.message || '登录失败');
         return { success: false };
@@ -115,7 +122,8 @@ export const AuthProvider = ({ children }) => {
     logout,
     handleTokenExpired,
     updateUser,
-    isAdmin
+    isAdmin,
+    getDefaultRouteByRole
   };
 
   return (

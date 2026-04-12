@@ -4,12 +4,21 @@ const { success, error, forbidden } = require('../utils/response');
 class AdoptionController {
   async getApplicationList(ctx) {
     try {
-      const { page = 1, pageSize = 10, status } = ctx.query;
+      const { page = 1, pageSize = 10, status, keyword } = ctx.query;
       const result = await AdoptionService.getApplicationList(
         parseInt(page),
         parseInt(pageSize),
-        status
+        { status, keyword: (keyword || '').trim() }
       );
+      success(ctx, result);
+    } catch (err) {
+      error(ctx, err.message, 500);
+    }
+  }
+
+  async getApplicationStats(ctx) {
+    try {
+      const result = await AdoptionService.getApplicationStats();
       success(ctx, result);
     } catch (err) {
       error(ctx, err.message, 500);
@@ -23,6 +32,19 @@ class AdoptionController {
       success(ctx, applications);
     } catch (err) {
       error(ctx, err.message, 500);
+    }
+  }
+
+  async getApplicationDetail(ctx) {
+    try {
+      const result = await AdoptionService.getApplicationDetail(parseInt(ctx.params.id, 10));
+      success(ctx, result);
+    } catch (err) {
+      if (err.message === '申请不存在') {
+        error(ctx, err.message, 404);
+      } else {
+        error(ctx, err.message, 500);
+      }
     }
   }
 

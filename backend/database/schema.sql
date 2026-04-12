@@ -42,23 +42,31 @@ CREATE TABLE `pet_info` (
     `personality` VARCHAR(200) DEFAULT NULL COMMENT '性格特点',
     `vaccination` VARCHAR(200) DEFAULT NULL COMMENT '疫苗接种情况',
     `sterilized` TINYINT DEFAULT 0 COMMENT '是否绝育：1-是，0-否',
+    `source_type` ENUM('platform', 'user') DEFAULT 'platform' COMMENT '发布来源',
+    `submission_status` ENUM('pending', 'approved', 'rejected') DEFAULT 'approved' COMMENT '发布审核状态',
+    `submission_comment` VARCHAR(200) DEFAULT NULL COMMENT '审核备注',
     `status` ENUM(
         'available',
         'pending',
-        'adopted'
+        'adopted',
+        'off_shelf'
     ) DEFAULT 'available' COMMENT '状态',
     `photos` JSON COMMENT '照片URL数组',
     `remarks` TEXT DEFAULT NULL COMMENT '备注信息',
     `created_by` INT NOT NULL COMMENT '创建人ID（管理员）',
+    `owner_user_id` INT DEFAULT NULL COMMENT '送养发布用户ID',
     `adopted_by` INT DEFAULT NULL COMMENT '领养人ID',
     `adopted_at` TIMESTAMP NULL COMMENT '领养时间',
     `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     INDEX idx_status (`status`),
+    INDEX idx_source_type (`source_type`),
+    INDEX idx_submission_status (`submission_status`),
     INDEX idx_breed (`breed`),
     INDEX idx_gender (`gender`),
     INDEX idx_created_by (`created_by`),
     FOREIGN KEY (`created_by`) REFERENCES `sys_user` (`id`),
+    FOREIGN KEY (`owner_user_id`) REFERENCES `sys_user` (`id`),
     FOREIGN KEY (`adopted_by`) REFERENCES `sys_user` (`id`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT = '宠物信息表';
 

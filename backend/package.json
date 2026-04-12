@@ -9,7 +9,10 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "db:check": "node scripts/checkEncoding.js",
     "db:fix": "node scripts/fixEncoding.js",
-    "db:init": "npm run db:fix && npm run db:check"
+    "db:init": "npm run db:fix && npm run db:check",
+    "smoke:pet-submission": "node scripts/smokePetSubmissionFlow.js",
+    "cleanup:pet-submission:dry": "node scripts/cleanupPetSubmissionFixtures.js",
+    "cleanup:pet-submission": "node scripts/cleanupPetSubmissionFixtures.js --execute"
   },
   "keywords": [
     "pet",

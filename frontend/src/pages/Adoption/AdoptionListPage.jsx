@@ -5,7 +5,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import './AdoptionListPage.css';
 
-function AdoptionListPage() {
+function AdoptionListPage({ forcedAdminView = false }) {
   const [adoptions, setAdoptions] = useState([]);
   const [loading, setLoading] = useState(false);
   const [detailVisible, setDetailVisible] = useState(false);
@@ -18,7 +18,7 @@ function AdoptionListPage() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const { user, handleTokenExpired } = useAuth();
-  const isAdminView = user?.role === 'admin';
+  const isAdminView = forcedAdminView || user?.role === 'admin';
   const focusId = searchParams.get('focusId');
 
   useEffect(() => {
