@@ -12,6 +12,14 @@ class AdminService {
   async publishAnnouncement(adminId, payload) {
     return NotificationService.broadcastSystemAnnouncement(adminId, payload);
   }
+
+  async getAnnouncementList(page, pageSize) {
+    return NotificationService.getAnnouncementList(page, pageSize);
+  }
+
+  async deleteAnnouncement(id) {
+    return NotificationService.deleteAnnouncement(id);
+  }
 }
 
 module.exports = new AdminService();

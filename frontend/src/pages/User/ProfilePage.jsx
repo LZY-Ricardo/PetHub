@@ -10,6 +10,7 @@ import './ProfilePage.css';
 function ProfilePage() {
   const { user, updateUser, handleTokenExpired, logout } = useAuth();
   const navigate = useNavigate();
+  const isAdminUser = user?.role === 'admin';
   const [editModalVisible, setEditModalVisible] = React.useState(false);
   const [passwordModalVisible, setPasswordModalVisible] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
@@ -210,33 +211,37 @@ function ProfilePage() {
           </Descriptions.Item>
         </Descriptions>
 
-        <Divider />
+        {!isAdminUser && (
+          <>
+            <Divider />
 
-        <div className="profile-section">
-          <h3>账号统计</h3>
-          <div className="stats-grid">
-            <div className="stat-item" onClick={() => navigate('/adoptions')}>
-              <div className="stat-value">{statsLoading ? '-' : stats.adoptionCount}</div>
-              <div className="stat-label">领养申请</div>
+            <div className="profile-section">
+              <h3>账号统计</h3>
+              <div className="stats-grid">
+                <div className="stat-item" onClick={() => navigate('/adoptions')}>
+                  <div className="stat-value">{statsLoading ? '-' : stats.adoptionCount}</div>
+                  <div className="stat-label">领养申请</div>
+                </div>
+                <div className="stat-item" onClick={() => navigate('/boarding')}>
+                  <div className="stat-value">{statsLoading ? '-' : stats.boardingCount}</div>
+                  <div className="stat-label">寄养申请</div>
+                </div>
+                <div className="stat-item" onClick={() => navigate('/my-pets')}>
+                  <div className="stat-value">档案</div>
+                  <div className="stat-label">我的宠物</div>
+                </div>
+                <div className="stat-item" onClick={() => navigate('/my-lost-pets')}>
+                  <div className="stat-value">{statsLoading ? '-' : stats.lostPetCount}</div>
+                  <div className="stat-label">寻宠发布</div>
+                </div>
+                <div className="stat-item" onClick={() => navigate('/my-forum-posts')}>
+                  <div className="stat-value">{statsLoading ? '-' : stats.forumPostCount}</div>
+                  <div className="stat-label">社区帖子</div>
+                </div>
+              </div>
             </div>
-            <div className="stat-item" onClick={() => navigate('/boarding')}>
-              <div className="stat-value">{statsLoading ? '-' : stats.boardingCount}</div>
-              <div className="stat-label">寄养申请</div>
-            </div>
-            <div className="stat-item" onClick={() => navigate('/my-pets')}>
-              <div className="stat-value">档案</div>
-              <div className="stat-label">我的宠物</div>
-            </div>
-            <div className="stat-item" onClick={() => navigate('/my-lost-pets')}>
-              <div className="stat-value">{statsLoading ? '-' : stats.lostPetCount}</div>
-              <div className="stat-label">寻宠发布</div>
-            </div>
-            <div className="stat-item" onClick={() => navigate('/my-forum-posts')}>
-              <div className="stat-value">{statsLoading ? '-' : stats.forumPostCount}</div>
-              <div className="stat-label">社区帖子</div>
-            </div>
-          </div>
-        </div>
+          </>
+        )}
       </Card>
 
       {/* 编辑资料弹窗 */}

@@ -20,7 +20,7 @@ export const adminMenuItems = [
   {
     key: '/admin/pet-submissions',
     icon: <AuditOutlined />,
-    label: '领养发布审核'
+    label: '送养发布审核'
   },
   {
     key: '/admin/adoptions',
@@ -51,6 +51,11 @@ export const adminMenuItems = [
     key: '/admin/announcements',
     icon: <BellOutlined />,
     label: '系统公告'
+  },
+  {
+    key: '/admin/notifications',
+    icon: <BellOutlined />,
+    label: '公告管理'
   },
   {
     key: '/admin/users',

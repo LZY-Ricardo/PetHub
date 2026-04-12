@@ -56,13 +56,16 @@ class ForumService {
     return await ForumDAO.getPostDetail(postId);
   }
 
-  async deletePost(id, userId) {
+  async deletePost(id, currentUser) {
     const post = await ForumDAO.getPostDetail(id);
     if (!post) {
       throw new Error('帖子不存在');
     }
 
-    if (post.user_id !== userId) {
+    const isOwner = Number(post.user_id) === Number(currentUser.userId);
+    const isAdmin = currentUser.role === 'admin';
+
+    if (!isOwner && !isAdmin) {
       throw new Error('无权删除此帖子');
     }
 
@@ -70,7 +73,7 @@ class ForumService {
     return { success: true };
   }
 
-  async updatePostCategory(id, userId, category) {
+  async updatePostCategory(id, currentUser, category) {
     const allowedCategories = ['经验分享', '求助问答', '宠物展示', '闲聊灌水'];
     if (!allowedCategories.includes(category)) {
       throw new Error('帖子分类无效');
@@ -81,7 +84,10 @@ class ForumService {
       throw new Error('帖子不存在');
     }
 
-    if (post.user_id !== userId) {
+    const isOwner = Number(post.user_id) === Number(currentUser.userId);
+    const isAdmin = currentUser.role === 'admin';
+
+    if (!isOwner && !isAdmin) {
       throw new Error('无权修改此帖子分类');
     }
 
@@ -141,7 +147,7 @@ class ForumService {
     return rows[0];
   }
 
-  async deleteComment(id, userId) {
+  async deleteComment(id, currentUser) {
     const sql = `SELECT * FROM forum_comment WHERE id = ?`;
     const db = require('../config/db');
     const [rows] = await db.promisePool.query(sql, [id]);
@@ -151,7 +157,10 @@ class ForumService {
       throw new Error('评论不存在');
     }
 
-    if (comment.user_id !== userId) {
+    const isOwner = Number(comment.user_id) === Number(currentUser.userId);
+    const isAdmin = currentUser.role === 'admin';
+
+    if (!isOwner && !isAdmin) {
       throw new Error('无权删除此评论');
     }
 

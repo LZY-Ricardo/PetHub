@@ -5,6 +5,7 @@ const {
   ensureForumCategoryColumn,
   ensureAdoptionPetStatusConsistency,
   ensureNotificationTable,
+  ensureSystemAnnouncementTable,
   ensurePetSubmissionColumns
 } = require('./config/db');
 
@@ -30,6 +31,8 @@ const startServer = async () => {
     await ensureAdoptionPetStatusConsistency();
     // 自动迁移：确保通知表存在
     await ensureNotificationTable();
+    // 自动迁移：确保系统公告表存在
+    await ensureSystemAnnouncementTable();
     // 自动迁移：确保宠物送养发布字段存在
     await ensurePetSubmissionColumns();
 

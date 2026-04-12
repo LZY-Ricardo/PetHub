@@ -20,6 +20,8 @@ router.get('/dashboard', authMiddleware, adminMiddleware, AdminController.getDas
  * @access private (admin)
  */
 router.post('/notifications/broadcast', authMiddleware, adminMiddleware, AdminController.publishAnnouncement);
+router.get('/notifications', authMiddleware, adminMiddleware, AdminController.getAnnouncementList);
+router.delete('/notifications/:id', authMiddleware, adminMiddleware, AdminController.deleteAnnouncement);
 router.get('/boarding-applications', authMiddleware, adminMiddleware, BoardingController.getAdminApplicationList);
 router.get('/boarding-applications/:id', authMiddleware, adminMiddleware, BoardingController.getAdminApplicationDetail);
 router.patch('/boarding-applications/:id/review', authMiddleware, adminMiddleware, BoardingController.reviewApplication);

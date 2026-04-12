@@ -123,6 +123,32 @@ const ensureNotificationTable = async () => {
 };
 
 /**
+ * 确保 system_announcement 表存在
+ */
+const ensureSystemAnnouncementTable = async () => {
+  try {
+    await promisePool.query(`
+      CREATE TABLE IF NOT EXISTS system_announcement (
+        id INT PRIMARY KEY AUTO_INCREMENT COMMENT '公告ID',
+        title VARCHAR(120) NOT NULL COMMENT '公告标题',
+        content VARCHAR(500) NOT NULL COMMENT '公告内容',
+        target_role ENUM('user') NOT NULL DEFAULT 'user' COMMENT '发送目标角色',
+        delivered_count INT NOT NULL DEFAULT 0 COMMENT '送达用户数',
+        created_by INT NOT NULL COMMENT '创建管理员ID',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+        INDEX idx_created_at (created_at),
+        INDEX idx_created_by (created_by),
+        FOREIGN KEY (created_by) REFERENCES sys_user(id) ON DELETE RESTRICT
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='系统公告表'
+    `);
+  } catch (error) {
+    console.error('❌ system_announcement 自动迁移失败:', error.message);
+    throw error;
+  }
+};
+
+/**
  * 确保 pet_info 表具备送养发布相关字段
  */
 const ensurePetSubmissionColumns = async () => {
@@ -201,5 +227,6 @@ module.exports = {
   ensureForumCategoryColumn,
   ensureAdoptionPetStatusConsistency,
   ensureNotificationTable,
+  ensureSystemAnnouncementTable,
   ensurePetSubmissionColumns
 };

@@ -4,7 +4,6 @@ import { Layout, Menu, Avatar, Dropdown, Button } from 'antd';
 import {
   LogoutOutlined,
   UserOutlined,
-  HomeOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined
 } from '@ant-design/icons';
@@ -28,12 +27,6 @@ const AdminLayout = () => {
       icon: <UserOutlined />,
       label: '个人中心',
       onClick: () => navigate('/profile')
-    },
-    {
-      key: 'goHome',
-      icon: <HomeOutlined />,
-      label: '前台首页',
-      onClick: () => navigate('/')
     },
     {
       key: 'logout',

@@ -54,9 +54,7 @@ class ForumController {
   async deletePost(ctx) {
     try {
       const { id } = ctx.params;
-      const userId = ctx.state.user.userId;
-
-      await ForumService.deletePost(parseInt(id), userId);
+      await ForumService.deletePost(parseInt(id), ctx.state.user);
       success(ctx, null, '删除成功');
     } catch (err) {
       if (err.message === '帖子不存在') {
@@ -72,14 +70,13 @@ class ForumController {
   async updatePostCategory(ctx) {
     try {
       const { id } = ctx.params;
-      const userId = ctx.state.user.userId;
       const { category } = ctx.request.body;
 
       if (!category) {
         return error(ctx, '帖子分类不能为空', 400);
       }
 
-      const post = await ForumService.updatePostCategory(parseInt(id), userId, category);
+      const post = await ForumService.updatePostCategory(parseInt(id), ctx.state.user, category);
       success(ctx, post, '分类更新成功');
     } catch (err) {
       if (err.message === '帖子不存在') {
@@ -124,9 +121,7 @@ class ForumController {
   async deleteComment(ctx) {
     try {
       const { id } = ctx.params;
-      const userId = ctx.state.user.userId;
-
-      await ForumService.deleteComment(parseInt(id), userId);
+      await ForumService.deleteComment(parseInt(id), ctx.state.user);
       success(ctx, null, '删除成功');
     } catch (err) {
       if (err.message === '评论不存在') {

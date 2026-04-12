@@ -16,15 +16,15 @@
   margin-bottom: 32px;
 }
 
-.page-title {
+.adoption-page-title {
   font-family: var(--font-heading);
   font-size: 32px;
   font-weight: 700;
-  color: var(--color-text-primary);
+  color: var(--color-warm-coral);
   margin-bottom: 8px;
 }
 
-.page-subtitle {
+.adoption-page-subtitle {
   font-size: 16px;
   color: var(--color-text-secondary);
 }
@@ -106,7 +106,7 @@
     padding: 24px;
   }
 
-  .page-title {
+  .adoption-page-title {
     font-size: 24px;
   }
 }

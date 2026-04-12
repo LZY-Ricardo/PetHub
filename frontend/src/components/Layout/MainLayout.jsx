@@ -1,5 +1,5 @@
 import React from 'react';
-import { Outlet, useNavigate, useLocation } from 'react-router-dom';
+import { Outlet, useNavigate, useLocation, Navigate } from 'react-router-dom';
 import { Layout, Menu, Button, Avatar, Dropdown, Badge } from 'antd';
 import {
   HomeOutlined,
@@ -24,6 +24,8 @@ const MainLayout = () => {
   const { user, logout, isAdmin } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
   const [unreadCount, setUnreadCount] = React.useState(0);
+  const isAdminUser = isAdmin();
+  const canAccessAdminProfile = isAdminUser && location.pathname === '/profile';
 
   const fetchUnreadCount = React.useCallback(async () => {
     if (!user) {
@@ -55,128 +57,150 @@ const MainLayout = () => {
     };
   }, [fetchUnreadCount]);
 
-  const menuItems = [
-    {
-      key: '/',
-      icon: <HomeOutlined />,
-      label: '首页'
-    },
-    {
-      key: '/pets',
-      icon: <HeartOutlined />,
-      label: '领养宠物'
-    },
-    {
-      key: '/lost-pets',
-      icon: <SearchOutlined />,
-      label: '宠物寻回'
-    },
-    {
-      key: '/forum',
-      icon: <MessageOutlined />,
-      label: '宠友社区'
-    },
-    {
-      key: '/notifications',
-      icon: (
-        <Badge count={unreadCount} size="small" overflowCount={99}>
-          <BellOutlined />
-        </Badge>
-      ),
-      label: '消息通知'
-    },
-    {
-      key: '/boarding',
-      icon: <HeartOutlined />,
-      label: '公益寄养'
-    }
-  ];
+  const menuItems = isAdminUser
+    ? [
+        {
+          key: '/admin/dashboard',
+          icon: <DashboardOutlined />,
+          label: '管理后台'
+        }
+      ]
+    : [
+        {
+          key: '/',
+          icon: <HomeOutlined />,
+          label: '首页'
+        },
+        {
+          key: '/pets',
+          icon: <HeartOutlined />,
+          label: '领养宠物'
+        },
+        {
+          key: '/lost-pets',
+          icon: <SearchOutlined />,
+          label: '宠物寻回'
+        },
+        {
+          key: '/forum',
+          icon: <MessageOutlined />,
+          label: '宠友社区'
+        },
+        {
+          key: '/notifications',
+          icon: (
+            <Badge count={unreadCount} size="small" overflowCount={99}>
+              <BellOutlined />
+            </Badge>
+          ),
+          label: '消息通知'
+        },
+        {
+          key: '/boarding',
+          icon: <HeartOutlined />,
+          label: '公益寄养'
+        }
+      ];
 
-  if (isAdmin()) {
-    menuItems.push({
-      key: '/admin/dashboard',
-      icon: <DashboardOutlined />,
-      label: '管理后台'
-    });
-  }
-
-  const userMenuItems = [
-    {
-      key: 'profile',
-      icon: <UserOutlined />,
-      label: '个人中心',
-      onClick: () => navigate('/profile')
-    },
-    ...(isAdmin() ? [{
-      key: 'adminDashboard',
-      icon: <DashboardOutlined />,
-      label: '后台管理',
-      onClick: () => navigate('/admin/dashboard')
-    }] : []),
-    {
-      key: 'notifications',
-      icon: <BellOutlined />,
-      label: unreadCount > 0 ? `消息通知（${unreadCount}）` : '消息通知',
-      onClick: () => navigate('/notifications')
-    },
-    {
-      key: 'myPets',
-      icon: <HeartOutlined />,
-      label: '我的宠物档案',
-      onClick: () => navigate('/my-pets')
-    },
-    {
-      key: 'publishSubmission',
-      icon: <HeartOutlined />,
-      label: '发布送养',
-      onClick: () => navigate('/pet-submissions/new')
-    },
-    {
-      key: 'myPetSubmissions',
-      icon: <HeartOutlined />,
-      label: '我的送养发布',
-      onClick: () => navigate('/my-pet-submissions')
-    },
-    {
-      key: 'myBoarding',
-      icon: <HeartOutlined />,
-      label: '我的寄养申请',
-      onClick: () => navigate('/boarding')
-    },
-    {
-      key: 'myAdoptions',
-      icon: <HeartOutlined />,
-      label: '我的申请',
-      onClick: () => navigate('/adoptions')
-    },
-    {
-      key: 'myLostPets',
-      icon: <SearchOutlined />,
-      label: '我的寻宠发布',
-      onClick: () => navigate('/my-lost-pets')
-    },
-    {
-      key: 'myForumPosts',
-      icon: <MessageOutlined />,
-      label: '我的社区帖子',
-      onClick: () => navigate('/my-forum-posts')
-    },
-    {
-      key: 'logout',
-      icon: <LogoutOutlined />,
-      label: '退出登录',
-      onClick: () => {
-        logout();
-        // 退出登录后跳转到首页
-        navigate('/');
-      }
-    }
-  ];
+  const userMenuItems = isAdminUser
+    ? [
+        {
+          key: 'profile',
+          icon: <UserOutlined />,
+          label: '个人中心',
+          onClick: () => navigate('/profile')
+        },
+        {
+          key: 'adminDashboard',
+          icon: <DashboardOutlined />,
+          label: '后台管理',
+          onClick: () => navigate('/admin/dashboard')
+        },
+        {
+          key: 'logout',
+          icon: <LogoutOutlined />,
+          label: '退出登录',
+          onClick: () => {
+            logout();
+            navigate('/');
+          }
+        }
+      ]
+    : [
+        {
+          key: 'profile',
+          icon: <UserOutlined />,
+          label: '个人中心',
+          onClick: () => navigate('/profile')
+        },
+        {
+          key: 'notifications',
+          icon: <BellOutlined />,
+          label: unreadCount > 0 ? `消息通知（${unreadCount}）` : '消息通知',
+          onClick: () => navigate('/notifications')
+        },
+        {
+          key: 'myPets',
+          icon: <HeartOutlined />,
+          label: '我的宠物档案',
+          onClick: () => navigate('/my-pets')
+        },
+        {
+          key: 'publishSubmission',
+          icon: <HeartOutlined />,
+          label: '发布送养',
+          onClick: () => navigate('/pet-submissions/new')
+        },
+        {
+          key: 'myPetSubmissions',
+          icon: <HeartOutlined />,
+          label: '我的送养发布',
+          onClick: () => navigate('/my-pet-submissions')
+        },
+        {
+          key: 'myBoarding',
+          icon: <HeartOutlined />,
+          label: '我的寄养申请',
+          onClick: () => navigate('/boarding')
+        },
+        {
+          key: 'myAdoptions',
+          icon: <HeartOutlined />,
+          label: '我的领养申请',
+          onClick: () => navigate('/adoptions')
+        },
+        {
+          key: 'myLostPets',
+          icon: <SearchOutlined />,
+          label: '我的寻宠发布',
+          onClick: () => navigate('/my-lost-pets')
+        },
+        {
+          key: 'myForumPosts',
+          icon: <MessageOutlined />,
+          label: '我的社区帖子',
+          onClick: () => navigate('/my-forum-posts')
+        },
+        {
+          key: 'logout',
+          icon: <LogoutOutlined />,
+          label: '退出登录',
+          onClick: () => {
+            logout();
+            // 退出登录后跳转到首页
+            navigate('/');
+          }
+        }
+      ];
 
   const handleMenuClick = ({ key }) => {
     navigate(key);
     setMobileMenuOpen(false);
   };
+
+  if (isAdminUser && !canAccessAdminProfile) {
+    return <Navigate to="/admin/dashboard" replace />;
+  }
 
   return (
     <Layout className="main-layout">

@@ -16,11 +16,11 @@ import ForumPage from './pages/Forum/ForumPage';
 import ForumDetailPage from './pages/Forum/ForumDetailPage';
 import MyForumPostsPage from './pages/Forum/MyForumPostsPage';
 import DashboardPage from './pages/Admin/DashboardPage';
-import AdminPlaceholderPage from './pages/Admin/AdminPlaceholderPage';
 import AdoptionManagementPage from './pages/Admin/AdoptionManagementPage';
 import PetSubmissionReviewPage from './pages/Admin/PetSubmissionReviewPage';
 import PetManagementPage from './pages/Admin/PetManagementPage';
 import AnnouncementPage from './pages/Admin/AnnouncementPage';
+import NotificationManagementPage from './pages/Admin/NotificationManagementPage';
 import LostPetManagementPage from './pages/Admin/LostPetManagementPage';
 import ForumManagementPage from './pages/Admin/ForumManagementPage';
 import AdminAccountPage from './pages/Admin/AdminAccountPage';
@@ -118,7 +118,7 @@ function App() {
               <Route path="lost-pets" element={<LostPetManagementPage />} />
               <Route path="boarding" element={<BoardingManagementPage />} />
               <Route path="forum" element={<ForumManagementPage />} />
-              <Route path="notifications" element={<AdminPlaceholderPage title="消息通知管理" />} />
+              <Route path="notifications" element={<NotificationManagementPage />} />
               <Route path="admin-accounts" element={<AdminAccountPage />} />
               <Route path="users" element={<UserManagementPage />} />
             </Route>

@@ -112,7 +112,7 @@ function DashboardPage() {
     {
       key: 'announcements',
       title: '系统公告',
-      description: '统一发布系统公告和通知',
+      description: '统一发布和管理系统公告',
       icon: <NotificationOutlined />,
       onClick: () => navigate('/admin/announcements')
     }

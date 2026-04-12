@@ -221,8 +221,8 @@ function AdoptionListPage() {
     <div className="adoption-list-page">
       <Card className="adoption-card" variant="borderless">
         <div className="page-header-content">
-          <h1 className="page-title">{isAdminView ? '领养申请管理' : '我的领养申请'}</h1>
-          <p className="page-subtitle">
+          <h1 className="adoption-page-title">{isAdminView ? '领养申请管理' : '我的领养申请'}</h1>
+          <p className="adoption-page-subtitle">
             {isAdminView ? '查看和处理用户提交的领养申请' : '查看和管理您的领养申请记录'}
           </p>
         </div>

@@ -80,7 +80,7 @@ function PetSubmissionReviewPage() {
     <div>
       <Card variant="borderless">
         <div style={{ marginBottom: 24 }}>
-          <h1 style={{ marginBottom: 8 }}>领养发布审核</h1>
+          <h1 style={{ marginBottom: 8 }}>送养发布审核</h1>
           <p style={{ margin: 0, color: '#6b7280' }}>处理普通用户提交的送养发布</p>
         </div>
 

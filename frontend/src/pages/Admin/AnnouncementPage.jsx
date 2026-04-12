@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
-import { Button, Card, Col, Form, Input, Row, Select, Switch } from 'antd';
+import { Button, Card, Form, Input } from 'antd';
 import { message } from '../../utils/antdApp';
-import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { apiClient, isApiError } from '../../utils/apiClient';
 import './AdminManagementPage.css';
@@ -9,7 +8,6 @@ import './AdminManagementPage.css';
 function AnnouncementPage() {
   const [publishing, setPublishing] = useState(false);
   const [announceForm] = Form.useForm();
-  const navigate = useNavigate();
   const { handleTokenExpired } = useAuth();
 
   const handlePublishAnnouncement = async (values) => {
@@ -34,7 +32,7 @@ function AnnouncementPage() {
       <div className="admin-management-header">
         <div>
           <h1 className="admin-management-title">系统公告</h1>
-          <p className="admin-management-subtitle">统一发布平台通知，控制发送范围与是否包含自己。</p>
+          <p className="admin-management-subtitle">统一发布平台通知</p>
         </div>
       </div>
 
@@ -43,34 +41,14 @@ function AnnouncementPage() {
           form={announceForm}
           layout="vertical"
           onFinish={handlePublishAnnouncement}
-          initialValues={{ targetRole: 'all', excludeSender: false }}
         >
-          <Row gutter={16}>
-            <Col xs={24} md={12}>
-              <Form.Item
-                label="公告标题"
-                name="title"
-                rules={[{ required: true, message: '请输入公告标题' }]}
-              >
-                <Input maxLength={120} placeholder="例如：系统维护通知" />
-              </Form.Item>
-            </Col>
-            <Col xs={24} md={12}>
-              <Form.Item
-                label="发送范围"
-                name="targetRole"
-                rules={[{ required: true, message: '请选择发送范围' }]}
-              >
-                <Select
-                  options={[
-                    { label: '全部用户', value: 'all' },
-                    { label: '普通用户', value: 'user' },
-                    { label: '管理员', value: 'admin' }
-                  ]}
-                />
-              </Form.Item>
-            </Col>
-          </Row>
+          <Form.Item
+            label="公告标题"
+            name="title"
+            rules={[{ required: true, message: '请输入公告标题' }]}
+          >
+            <Input maxLength={120} placeholder="例如：系统维护通知" />
+          </Form.Item>
 
           <Form.Item
             label="公告内容"
@@ -78,10 +56,6 @@ function AnnouncementPage() {
             rules={[{ required: true, message: '请输入公告内容' }]}
           >
             <Input.TextArea rows={6} maxLength={500} showCount placeholder="请输入公告详情" />
-          </Form.Item>
-
-          <Form.Item name="excludeSender" valuePropName="checked">
-            <Switch checkedChildren="不发送给自己" unCheckedChildren="包含自己" />
           </Form.Item>
 
           <Button type="primary" htmlType="submit" loading={publishing}>

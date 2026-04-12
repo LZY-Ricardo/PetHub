@@ -101,6 +101,15 @@ class NotificationDAO extends BaseDAO {
     return result.insertId;
   }
 
+  async deleteNotificationsByAnnouncementId(announcementId) {
+    const sql = `
+      DELETE FROM ${this.tableName}
+      WHERE related_type = 'system_announcement' AND related_id = ?
+    `;
+    const [result] = await this.pool.query(sql, [announcementId]);
+    return result.affectedRows || 0;
+  }
+
   async getAdminIds() {
     const sql = `SELECT id FROM sys_user WHERE role = 'admin' AND status = 1`;
     const [rows] = await this.pool.query(sql);

@@ -30,6 +30,32 @@ class AdminController {
       }
     }
   }
+
+  async getAnnouncementList(ctx) {
+    try {
+      const { page = 1, pageSize = 10 } = ctx.query;
+      const result = await AdminService.getAnnouncementList(page, pageSize);
+      success(ctx, result, '获取成功');
+    } catch (err) {
+      error(ctx, err.message, 500);
+    }
+  }
+
+  async deleteAnnouncement(ctx) {
+    try {
+      const { id } = ctx.params;
+      const result = await AdminService.deleteAnnouncement(id);
+      success(ctx, result, '公告删除成功');
+    } catch (err) {
+      if (err.message.includes('ID无效')) {
+        error(ctx, err.message, 400);
+      } else if (err.message === '公告不存在') {
+        error(ctx, err.message, 404);
+      } else {
+        error(ctx, err.message, 500);
+      }
+    }
+  }
 }
 
 module.exports = new AdminController();
